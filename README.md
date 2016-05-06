@@ -3,200 +3,139 @@
 
 搜羅一些常見的演算法與資料結構，並以Swift程式語言加以實作。
 
-## Important links
+## 目錄：
 
-[What are algorithms and data structures?](What are Algorithms.markdown) Pancakes!
+### 入門主題：
 
-[Why learn algorithms?](Why Algorithms.markdown) Worried this isn't your cup of tea? Then read this.
+- [Stack](Stack/)  *堆疊*
+- [Queue](Queue/)  *佇列*
+- [Insertion Sort](Insertion Sort/)  *插入排序法*
+- [Binary Search](Binary Search/) and [Binary Search Tree](Binary Search Tree/)  *二元搜尋與二元搜尋樹*
+- [Merge Sort](Merge Sort/)  *合併排序法*
+- [Boyer-Moore string search](Boyer-Moore/) *Boyer-Moore字串搜尋法*
 
-[Big-O notation](Big-O Notation.markdown). We often say things like, "This algorithm is **O(n)**." If you don't know what that means, read this first.
+### （一）演算法：
 
-[Algorithm design techniques](Algorithm Design.markdown). How do you create your own algorithms?
+#### A. 搜尋類演算法：
 
-[How to contribute](How to Contribute.markdown). Report an issue to leave feedback, or submit a pull request.
+- [Linear Search](Linear Search/). *線性搜尋法*
+- [Binary Search](Binary Search/). *二元搜尋法*
+- [Count Occurrences](Count Occurrences/). *計數法*
+- [Select Minimum / Maximum](Select Minimum Maximum). *最大最小值搜尋*
+- [k-th Largest Element](Kth Largest Element/). *查找第k大的值*
+- [Selection Sampling](Selection Sampling/). *亂數取樣*
+- [Union-Find](Union-Find/). *聯合搜尋法*
 
-## Where to start?
+#### B. 字串搜尋演算法：
 
-If you're new to algorithms and data structures, here are a few good ones to start out with:
+- [Brute-Force String Search](Brute-Force String Search/). *字串暴力搜尋法*
+- [Boyer-Moore](Boyer-Moore/). *Boyer-Moore字串搜尋法*
+- [Longest Common Subsequence](Longest Common Subsequence/). *最長共同子序列演算法*
 
-- [Stack](Stack/)
-- [Queue](Queue/)
-- [Insertion Sort](Insertion Sort/)
-- [Binary Search](Binary Search/) and [Binary Search Tree](Binary Search Tree/)
-- [Merge Sort](Merge Sort/)
-- [Boyer-Moore string search](Boyer-Moore/)
+#### C. 排序演算法
 
-## The algorithms
+- [Insertion Sort](Insertion Sort/) *插入排序法*
+- [Selection Sort](Selection Sort/) *選擇排序法*
+- [Shell Sort](Shell Sort/) *希爾排序法*
+- [Quicksort](Quicksort/) *快速排序法*
+- [Merge Sort](Merge Sort/) *合併排序法*
+- [Heap Sort](Heap Sort/) *堆積排序法*
+- Bucket Sort *桶子排序法*
+- [Counting Sort](Counting Sort/) *計數排序法*
+- Radix Sort *基數排序法*
+- [Topological Sort](Topological Sort/) *拓撲排序法*
+- [Bubble Sort](Bubble Sort/) *氣泡排序法*
 
-### Searching
+#### D. 資料壓縮
 
-- [Linear Search](Linear Search/). Find an element in an array.
-- [Binary Search](Binary Search/). Quickly find elements in a sorted array.
-- [Count Occurrences](Count Occurrences/). Count how often a value appears in an array.
-- [Select Minimum / Maximum](Select Minimum Maximum). Find the minimum/maximum value in an array.
-- [k-th Largest Element](Kth Largest Element/). Find the *k*-th largest element in an array, such as the median.
-- [Selection Sampling](Selection Sampling/). Randomly choose a bunch of items from a collection.
-- [Union-Find](Union-Find/). Keeps track of disjoint sets and lets you quickly merge them.
+- [Run-Length Encoding (RLE)](Run-Length Encoding/). *遊程編碼*
+- [Huffman Coding](Huffman Coding/). *霍夫曼編碼*
 
-### String Search
+#### E. 雜項
 
-- [Brute-Force String Search](Brute-Force String Search/). A naive method.
-- [Boyer-Moore](Boyer-Moore/). A fast method to search for substrings. It skips ahead based on a look-up table, to avoid looking at every character in the text.
-- Rabin-Karp
-- [Longest Common Subsequence](Longest Common Subsequence/). Find the longest sequence of characters that appear in the same order in both strings.
+- [Shuffle](Shuffle/). *洗牌法*
 
-### Sorting
+#### F. 數學
 
-It's fun to see how sorting algorithms work, but in practice you'll almost never have to provide your own sorting routines. Swift's own `sort()` is more than up to the job. But if you're curious, read on...
+- [Greatest Common Divisor (GCD)](GCD/). *最大公因數*
+- [Permutations and Combinations](Combinatorics/). *排列組合*
+- [Shunting Yard Algorithm](Shunting Yard/). *調度場演算法*.
+- Statistics *統計*
 
-Basic sorts:
+#### G. 機器學習
 
-- [Insertion Sort](Insertion Sort/)
-- [Selection Sort](Selection Sort/)
-- [Shell Sort](Shell Sort/)
+- [k-Means Clustering](K-Means/). *k-平均演算法*
+- k-Nearest Neighbors *最近鄰居法*
+- Linear Regression *線性回歸*
+- Logistic Regression  *羅輯回歸*
+- Neural Networks *神經網路*
+- PageRank *佩奇排序演算法/網頁排名*
 
-Fast sorts:
+### （二）資料結構
 
-- [Quicksort](Quicksort/)
-- [Merge Sort](Merge Sort/)
-- [Heap Sort](Heap Sort/)
+#### 陣列(Array)型資料結構
 
-Special-purpose sorts:
+- [Array2D](Array2D/). *二維陣列*
+- [Bit Set](Bit Set/). *二元組*
+- [Fixed Size Array](Fixed Size Array/). *定容陣列*
+- [Ordered Array](Ordered Array/). *排序陣列*
 
-- Bucket Sort
-- [Counting Sort](Counting Sort/)
-- Radix Sort
-- [Topological Sort](Topological Sort/)
+#### 佇列(Queue)型資料結構
 
-Bad sorting algorithms (don't use these!):
+- [Stack](Stack/). *堆疊*
+- [Queue](Queue/). *佇列*
+- [Deque](Deque/). *双端佇列*
+- [Priority Queue](Priority Queue). *資料排序佇列*
+- [Bounded Priority Queue](Bounded Priority Queue). *優先佇列*
+- [Ring Buffer](Ring Buffer/). *環形緩衝區*
 
-- [Bubble Sort](Bubble Sort/)
+#### 串列(Lists)
 
-### Compression
+- [Linked List](Linked List/). *鏈結串列*
+- Skip List *跳躍列表*
 
-- [Run-Length Encoding (RLE)](Run-Length Encoding/). Store repeated values as a single byte and a count.
-- [Huffman Coding](Huffman Coding/). Store more common elements using a smaller number of bits.
+#### 樹(Trees)
 
-### Miscellaneous
+- [Tree](Tree/) *樹*
+- [Binary Tree](Binary Tree/) *二元樹*
+- [Binary Search Tree (BST)](Binary Search Tree/) *二元搜尋樹*
+- [AVL Tree](AVL Tree/) *高度平衡樹*
+- Red-Black Tree *紅黑樹*
+- Splay Tree *參展數*
+- Threaded Binary Tree *線索二元樹*
+- [Segment Tree](Segment Tree/). *線段樹*
+- kd-Tree *k-d樹*
+- [Heap](Heap/). *堆積*
+- Fibonacci Heap *斐波那契堆*
+- Trie *前綴樹/櫥*
+- [B-Tree](B Tree/) *B樹*
 
-- [Shuffle](Shuffle/). Randomly rearranges the contents of an array.
+#### 雜湊法(Hashing)
 
-### Mathematics
+- [Hash Table](Hash Table/). *雜湊表*
+- Hash Functions *雜湊函式*
 
-- [Greatest Common Divisor (GCD)](GCD/). Special bonus: the least common multiple.
-- [Permutations and Combinations](Combinatorics/). Get your combinatorics on!
-- [Shunting Yard Algorithm](Shunting Yard/). Convert infix expressions to postfix.
-- Statistics
+#### Sets 集合
 
-### Machine learning
+- [Bloom Filter](Bloom Filter/). *布隆過濾器*
+- [Hash Set](Hash Set/). *雜湊集合*
+- Multiset *多重集*
+- [Ordered Set](Ordered Set/). *有序集合*
 
-- [k-Means Clustering](K-Means/). Unsupervised classifier that partitions data into *k* clusters.
-- k-Nearest Neighbors
-- Linear Regression
-- Logistic Regression
-- Neural Networks
-- PageRank
+#### Graphs 圖論
 
-## Data structures
+- [Graph](Graph/) *圖論*
+- [Breadth-First Search (BFS)](Breadth-First Search/) *廣度優先搜尋法*
+- [Depth-First Search (DFS)](Depth-First Search/) *深度優先搜尋法*
+- [Shortest Path](Shortest Path %28Unweighted%29/) *最短路徑搜尋法*
+- [Minimum Spanning Tree](Minimum Spanning Tree %28Unweighted%29/) *最小生成樹*
+- All Paths *所有路徑搜尋法*
 
-The choice of data structure for a particular task depends on a few things.
+### （三）解謎
 
-First, there is the shape of your data and the kinds of operations that you'll need to perform on it. If you want to look up objects by a key you need some kind of dictionary; if your data is hierarchical in nature you want a tree structure of some sort; if your data is sequential you want a stack or queue.
 
-Second, it matters what particular operations you'll be performing most, as certain data structures are optimized for certain actions. For example, if you often need to find the most important object in a collection, then a heap or priority queue is more optimal than a plain array.
+- [Two-Sum Problem](Two-Sum Problem/) *子集和問題*
+- [Fizz Buzz](Fizz Buzz/) *Fizz buzz團體遊戲*
+- [Monty Hall Problem](Monty Hall Problem/)  *蒙提霍爾問題*
 
-Most of the time using just the built-in `Array`, `Dictionary`, and `Set` types is sufficient, but sometimes you may want something more fancy...
 
-### Variations on arrays
-
-- [Array2D](Array2D/). A two-dimensional array with fixed dimensions. Useful for board games.
-- [Bit Set](Bit Set/). A fixed-size sequence of *n* bits.
-- [Fixed Size Array](Fixed Size Array/). When you know beforehand how large your data will be, it might be more efficient to use an old-fashioned array with a fixed size.
-- [Ordered Array](Ordered Array/). An array that is always sorted.
-
-### Queues
-
-- [Stack](Stack/). Last-in, first-out!
-- [Queue](Queue/). First-in, first-out!
-- [Deque](Deque/). A double-ended queue.
-- [Priority Queue](Priority Queue). A queue where the most important element is always at the front.
-- [Bounded Priority Queue](Bounded Priority Queue). A queue that is bounded to have a limited number of elements. :construction:
-- [Ring Buffer](Ring Buffer/). Also known as a circular buffer. An array of a certain size that conceptually wraps around back to the beginning.
-
-### Lists
-
-- [Linked List](Linked List/). A sequence of data items connected through links. Covers both singly and doubly linked lists.
-- Skip List
-
-### Trees
-
-- [Tree](Tree/). A general-purpose tree structure.
-- [Binary Tree](Binary Tree/). A tree where each node has at most two children.
-- [Binary Search Tree (BST)](Binary Search Tree/). A binary tree that orders its nodes in a way that allows for fast queries.
-- [AVL Tree](AVL Tree/). A binary search tree that balances itself using rotations. :construction:
-- Red-Black Tree
-- Splay Tree
-- Threaded Binary Tree
-- [Segment Tree](Segment Tree/). Can quickly compute a function over a portion of an array.
-- kd-Tree
-- [Heap](Heap/). A binary tree stored in an array, so it doesn't use pointers. Makes a great priority queue.
-- Fibonacci Heap
-- Trie
-- [B-Tree](B Tree/) :construction:
-
-### Hashing
-
-- [Hash Table](Hash Table/). Allows you to store and retrieve objects by a key. This is how the dictionary type is usually implemented.
-- Hash Functions
-
-### Sets
-
-- [Bloom Filter](Bloom Filter/). A constant-memory data structure that probabilistically tests whether an element is in a set.
-- [Hash Set](Hash Set/). A set implemented using a hash table.
-- Multiset
-- [Ordered Set](Ordered Set/). A set where the order of items matters.
-
-### Graphs
-
-- [Graph](Graph/)
-- [Breadth-First Search (BFS)](Breadth-First Search/)
-- [Depth-First Search (DFS)](Depth-First Search/)
-- [Shortest Path](Shortest Path %28Unweighted%29/) on an unweighted tree
-- [Minimum Spanning Tree](Minimum Spanning Tree %28Unweighted%29/) on an unweighted tree
-- All Paths
-
-## Puzzles
-
-A lot of software developer interview questions consist of algorithmic puzzles. Here is a small selection of fun ones. For more puzzles (with answers), see [here](http://elementsofprogramminginterviews.com/) and [here](http://www.crackingthecodinginterview.com).
-
-- [Two-Sum Problem](Two-Sum Problem/)
-- [Fizz Buzz](Fizz Buzz/)
-- [Monty Hall Problem](Monty Hall Problem/)
-
-## Learn more!
-
-For more information, check out these great books:
-
-- [Introduction to Algorithms](https://mitpress.mit.edu/books/introduction-algorithms) by Cormen, Leiserson, Rivest, Stein
-- [The Algorithm Design Manual](http://www.algorist.com) by Skiena
-- [Elements of Programming Interviews](http://elementsofprogramminginterviews.com) by Aziz, Lee, Prakash
-- [Algorithms](http://www.cs.princeton.edu/~rs/) by Sedgewick
-
-The following books are available for free online:
-
-- [Algorithms](http://www.beust.com/algorithms.pdf) by Dasgupta, Papadimitriou, Vazirani
-- [Algorithms, Etc.](http://jeffe.cs.illinois.edu/teaching/algorithms/) by Erickson
-- [Algorithms + Data Structures = Programs](http://www.ethoberon.ethz.ch/WirthPubl/AD.pdf) by Wirth
-- Algorithms and Data Structures: The Basic Toolbox by Mehlhorn and Sanders
-
-Other algorithm repositories:
-
-- [EKAlgorithms](https://github.com/EvgenyKarkan/EKAlgorithms). A great collection of algorithms in Objective-C.
-- [@lorentey](https://github.com/lorentey/). Production-quality Swift implementations of common algorithms and data structures.
-- [Rosetta Code](http://rosettacode.org). Implementations in pretty much any language you can think of.
-
-## License
-
-All content is licensed under the terms of the MIT open source license.
-
-[![Build Status](https://travis-ci.org/hollance/swift-algorithm-club.svg?branch=master)](https://travis-ci.org/hollance/swift-algorithm-club)
