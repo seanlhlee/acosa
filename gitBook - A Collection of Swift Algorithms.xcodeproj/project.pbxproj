@@ -7,16 +7,14 @@
 	objects = {
 
 /* Begin PBXFileReference section */
-		AD566C2C1CDC6C3200DCA72F /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
-		AD566C2D1CDC6C3200DCA72F /* SUMMARY.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = SUMMARY.md; sourceTree = "<group>"; };
+		AD9397101CDC71B0002F1330 /* gitBook */ = {isa = PBXFileReference; lastKnownFileType = folder; path = gitBook; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
 		ADA2D0DF1CDC685500599313 = {
 			isa = PBXGroup;
 			children = (
-				AD566C2C1CDC6C3200DCA72F /* README.md */,
-				AD566C2D1CDC6C3200DCA72F /* SUMMARY.md */,
+				AD9397101CDC71B0002F1330 /* gitBook */,
 			);
 			sourceTree = "<group>";
 		};
