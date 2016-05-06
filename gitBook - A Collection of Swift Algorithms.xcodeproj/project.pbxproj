@@ -8,6 +8,7 @@
 
 /* Begin PBXFileReference section */
 		AD9397101CDC71B0002F1330 /* gitBook */ = {isa = PBXFileReference; lastKnownFileType = folder; path = gitBook; sourceTree = "<group>"; };
+		ADFB4CA01CDCFCE300D6FE9A /* Data_Structures_Queues.playground */ = {isa = PBXFileReference; lastKnownFileType = file.playground; path = Data_Structures_Queues.playground; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -15,6 +16,7 @@
 			isa = PBXGroup;
 			children = (
 				AD9397101CDC71B0002F1330 /* gitBook */,
+				ADFB4CA01CDCFCE300D6FE9A /* Data_Structures_Queues.playground */,
 			);
 			sourceTree = "<group>";
 		};
