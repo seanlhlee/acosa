@@ -37,7 +37,7 @@ This first example shows k-Means finding all three clusters. In all these exampl
 
 In the first iteration, we choose three data points at random and put our centroids on top of them. Then in each subsequent iteration, we figure out which data points are closest to these centroids, and move the centroids to the average position of those data points. This repeats until we reach equilibrium and the centroids stop moving.
 
-![Good Clustering](pics/k_means_good.png)
+![Good Clustering](gitBook/pics/k_means_good.png)
 
 The selection of initial centroids was fortuitous! We found the lower left cluster (indicated by red) and did pretty good on the center and upper left clusters.
 
@@ -47,11 +47,11 @@ The selection of initial centroids was fortuitous! We found the lower left clust
 
 The next two examples highlight the unpredictability of k-Means and how it not always finds the best clustering.
 
-![Bad Clustering 1](pics/k_means_bad1.png)
+![Bad Clustering 1](gitBook/pics/k_means_bad1.png)
 
 As you can see in this one, the initial centroids were all a little too close to one another, and the blue one didn't quite get to a good place. By adjusting the convergence distance we should be able to get it better.
 
-![Bad Clustering 1](pics/k_means_bad2.png)
+![Bad Clustering 1](gitBook/pics/k_means_bad2.png)
 
 In this example, the blue cluster never really could separate from the red cluster and as such sort of got stuck down there.
 

@@ -26,7 +26,7 @@ Typical operations on a set are:
 
 Union, intersection, and difference are ways to combine two sets into a single one:
 
-![Union, intersection, difference](pics/CombineSets.png)
+![Union, intersection, difference](gitBook/pics/CombineSets.png)
 
 As of Swift 1.2, the standard library includes a built-in `Set` type but here I'll show how you can make your own. You wouldn't use this in production code, but it's instructive to see how sets are implemented.
 

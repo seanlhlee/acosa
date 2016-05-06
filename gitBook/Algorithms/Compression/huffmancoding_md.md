@@ -49,7 +49,7 @@ When compressing a stream of bytes, the algorithm first creates a frequency tabl
 
 For our example, the tree looks like this:
 
-![The compression tree](pics/Tree.png)
+![The compression tree](gitBook/pics/Tree.png)
 
 Note that the tree has 16 leaf nodes (the grey ones), one for each byte value from the input. Each leaf node also shows the count of how often it occurs. The other nodes are "intermediate" nodes. The number shown in these nodes is the sum of the counts of their child nodes. The count of the root node is therefore the total number of bytes in the input.
 
@@ -199,7 +199,7 @@ The `frequencyTable()` method looks at those first 256 nodes from the tree but k
 
 As a reminder, there is the compression tree for the example:
 
-![The compression tree](pics/Tree.png)
+![The compression tree](gitBook/pics/Tree.png)
 
 The leaf nodes represent the actual bytes that are present in the input data. The intermediary nodes connect the leaves in such a way that the path from the root to a frequently-used byte value is shorter than the path to a less common byte value. As you can see, `m`, `s`, space, and `o` are the most common letters in our input data and therefore they are highest up in the tree.
 
@@ -258,7 +258,7 @@ Here is how it works step-by-step:
 
 The animation shows what the process looks like:
 
-![Building the tree](pics/BuildTree.gif)
+![Building the tree](gitBook/pics/BuildTree.gif)
 
 > **Note:** Instead of using a priority queue, you can repeatedly iterate through the `tree` array to find the next two smallest nodes, but that makes the compressor quite slow, **O(n^2)**. Using the priority queue, the running time is only **O(n log n)** where **n** is the number of nodes.
 
@@ -317,7 +317,7 @@ As we're going back from the root to the leaf node, we write a 1 bit or a 0 bit 
 
 In a picture:
 
-![How compression works](pics/Compression.png)
+![How compression works](gitBook/pics/Compression.png)
 
 Even though the illustration of the tree shows a 0 or 1 for each edge between the nodes, the bit values 0 and 1 aren't actually stored in the tree! The rule is that we write a 1 bit if we take the left branch and a 0 bit if we take the right branch, so just knowing the direction we're going in is enough to determine what bit value to write.
 
@@ -391,7 +391,7 @@ This also uses a helper method to traverse the tree:
 
 In a picture:
 
-![How decompression works](pics/Decompression.png)
+![How decompression works](gitBook/pics/Decompression.png)
 
 Here's how you would use the decompression method:
 

@@ -64,7 +64,7 @@ Each node has the following data:
 
 If our array is `[1, 2, 3, 4]` and the function `f = a + b`, the segment tree looks like this:
 
-![structure](pics/Structure.png)
+![structure](gitBook/pics/Structure.png)
 
 The `leftBound` and `rightBound` of each node are marked in red.
 
@@ -141,19 +141,19 @@ Again, this is a recursive method. It checks four different possibilities.
 
 1) First, we check if the query segment is equal to the segment for which our current node is responsible. If it is we just return this node's value.
 
-![equalSegments](pics/EqualSegments.png)
+![equalSegments](gitBook/pics/EqualSegments.png)
 
 2) Does the query segment fully lie within the right child? If so, recursively perform the query on the right child.
 
-![rightSegment](pics/RightSegment.png)
+![rightSegment](gitBook/pics/RightSegment.png)
 
 3) Does the query segment fully lie within the left child? If so, recursively perform the query on the left child.
 
-![leftSegment](pics/LeftSegment.png)
+![leftSegment](gitBook/pics/LeftSegment.png)
 
 4) If none of the above, it means our query partially lies in both children so we combine the results of queries on both children.
 
-![mixedSegment](pics/MixedSegment.png)
+![mixedSegment](gitBook/pics/MixedSegment.png)
 
 This is how you can test it out in a playground:
 

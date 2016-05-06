@@ -2,19 +2,19 @@
 
 A tree represents hierarchical relationships between objects. This is a tree:
 
-![A tree](pics/Tree1.png)
+![A tree](gitBook/pics/Tree1.png)
 
 A tree consists of nodes, and these nodes are linked to one another.
 
 Nodes have links to their children and usually to their parent as well. The children are the nodes below a given node; the parent is the node above. A node always has just one parent but can have multiple children.
 
-![A tree](pics/ParentChildren.png)
+![A tree](gitBook/pics/ParentChildren.png)
 
 A node without a parent is the *root* node. A node without children is a *leaf* node. 
 
 The pointers in a tree do not form cycles. This is not a tree:
 
-![Not a tree](pics/Cycles.png)
+![Not a tree](gitBook/pics/Cycles.png)
 
 Such a structure is called a [graph](../Graph/). A tree is really a very simple form of a graph. (In a similar vein, a [linked list](../Linked List/) is a simple version of a tree. Think about it!)
 
@@ -102,7 +102,7 @@ If you print out the value of `tree`, you'll get:
 
 That corresponds to the following structure:
 
-![Example tree](pics/Example3.png)
+![Example tree](gitBook/pics/Example3.png)
 
 The `beverages` node is the root because it has no parent. The leaves are `black`, `green`, `chai`, `coffee`, `cocoa`, `ginger ale`, `bitter lemon`, `milk` because they don't have any child nodes.
 

@@ -8,7 +8,7 @@ Breadth-first search can be used on both directed and undirected graphs.
 
 Here's how breadth-first search works on a graph:
 
-![Animated example of a breadth-first search](pics/AnimatedExample.gif)
+![Animated example of a breadth-first search](gitBook/pics/AnimatedExample.gif)
 
 When we visit a node, we color it black. We also put its neighbor nodes into a [queue](../Queue/). In the animation the nodes that are enqueued but not visited yet are shown in gray.
 
@@ -79,7 +79,7 @@ The queue is now empty, meaning that all nodes have been explored. The order in 
 
 We can show this as a tree:
 
-![The BFS tree](pics/TraversalTree.png)
+![The BFS tree](gitBook/pics/TraversalTree.png)
 
 The parent of a node is the one that "discovered" that node. The root of the tree is the node you started the breadth-first search from.
 

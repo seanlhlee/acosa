@@ -2,7 +2,7 @@
 
 A binary tree is a [tree](../Tree/) where each node has 0, 1, or 2 children. This is a binary tree:
 
-![A binary tree](pics/BinaryTree.png)
+![A binary tree](gitBook/pics/BinaryTree.png)
 
 The child nodes are usually called the *left* child and the *right* child. If a node doesn't have any children, it's called a *leaf* node. The *root* is the node at the very top of the tree (programmers like their trees upside down).
 
@@ -12,7 +12,7 @@ Binary trees are often used as [binary search trees](../Binary Search Tree/). In
 
 For example, here is a binary tree that represents a sequence of arithmetical operations, `(5 * (a - 10)) + (-4 * (3 / b))`:
 
-![A binary tree](pics/Operations.png)
+![A binary tree](gitBook/pics/Operations.png)
 
 ## The code
 
