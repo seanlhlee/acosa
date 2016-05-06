@@ -8,7 +8,7 @@ When you define an array like so,
 	
 the compiler allocates one contiguous block of memory that can hold 40 bytes (assuming an `int` is 4 bytes):
 
-![An array with room for 10 elements](gitBook/pics/array.png)
+![An array with room for 10 elements](/gitBook/pics/array.png)
 
 That's your array. It will always be this size. If you need to fit more than 10 elements, you're out of luck... there is no room for it.
 
@@ -28,11 +28,11 @@ The following operations are typical for an array:
 
 For a fixed-size array, appending is easy as long as the array isn't full yet:
 
-![Appending a new element](gitBook/pics/append.png)
+![Appending a new element](/gitBook/pics/append.png)
 
 Looking up by index is also quick and easy:
 
-![Indexing the array](gitBook/pics/indexing.png)
+![Indexing the array](/gitBook/pics/indexing.png)
 
 These two operations have complexity **O(1)**, meaning the time it takes to perform them is independent of the size of the array.
 
@@ -40,13 +40,13 @@ For an array that can grow, appending is more involved: if the array is full, ne
 
 The expensive operations are inserting and deleting. When you insert an element somewhere that's not at the end, it requires moving up the remainder of the array by one position. That involves a relatively costly memory copy operation. For example, inserting the value `7` in the middle of the array:
 
-![Insert requires a memory copy](gitBook/pics/insert.png)
+![Insert requires a memory copy](/gitBook/pics/insert.png)
 
 If your code was using any indexes into the array beyond the insertion point, these indexes are now referring to the wrong objects. 
 
 Deleting requires a copy the other way around:
 
-![Delete also requires a memory copy](gitBook/pics/delete.png)
+![Delete also requires a memory copy](/gitBook/pics/delete.png)
 
 This, by the way, is also true for `NSMutableArray` or Swift arrays. Inserting and deleting are **O(n)** operations -- the larger the array the more time it takes.
 
@@ -83,7 +83,7 @@ func removeAtIndex(index) {
 
 This copies the last element on top of the element you want to remove, and then decrements the size of the array.
 
-![Deleting just means copying one element](gitBook/pics/delete-no-copy.png)
+![Deleting just means copying one element](/gitBook/pics/delete-no-copy.png)
 
 This is why the array is not sorted. To avoid an expensive copy of a potentially large portion of the array we copy just one element, but that does change the order of the elements.
 

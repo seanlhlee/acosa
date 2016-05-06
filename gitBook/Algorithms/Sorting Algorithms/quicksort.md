@@ -93,7 +93,7 @@ And now we're done at this level of the recursion because we can't split up the 
 
 This process repeats until all the subarrays have been sorted. In a picture:
 
-![Example](gitBook/pics/Example.png)
+![Example](/gitBook/pics/Example.png)
 
 Now if you read the colored boxes from left to right, you get the sorted array:
 

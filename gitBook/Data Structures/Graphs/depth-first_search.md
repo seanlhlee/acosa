@@ -8,7 +8,7 @@ Depth-first search can be used on both directed and undirected graphs.
 
 Here's how depth-first search works on a graph:
 
-![Animated example](gitBook/pics/AnimatedExample1.gif)
+![Animated example](/gitBook/pics/AnimatedExample1.gif)
 
 Let's say we start the search from node `A`. In depth-first search we look at the starting node's first neighbor and visit that. In the example that is node `B`. Then we look at node `B`'s first neighbor and visit it. This is node `D`. Since `D` doesn't have any unvisited neighbors of its own, we backtrack to node `B` and go to its other neighbor `E`. And so on, until we've visited all the nodes in the graph.
 
@@ -18,7 +18,7 @@ For the example, the nodes were visited in the order `A`, `B`, `D`, `E`, `H`, `F
 
 The depth-first search process can also be visualized as a tree:
 
-![Traversal tree](gitBook/pics/TraversalTree1.png)
+![Traversal tree](/gitBook/pics/TraversalTree1.png)
 
 The parent of a node is the one that "discovered" that node. The root of the tree is the node you started the depth-first search from. Whenever there's a branch, that's where we backtracked.
 

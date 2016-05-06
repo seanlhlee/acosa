@@ -8,7 +8,7 @@ If you don't know what a tree is or what it is for, then [read this first](../Tr
 
 Here is an example of a valid binary search tree:
 
-![A binary search tree](gitBook/pics/Tree11.png)
+![A binary search tree](/gitBook/pics/Tree11.png)
 
 Notice how each left child is smaller than its parent node, and each right child is greater than its parent node. This is the key feature of a binary search tree.
 
@@ -27,7 +27,7 @@ Say we want to insert the new value `9`:
 
 The tree now looks like this:
 
-![After adding 9](gitBook/pics/Tree12.png)
+![After adding 9](/gitBook/pics/Tree12.png)
 
 There is always only one possible place where the new element can be inserted in the tree. Finding this place is usually pretty quick. It takes **O(h)** time, where **h** is the height of the tree.
 
@@ -47,7 +47,7 @@ Like most tree operations, this is performed recursively until either we find wh
 
 If we were looking for the value `5` in the example, it would go as follows:
 
-![Searching the tree](gitBook/pics/Searching.png)
+![Searching the tree](/gitBook/pics/Searching.png)
 
 Thanks to the structure of the tree, searching is really fast. It runs in **O(h)** time. If you have a well-balanced tree with a million nodes, it only takes about 20 steps to find anything in this tree. (The idea is very similar to [binary search](../Binary Search) in an array.)
 
@@ -65,21 +65,21 @@ Once again, this happens recursively.
 
 If you traverse a binary search tree in-order, it looks at all the nodes as if they were sorted from low to high. For the example tree, it would print `1, 2, 5, 7, 9, 10`:
 
-![Traversing the tree](gitBook/pics/Traversing.png)
+![Traversing the tree](/gitBook/pics/Traversing.png)
 
 ## Deleting nodes
 
 Removing nodes is kinda tricky. It is easy to remove a leaf node, you just disconnect it from its parent:
 
-![Deleting a leaf node](gitBook/pics/DeleteLeaf.png)
+![Deleting a leaf node](/gitBook/pics/DeleteLeaf.png)
 
 If the node to remove has only one child, we can link that child to the parent node. So we just pull the node out:
 
-![Deleting a node with one child](gitBook/pics/DeleteOneChild.png)
+![Deleting a node with one child](/gitBook/pics/DeleteOneChild.png)
 
 The gnarly part is when the node to remove has two children. To keep the tree properly sorted, we must replace this node by the smallest child that is larger than the node:
 
-![Deleting a node with two children](gitBook/pics/DeleteTwoChildren.png)
+![Deleting a node with two children](/gitBook/pics/DeleteTwoChildren.png)
 
 This is always the leftmost descendant in the right subtree. It requires an additional search of at most **O(h)** to find this child.
 
@@ -245,7 +245,7 @@ When you do a `print(tree)`, you should get something like this:
 
 The root node is in the middle. With some imagination, you should see that this indeed corresponds to the following tree:
 
-![The tree](gitBook/pics/Tree2.png)
+![The tree](/gitBook/pics/Tree2.png)
 
 By the way, you may be wondering what happens when you insert duplicate items? We always insert those in the right branch. Try it out!
 
@@ -410,7 +410,7 @@ We also need a function that returns the leftmost descendent of a node:
 
 To see how this works, take the following tree:
 
-![Example](gitBook/pics/MinimumMaximum.png)
+![Example](/gitBook/pics/MinimumMaximum.png)
 
 For example, if we look at node `10`, its leftmost descendent is `6`. We get there by following all the `left` pointers until there are no more left children to look at. The leftmost descendent of the root node `7` is `1`. Therefore, `1` is the minimum value in the entire tree.
 
@@ -562,7 +562,7 @@ if let node9 = tree.search(9) {
 
 The binary search tree is always "sorted" but that doesn't mean that consecutive numbers are actually next to each other in the tree.
 
-![Example](gitBook/pics/Tree12.png)
+![Example](/gitBook/pics/Tree12.png)
 
 Note that you can't find the number that comes before `7` by just looking at its left child node. The left child is `2`, not `5`. Likewise for the number that comes after `7`.
 

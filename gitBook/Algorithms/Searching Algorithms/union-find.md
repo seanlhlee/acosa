@@ -117,13 +117,13 @@ Recall that each set is represented by a tree and that the index of the root nod
 
 Here's illustration of what I mean. Let's say the tree looks like this:
 
-![BeforeFind](gitBook/pics/BeforeFind.png)
+![BeforeFind](/gitBook/pics/BeforeFind.png)
 
 We call `setOf(4)`. To find the root node we have to first go to node `2` and then to node `7`. (The indexes of the elements are marked in red.)
 
 During the call to `setOf(4)`, the tree is reorganized to look like this:
 
-![AfterFind](gitBook/pics/AfterFind.png)
+![AfterFind](/gitBook/pics/AfterFind.png)
 
 Now if we need to call `setOf(4)` again, we no longer have to go through node `2` to get to the root. So as you use the Union-Find data structure, it optimizes itself. Pretty cool!
 
@@ -175,11 +175,11 @@ Here is how it works:
 
 An illustration may help to better understand this. Let's say we have these two sets, each with its own tree:
 
-![BeforeUnion](gitBook/pics/BeforeUnion.png)
+![BeforeUnion](/gitBook/pics/BeforeUnion.png)
 
 Now we call `unionSetsContaining(4, and: 3)`. The smaller tree is attached to the larger one:
 
-![AfterUnion](gitBook/pics/AfterUnion.png)
+![AfterUnion](/gitBook/pics/AfterUnion.png)
 
 Note that, because we call `setOf()` at the start of the method, the larger tree was also optimized in the process -- node `3` now hangs directly off the root.
 

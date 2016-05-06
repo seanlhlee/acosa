@@ -4,7 +4,7 @@ Goal: find the shortest route to go from one node to another in a graph.
 
 Suppose we have to following graph:
 
-![Example graph](gitBook/pics/Graphs.png)
+![Example graph](/gitBook/pics/Graphs.png)
 
 We may want to find out what the shortest way is to get from node `A` to node `F`.
 

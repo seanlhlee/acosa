@@ -12,7 +12,7 @@ Let's say the array to sort is:
 
 This is first turned into a max-heap that looks like this:
 
-![The max-heap](gitBook/pics/MaxHeap.png)
+![The max-heap](/gitBook/pics/MaxHeap.png)
 
 The heap's internal array is then:
 

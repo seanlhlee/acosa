@@ -4,17 +4,17 @@ A minimum spanning tree describes a path that contains the smallest number of ed
 
 Take a look at the following graph:
 
-![Graph](gitBook/pics/Graph4.png)
+![Graph](/gitBook/pics/Graph4.png)
 
 If we start from node `a` and want to visit every other node, then what is the most efficient path to do that? We can calculate this with the minimum spanning tree algorithm.
 
 Here is the minimum spanning tree for the graph. It is represented by the bold edges:
 
-![Minimum spanning tree](gitBook/pics/MinimumSpanningTree.png)
+![Minimum spanning tree](/gitBook/pics/MinimumSpanningTree.png)
 
 Drawn as a more conventional tree it looks like this:
 
-![An actual tree](gitBook/pics/Tree4.png)
+![An actual tree](/gitBook/pics/Tree4.png)
 
 To calculate the minimum spanning tree on an unweighted graph, we can use the [breadth-first search](../Breadth-First Search/) algorithm. Breadth-first search starts at a source node and traverses the graph by exploring the immediate neighbor nodes first, before moving to the next level neighbors. If we tweak this algorithm by selectively removing edges, then it can convert the graph into the minimum spanning tree.
 

@@ -6,17 +6,17 @@ In other words, a topological sort places the vertices of a [directed acyclic gr
 
 Consider the graph in the following example:
 
-![Example](gitBook/pics/Graph.png)
+![Example](/gitBook/pics/Graph.png)
 
 This graph has two possible topological sorts:
 
-![Example](gitBook/pics/TopologicalSort.png)
+![Example](/gitBook/pics/TopologicalSort.png)
 
 The topological orderings are **S, V, W, T, X** and **S, W, V, T, X**. Notice how the arrows all go from left to right.
 
 The following is not a valid topological sort for this graph, since **X** and **T** cannot happen before **V**:
 
-![Example](gitBook/pics/InvalidSort.png)
+![Example](/gitBook/pics/InvalidSort.png)
 
 ## Where is this used?
 
@@ -26,7 +26,7 @@ Since you're learning about topological sort, let's take this topic as an exampl
 
 If we were to represent these objectives in the form of a graph it would look as follows:
 
-![Example](gitBook/pics/Algorithms.png)
+![Example](/gitBook/pics/Algorithms.png)
 
 If we consider each algorithm to be a vertex in the graph you can clearly see the dependencies between them. To learn something you might have to know something else first. This is exactly what topological sort is used for -- it will sort things out so that you know what to do first.
 
@@ -56,7 +56,7 @@ The last step of the sort is to combine the results of the different depth-first
 
 Consider the following graph:
 
-![Graph Example](gitBook/pics/Example.png)
+![Graph Example](/gitBook/pics/Example.png)
 
 **Step 1:** The vertices with 0 in-degree are: **3, 7, 5**. These are our starting vertices.
 
@@ -80,7 +80,7 @@ Vertex 5: 5
 
 The result of the topological sort looks like this:
 
-![Result of the sort](gitBook/pics/GraphResult.png)
+![Result of the sort](/gitBook/pics/GraphResult.png)
 
 > **Note:** This is not the only possible topological sort for this graph. For example, other valid solutions are **3, 7, 5, 10, 8, 11, 9, 2** and **3, 7, 5, 8, 11, 2, 9, 10**. Any order where all the arrows are going from left to right will do. 
 
