@@ -1,5 +1,7 @@
 ## 目錄：
 
+- [Introduction](README.md)  *簡介*
+
 ### 入門主題：
 
 - [Stack](Stack/)  *堆疊*
