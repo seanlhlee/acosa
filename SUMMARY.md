@@ -16,7 +16,7 @@
 
 #### A. 搜尋類演算法：
 
-- [Linear Search](linear_search.md) *線性搜尋法*
+- [Linear Search](acosa/gitBook/Algorithms/Searching Algorithms/linear_search.md) *線性搜尋法*
 - [Binary Search](binary_search.md) *二元搜尋法*
 - [Count Occurrences](count_occurrences.md) *計數法*
 - [Select Minimum / Maximum](select_minimum_maximum.md) *最大最小值搜尋*
