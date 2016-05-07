@@ -2,9 +2,7 @@
 
 目標：快速查找出陣列中的目標元素
 
-Let's say you have an array of numbers and you want to determine whether a specific number is in that array, and if so, at which index.
-
-In most cases, Swift's `indexOf()` function is good enough for that:
+假設您有一陣列，要找出該陣列中是否含有目標元素，如果含有其索引值為何？大部分情形下，Swift內建的`indexOf()`函式非常好用。
 
 ```swift
 let numbers = [11, 59, 3, 2, 53, 17, 31, 7, 19, 67, 47, 13, 37, 61, 29, 43, 5, 41, 23]
@@ -12,7 +10,7 @@ let numbers = [11, 59, 3, 2, 53, 17, 31, 7, 19, 67, 47, 13, 37, 61, 29, 43, 5, 4
 numbers.indexOf(43)  // returns 15
 ```
 
-The built-in `indexOf()` function performs a [linear search](../Linear Search/). In code that looks something like this:
+根據Matthijs Hollemans的說法，Swift內建的`indexOf()`函式採用線性搜尋法（[linear search](../Linear Search/)） function performs a . In code that looks something like this:
 
 ```swift
 func linearSearch<T: Equatable>(a: [T], _ key: T) -> Int? {
