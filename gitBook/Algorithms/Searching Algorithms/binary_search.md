@@ -10,8 +10,7 @@ let numbers = [11, 59, 3, 2, 53, 17, 31, 7, 19, 67, 47, 13, 37, 61, 29, 43, 5, 4
 numbers.indexOf(43)  // returns 15
 ```
 
-根據Matthijs Hollemans的說法，Swift內建的`indexOf()`函式採用線性搜尋法（[linear search](../Linear Search/)） function performs a . In code that looks something like this:
-
+根據Matthijs Hollemans的說法，Swift內建的`indexOf()`函式採用線性搜尋法（[Linear Search](gitBook/Algorithms/Searching Algorithms/linear_search.md)），其實作類似：
 ```swift
 func linearSearch<T: Equatable>(a: [T], _ key: T) -> Int? {
   for i in 0 ..< a.count {
@@ -21,74 +20,56 @@ func linearSearch<T: Equatable>(a: [T], _ key: T) -> Int? {
   }
   return nil
 }
-```
 
-And you'd use it like this:
-
-```swift
 linearSearch(numbers, 43)  // returns 15
 ```
 
-So what's the problem? `linearSearch()` loops through the entire array from the beginning, until it finds the element you're looking for. In the worst case, the value isn't even in the array and all that work is done for nothing.
+這樣有什麼問題呢？`linearSearch()`函式的迴圈是從頭開始一項一項查找直到找到目標元素，最差情況下，陣列中不含有目標元素，卻仍進行逐一查找的工作。
 
-On average, the linear search algorithm needs to look at half the values in the array. If your array is large enough, this starts to become very slow!
+平均而言，線性搜尋法會查找大約一半的元素，當元素很多時，將會很緩慢。
 
-## Divide and conquer
+## 分而治之（Divide and conquer）
 
-The classic way to speed this up is to use a *binary search*. The trick is to keep splitting the array in half until the value is found.
+典型加速查找工作的方法是二元搜尋法（ *binary search*），訣竅是不斷將資料分半直到找到目標元素。
 
-For an array of size `n`, the performance is not **O(n)** as with linear search but only **O(log n)**. To put that in perspective, binary search on an array with 1,000,000 elements only takes about 20 steps to find what you're looking for, because `log_2(1,000,000) = 19.9`. And for an array with a billion elements it only takes 30 steps. (Then again, when was the last time you used an array with a billion items?)
+對一個大小為`n`的陣列，採用線性搜索效率為**O(n)**，而二元搜尋法為**O(log n)**。二元搜尋法查找百萬筆資料的陣列僅需20步（`log_2(1,000,000) = 19.9`）。而查找10億筆資料時也僅需30步。
 
-Sounds great, but there is a downside to using binary search: the array must be sorted. In practice, this usually isn't a problem.
+聽起來很棒，但有一個問題，陣列必須排序過，通常來說這並不是大問題。
 
-Here's how binary search works:
+以下說明二元搜尋的運作方式：
 
-- Split the array in half and determine whether the thing you're looking for, known as the *search key*, is in the left half or in the right half. 
-- How do you determine in which half the search key is? This is why you sorted the array first, so you can do a simple `<` or `>` comparison.
-- If the search key is in the left half, you repeat the process there: split the left half into two even smaller pieces and look in which piece the search key must lie. (Likewise for when it's the right half.)
-- This repeats until the search key is found. If the array cannot be split up any further, you must regrettably conclude that the search key is not present in the array.
+- 將陣列分成兩半，判斷是否有目標元素（*search key*），判斷目標元素可能出現在陣列之左半部或右半部。 
+- 透過事先排序，可以經由比較值`<`或`>`判斷哪半部可能含有目標元素（*search key*）。
+- 如果目標元素（*search key*）可能在左半側，繼續將左半側資料分半，再判斷可能所在的部分。
+- 一直重複上述過程直到找到目標元素。如果無法再細分更小的部分，代表陣列中並不包含目標元素。 
 
-Now you know why it's called a "binary" search: in every step it splits the array into two halves. This process of *divide-and-conquer* is what allows it to quickly narrow down where the search key must be.
+這樣的過程稱為分治法（*divide-and-conquer*），是一種快速縮小作業範圍的方式。
 
-## The code
+## 實作
 
-Here is a recursive implementation of binary search in Swift:
+以下是一個以遞迴的方式實作的Swift二元搜尋法：
 
 ```swift
-func binarySearch<T: Comparable>(a: [T], key: T, range: Range<Int>) -> Int? {
-  if range.startIndex >= range.endIndex {
-    // If we get here, then the search key is not present in the array.
-    return nil
-
-  } else {
-    // Calculate where to split the array.
-    let midIndex = range.startIndex + (range.endIndex - range.startIndex) / 2
-    
-    // Is the search key in the left half?
-    if a[midIndex] > key {
-      return binarySearch(a, key: key, range: range.startIndex ..< midIndex)
-      
-    // Is the search key in the right half?
-    } else if a[midIndex] < key {
-      return binarySearch(a, key: key, range: midIndex + 1 ..< range.endIndex)
-      
-    // If we get here, then we've found the search key!
-    } else {
-      return midIndex
-    }
-  }
+// range參數預設值為陣列的全部範圍，用以方便一般之搜尋作業。
+func binarySearch<T: Comparable>(key: T, inArray a: [T], range: Range<Int> = a.indices) -> Int? {
+	// 如果出現這情況，表示目標元素不在陣列之中
+	guard range.startIndex < range.endIndex else { return nil }
+	// 計算如何切分陣列查找的範圍
+	let midIndex = range.startIndex + (range.endIndex - range.startIndex) / 2
+	// 切分的位置點，剛好找到目標，回傳索引值。不是目標時才往下切分陣列
+	guard a[midIndex] != key else { return midIndex }
+	// 判斷目標元素是在左或右半側
+	let range = a[midIndex] > key ? range.startIndex ..< midIndex : midIndex + 1 ..< range.endIndex
+	return binarySearch(key, inArray: a, range: range)
 }
+
+let numbers = [5, 6, 12, 15, 18, 23, 29, 29, 31, 32, 37, 41, 46, 51, 54, 64, 73, 76, 89]
+
+binarySearch(31, inArray: numbers)  // 8
+binarySearch(43, inArray: numbers)  // nil
 ```
 
-To try this out, copy the code to a playground and do:
-
-```swift
-let numbers = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67]
-
-binarySearch(numbers, key: 43, range: 0 ..< numbers.count)  // gives 13
-```
-
-Note that the `numbers` array is sorted. The binary search algorithm does not work otherwise!
+> **注意：** 搜尋的陣列`numbers`必須事先排序，未排序時此法失效。
 
 I said that binary search works by splitting the array in half, but we don't actually create two new arrays. Instead, we keep track of these splits using a Swift `Range` object. Initially, this range covers the entire array, `0 ..< numbers.count`.  As we split the array, the range becomes smaller and smaller.
 
