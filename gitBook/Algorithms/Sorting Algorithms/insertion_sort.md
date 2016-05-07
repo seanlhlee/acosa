@@ -75,7 +75,7 @@
 
 上面描述的即是插入排序法內層的迴圈，依照交換(swap)位置的方式來達成排序的效果。
 
-## The code
+## 實作
 
 Here is an implementation of insertion sort in Swift:
 
