@@ -7,7 +7,7 @@
 ### 入門主題：
 
 - [Stack](gitBook/Data Structures/Queues/stack.md)  *堆疊*
-- [Queue](gitBook/Data Structures/Queues/queue.md) *佇列*
+- [Queue](gitBook/Data Structures/Queues/queue.md)  *佇列*
 - [Insertion Sort](gitBook/Algorithms/Sorting Algorithms/insertion_sort.md)  *插入排序法*
 - [Binary Search](gitBook/Algorithms/Searching Algorithms/binary_search.md) and [Binary Search Tree](gitBook/Data Structures/Trees/binary_search_tree.md)  *二元搜尋與二元搜尋樹*
 - [Merge Sort](gitBook/Algorithms/Sorting Algorithms/merge_sort.md)  *合併排序法*
