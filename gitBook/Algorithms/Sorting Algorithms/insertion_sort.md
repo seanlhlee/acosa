@@ -77,19 +77,18 @@
 
 ## 實作
 
-Here is an implementation of insertion sort in Swift:
-
+以下為插入排序法(insertion sort)的Swift實作：
 ```swift
-func insertionSort(array: [Int]) -> [Int] {
-  var a = array                             // 1
-  for x in 1..<a.count {                    // 2
-    var y = x
-    while y > 0 && a[y] < a[y - 1] {        // 3
-      swap(&a[y - 1], &a[y])
-      y -= 1
-    }
-  }
-  return a
+func insertionSort<T>(array: [T], _ isOrderedBefore: (T, T) -> Bool) -> [T] {
+	var a = array
+	for x in 1..<a.count {
+		var y = x
+		while y > 0 && !isOrderedBefore(a[y - 1], a[y]) {
+			swap(&a[y], &a[y - 1])
+			y -= 1
+		}
+	}
+	return a
 }
 ```
 
