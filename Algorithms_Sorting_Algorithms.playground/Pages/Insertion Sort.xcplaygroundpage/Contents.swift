@@ -1,15 +1,18 @@
+/*:
+[Next](@next)
+***
 # 插入排序法（Insertion Sort）
 
 目標：將一個陣列中的元素由高到低（或高至低）排序。插入排序法的運作方式如下：
 
 - 放入一堆沒有順序的元素
 - 從這堆中取出一個
-- 在新的陣列中加入此元素 
+- 在新的陣列中加入此元素
 - 在未排序的堆中再取出一個元素，依據與第一個元素比較關係，決定放入新的陣列中之位置。
 - 再次取出元素並插入新陣列中依排序規則適當的位置
 - 持續進行上述步驟直到無序堆中已無元素
 
-從上述步驟，是取出元素並插入到一個排序陣列的適當位置中，因此稱為插入排序法（Insertion Sort）。 
+從上述步驟，是取出元素並插入到一個排序陣列的適當位置中，因此稱為插入排序法（Insertion Sort）。
 
 ## 例子
 
@@ -57,19 +60,19 @@
 下一個要處理的是`4`，我們要將其插入到`[ 3, 5, 8 ]`適當的位置處。在此之前的元素為 `8`。
 
 	[ 3, 5, 8, 4 | 6 ]
-	        ^
-	        
+			   ^
+
 該元素比`4`大，所以`4`應該被放在`8`之前，因此交換（swap）兩者的位置：
 
 	[ 3, 5, 4, 8 | 6 ]
-	        <-->
-	       swapped
+			<-->
+			swapped
 
 再往前一個元素為`5`以比`4`大，要再交換位置：
 
 	[ 3, 4, 5, 8 | 6 ]
-	     <-->
-	    swapped
+		 <-->
+		 swapped
 
 依序往前為`3`，比`4`小代表現在我們已經排序好`4`的位置了。
 
@@ -78,7 +81,8 @@
 ## 實作
 
 以下為插入排序法（insertion sort）的Swift實作：
-```swift
+*/
+/*
 func insertionSort<T>(array: [T], _ isOrderedBefore: (T, T) -> Bool) -> [T] {
 	var a = array
 	for x in 1..<a.count {
@@ -90,8 +94,8 @@ func insertionSort<T>(array: [T], _ isOrderedBefore: (T, T) -> Bool) -> [T] {
 	}
 	return a
 }
-```
-
+*/
+/*:
 實作原理說明：
 
 1. 傳入Swift函式之參數值不可變，因此先複製一份與`array`內容相同的陣列，最終回傳的是一個經過排序的*陣列副本*。
@@ -100,52 +104,52 @@ func insertionSort<T>(array: [T], _ isOrderedBefore: (T, T) -> Bool) -> [T] {
 
 3. 內迴圈處理`x`之前的位置，並以反向的方式半段元素位置是否交換（swap）。
 
-> **注意：** 外迴圈由1開始，因為內迴圈的運作包含兩元素值的比較判斷。 
+> **注意：** 外迴圈由1開始，因為內迴圈的運作包含兩元素值的比較判斷。
 
 ## 不做換位（swap）的改良
 
 前面的實作透過換位的方式將處理的元素移到排序好的部分：
 
 	[ 3, 5, 8, 4 | 6 ]
-	        <-->
-            swap
-	        
+			<-->
+			swap
+
 	[ 3, 5, 4, 8 | 6 ]
-         <-->
-	     swap
+		 <-->
+		 swap
 
 可以改寫為不呼叫換位函式`swap()`，而是將已排序部分原本需要被交換的元素右移的方式來進行，以改善效能。
 
 	[ 3, 5, 8, 4 | 6 ]   remember 4
-	           *
-	
+			   *
+
 	[ 3, 5, 8, 8 | 6 ]   shift 8 to the right
-	        --->
-	        
+			--->
+
 	[ 3, 5, 5, 8 | 6 ]   shift 5 to the right
-	     --->
-	     
+		 --->
+
 	[ 3, 4, 5, 8 | 6 ]   copy 4 into place
-	     *
+		 *
 
 In code that looks like this:
-
-```swift
-func insertionSort<T>(array: [T], _ isOrderedBefore: (T, T) -> Bool) -> [T] {
+*/
+/*
+func insertionSortImproved<T>(array: [T], _ isOrderedBefore: (T, T) -> Bool) -> [T] {
 	var a = array
 	for x in 1..<a.count {
 		var y = x
-        let temp = a[y]
+		let temp = a[y]
 		while y > 0 && !isOrderedBefore(a[y - 1], temp) {
 			a[y] = a[y - 1]
 			y -= 1
 		}
-        a[y] = temp
+		a[y] = temp
 	}
 	return a
 }
-```
-
+*/
+/*:
 ## 效能
 
 如果陣列中的元素已部分有序，插入排序法是很有效率的方法。最差狀況，因為有兩層迴圈，插入排序法的效率是**O(n^2)**。 其他的排序演算法如快速排序法（quicksort）與合併排序法（merge sort）效率為**O(n log n)**，差異在當數據量大時才比較明顯。
@@ -155,4 +159,36 @@ func insertionSort<T>(array: [T], _ isOrderedBefore: (T, T) -> Bool) -> [T] {
 ## 參考資料
 
 [維基百科: Insertion sort](https://en.wikipedia.org/wiki/Insertion_sort)
+***
+# **測試**:
+*/
+import Foundation
 
+let array = [2,7,3,1,0,9,8,5]
+insertionSort(array, <)
+insertionSortImproved(array, >)
+
+func testCode1() {
+	var array = [UInt32]()
+	for _ in 0..<100 {
+		array.append(arc4random_uniform(3000))
+	}
+	insertionSort(array, <)
+}
+
+func testCode2() {
+	var array = [UInt32]()
+	for _ in 0..<100 {
+		array.append(arc4random_uniform(3000))
+	}
+	insertionSortImproved(array, <)
+}
+
+timeElapsedInSecondsWhenRunningCode(testCode1)
+timeElapsedInSecondsWhenRunningCode(testCode2)
+
+
+/*:
+***
+[Next](@next)
+*/

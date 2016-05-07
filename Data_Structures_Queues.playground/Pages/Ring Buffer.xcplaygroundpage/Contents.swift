@@ -1,7 +1,13 @@
-//: [Previous](@previous)
+/*:
+[Previous](@previous) | [Next](@next)
+***
+*/
 
 import Foundation
 
 var str = "Hello, playground"
 
-//: [Next](@next)
+/*:
+***
+[Previous](@previous) | [Next](@next)
+*/

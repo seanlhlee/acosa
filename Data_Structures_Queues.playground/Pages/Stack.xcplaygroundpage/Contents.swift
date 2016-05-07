@@ -1,4 +1,6 @@
 /*:
+[Next](@next)
+***
 # 堆疊(Stack)
 
 ![](stackPushPop_2x.png)
@@ -101,4 +103,8 @@ func testCode() {
 
 timeElapsedInSecondsWhenRunningCode(testCode)
 
+/*:
+****
+[Next](@next)
+*/
 

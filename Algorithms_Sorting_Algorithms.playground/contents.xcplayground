@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<playground version='6.0' target-platform='ios' display-mode='rendered'>
+    <pages>
+        <page name='Insertion Sort'/>
+        <page name='Selection Sort'/>
+        <page name='Shell Sort'/>
+        <page name='Quick Sort'/>
+        <page name='Merge Sort'/>
+        <page name='Heap Sort'/>
+        <page name='Counting Sort'/>
+        <page name='Topological Sort'/>
+        <page name='Bubble Sort'/>
+    </pages>
+</playground>

@@ -1,4 +1,7 @@
 /*:
+[Previous](@previous) | [Next](@next)
+***
+
 # 佇列(Queue)
 
 佇列(Queue)很像陣列，由資料組最後加入新的元素，而由最前面取出元素，即先進先出(FIFO)。使用*enqueue*方法來新增一個新的元素到佇列的後端，使用*dequeue*方法來自佇列之前端移除元素，或以*peek*方法取得前端的元素而不移出。
@@ -152,5 +155,8 @@ timeElapsedInSecondsWhenRunningCode(testCode3)	// 約0.55~0.60秒
 
 // 從實測結果來看，改良版的Queue似乎沒有得到效率上的提升，其原因可能是多了一個變數的讀取寫入動作，是否如此呢? 需要再深入研究。
 
-
+/*:
+***
+[Previous](@previous) | [Next](@next)
+*/
 
