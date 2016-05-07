@@ -148,14 +148,11 @@ func insertionSort<T>(array: [T], _ isOrderedBefore: (T, T) -> Bool) -> [T] {
 
 ## 效能
 
-如果陣列中的元素已部分有序，插入排序法是很有效率的方法。最差狀況，因為有兩層迴圈，插入排序法的效率是**O(n^2)**。 其他的排序演算法快速quicksort and merge sort, have **O(n log n)** performance, which is faster on large inputs.
+如果陣列中的元素已部分有序，插入排序法是很有效率的方法。最差狀況，因為有兩層迴圈，插入排序法的效率是**O(n^2)**。 其他的排序演算法如快速排序法（quicksort）與合併排序法（merge sort）效率為**O(n log n)**，差異在當數據量大時才比較明顯。
 
-Insertion sort is actually very fast for sorting small arrays. Some standard libraries have sort functions that switch from a quicksort to insertion sort when the partition size is 10 or less.
+插入排序法事實上很快，部分標準函式庫甚至將處理元素量少於10的排序函式由快速排序法轉為使用插入排序法。
 
-I did a quick test comparing our `insertionSort()` with Swift's built-in `sort()`. On arrays of about 100 items or so, the difference in speed is tiny. However, as your input becomes larger, **O(n^2)** quickly starts to perform a lot worse than **O(n log n)** and insertion sort just can't keep up.
+## 參考資料
 
-## See also
+[維基百科: Insertion sort](https://en.wikipedia.org/wiki/Insertion_sort)
 
-[Insertion sort on Wikipedia](https://en.wikipedia.org/wiki/Insertion_sort)
-
-*Written for Swift Algorithm Club by Matthijs Hollemans*
