@@ -51,15 +51,16 @@ linearSearch(numbers, 43)  // returns 15
 
 ```swift
 // range參數預設值為陣列的全部範圍，用以方便一般之搜尋作業。
-func binarySearch<T: Comparable>(key: T, inArray a: [T], range: Range<Int> = a.indices) -> Int? {
+func binarySearch<T: Comparable>(key: T, inArray a: [T], range: Range<Int>? = nil) -> Int? {
+	let r = range != nil ? range! : a.indices
 	// 如果出現這情況，表示目標元素不在陣列之中
-	guard range.startIndex < range.endIndex else { return nil }
+	guard r.startIndex < r.endIndex else { return nil }
 	// 計算如何切分陣列查找的範圍
-	let midIndex = range.startIndex + (range.endIndex - range.startIndex) / 2
+	let midIndex = r.startIndex + (r.endIndex - r.startIndex) / 2
 	// 切分的位置點，剛好找到目標，回傳索引值。不是目標時才往下切分陣列
 	guard a[midIndex] != key else { return midIndex }
 	// 判斷目標元素是在左或右半側
-	let range = a[midIndex] > key ? range.startIndex ..< midIndex : midIndex + 1 ..< range.endIndex
+	let range = a[midIndex] > key ? r.startIndex ..< midIndex : midIndex + 1 ..< r.endIndex
 	return binarySearch(key, inArray: a, range: range)
 }
 
