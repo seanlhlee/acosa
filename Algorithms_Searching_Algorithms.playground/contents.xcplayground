@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<playground version='6.0' target-platform='ios'>
+    <pages>
+        <page name='Linear Search'/>
+        <page name='Binary Search'/>
+        <page name='Count Occurrences'/>
+        <page name='Select Minimum_Maximum'/>
+        <page name='k-th Largest Element'/>
+        <page name='Selection Sampling'/>
+        <page name='Union-Find'/>
+    </pages>
+</playground>
