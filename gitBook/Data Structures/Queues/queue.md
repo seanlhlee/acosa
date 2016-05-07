@@ -91,7 +91,7 @@ public struct Queue<Element> {
 
 在列前頭的空物件會佔據記憶體，可在必要時進行調整成如下，而此動作頻度低，而增進了dequeue的平均效能至**O(1)**。釋放閒置記憶體後，示意為：：
 
-	[ "Tim", "Grace", xxx, xxx, xxx, xxx ]
+	[ "世雄", "靜香", xxx, xxx, xxx, xxx ]
 
 以下為改善效能的佇列(Queue)實作：
 
