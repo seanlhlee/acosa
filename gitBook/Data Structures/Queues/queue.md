@@ -1,6 +1,6 @@
-# 佇列(Queue)
+# 佇列（Queue）
 
-佇列(Queue)很像陣列，由資料組最後加入新的元素，而由最前面取出元素，即先進先出(FIFO)。使用*enqueue*方法來新增一個新的元素到佇列的後端，使用*dequeue*方法來自佇列之前端移除元素，或以*peek*方法取得前端的元素而不移出。
+佇列（Queue）很像陣列，由資料組最後加入新的元素，而由最前面取出元素，即先進先出（FIFO）。使用*enqueue*方法來新增一個新的元素到佇列的後端，使用*dequeue*方法來自佇列之前端移除元素，或以*peek*方法取得前端的元素而不移出。
 
 在許多演算法中，需要暫時加入元素至一組資料中並在之後將其取出時，當中順序是重要時，可以使用堆疊或是佇列。
 
@@ -10,7 +10,7 @@
 queue.enqueue(10)
 ```
 
-現在佇列為`[ 10 ]`。再加入(enqueue)一個整數：
+現在佇列為`[ 10 ]`。再加入（enqueue）一個整數：
 
 ```swift
 queue.enqueue(3)
@@ -36,7 +36,7 @@ queue.dequeue()
 
 若再dequeue則會回傳`3`、`57`直到佇列已空。佇列已空時，可以實作回傳`nil`或是揭露處物訊息如"queue underflow"。
 
-> **注意：** 當操作時加入與移除的順序不重要時，選擇佇列(Queue)並非最佳選擇，堆疊(Stack)會更簡單快速。
+> **注意：** 當操作時加入與移除的順序不重要時，選擇佇列（Queue）並非最佳選擇，堆疊（Stack）會更簡單快速。
 
 ##	實作
 
@@ -93,7 +93,7 @@ public struct Queue<Element> {
 
 	[ "世雄", "靜香", xxx, xxx, xxx, xxx ]
 
-以下為改善效能的佇列(Queue)實作：
+以下為改善效能的佇列（Queue）實作：
 
 ```swift
 public struct Queue<Element> {
@@ -156,4 +156,4 @@ public struct Queue<Element> {
 
 該實作的意義上是當陣列大小超過50且有25%的比例是空物件時，進行記憶體的釋放動作。
 
-還有其他的方法來實作佇列(Queue)，諸如串列(Linked List)、環形緩衝區(Ring Buffer)或是堆積(Heap)。
+還有其他的方法來實作佇列（Queue），諸如串列（Linked List）、環形緩衝區（Ring Buffer）或是堆積（Heap）。
