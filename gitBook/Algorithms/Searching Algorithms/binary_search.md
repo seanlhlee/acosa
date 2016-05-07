@@ -75,9 +75,6 @@ binarySearch(43, inArray: numbers)  // nil
 
 二元搜尋法是不斷的二分查找的部分，此實作中我們使用Swift的`Range`物件來定義要查找的範圍，一開始的範圍是整個陣列，呼叫使用時方便起見，將range參數預設值定為陣列全部範圍`a.indices`，之後再不斷細分查找的範圍。此實作採用遞迴（Recursive Method）的方式，也可以採用疊代法（Iterative Method）來實作。
 
-
-
-
 ## 參考資料
 
 [維基百科: Binary Search](https://en.wikipedia.org/wiki/Binary_search_algorithm)
