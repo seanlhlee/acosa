@@ -100,13 +100,11 @@ func insertionSort<T>(array: [T], _ isOrderedBefore: (T, T) -> Bool) -> [T] {
 
 3. 內迴圈處理`x`之前的位置，並以反向的方式半段元素位置是否交換(swap)。
 
-> **Note:** The outer loop starts at index 1, not 0. Moving the very first element from the pile to the sorted portion doesn't actually change anything, so we might as well skip it. 
+> **注意：** 外迴圈由1開始，因為內迴圈的運作包含兩元素值的比較判斷。 
 
-## No more swaps
+## 不做換位(swap)的改良
 
-The above version of insertion sort works fine, but it can be made a tiny bit faster by removing the call to `swap()`. 
-
-You've seen that we swap numbers to move the next element into its sorted position:
+前面的實作透過換位的方式將處理的元素移到排序好的部分：
 
 	[ 3, 5, 8, 4 | 6 ]
 	        <-->
@@ -116,7 +114,7 @@ You've seen that we swap numbers to move the next element into its sorted positi
          <-->
 	     swap
 
-Instead of swapping with each of the previous elements, we can just shift all those elements one position to the right, and then copy the new number into the right position.
+可以改寫為不呼叫換位函式`swap()`，而是將已排序部分原本需要被交換的元素右移的方式來進行，以改善效能。
 
 	[ 3, 5, 8, 4 | 6 ]   remember 4
 	           *
@@ -133,78 +131,24 @@ Instead of swapping with each of the previous elements, we can just shift all th
 In code that looks like this:
 
 ```swift
-func insertionSort(array: [Int]) -> [Int] {
-  var a = array
-  for x in 1..<a.count {
-    var y = x
-    let temp = a[y]
-    while y > 0 && temp < a[y - 1] {
-      a[y] = a[y - 1]                // 1
-      y -= 1
-    }
-    a[y] = temp                      // 2
-  }
-  return a
+func insertionSort<T>(array: [T], _ isOrderedBefore: (T, T) -> Bool) -> [T] {
+	var a = array
+	for x in 1..<a.count {
+		var y = x
+        let temp = a[y]
+		while y > 0 && !isOrderedBefore(a[y - 1], temp) {
+			a[y] = a[y - 1])
+			y -= 1
+		}
+        a[y] = temp
+	}
+	return a
 }
 ```
 
-The line at `//1` is what shifts up the previous elements by one position. At the end of the inner loop, `y` is the destination index for the new number in the sorted portion, and the line at `//2` copies this number into place.
+## 效能
 
-## Making it generic
-
-It would be nice to sort other things than just numbers. We can make the datatype of the array generic and use a user-supplied function (or closure) to perform the less-than comparison. This only requires two changes to the code.
-
-The function signature becomes:
-
-```swift
-func insertionSort<T>(array: [T], _ isOrderedBefore: (T, T) -> Bool) -> [T] {
-```
-
-The array has type `[T]` where `T` is the placeholder type for the generics. Now `insertionSort()` will accept any kind of array, whether it contains numbers, strings, or something else.
-
-The new parameter `isOrderedBefore: (T, T) -> Bool` is a function that takes two `T` objects and returns true if the first object comes before the second, and false if the second object should come before the first. This is exactly what Swift's built-in `sort()` function does.
-
-The only other change is in the inner loop, which now becomes:
-
-```swift
-      while y > 0 && isOrderedBefore(temp, a[y - 1]) {
-```
-
-Instead of writing `temp < a[y - 1]`, we call the `isOrderedBefore()` function. It does the exact same thing, except we can now compare any kind of object, not just numbers.
-
-To test this in a playground, do:
-
-```swift
-let numbers = [ 10, -1, 3, 9, 2, 27, 8, 5, 1, 3, 0, 26 ]
-insertionSort(numbers, <)
-insertionSort(numbers, >)
-```
-
-The `<` and `>` determine the sort order, low-to-high and high-to-low, respectively.
-
-Of course, you can also sort other things such as strings,
-
-```swift
-let strings = [ "b", "a", "d", "c", "e" ]
-insertionSort(strings, <)
-```
-
-or even more complex objects:
-
-```swift
-let objects = [ obj1, obj2, obj3, ... ]
-insertionSort(objects) { $0.priority < $1.priority }
-```
-
-The closure tells `insertionSort()` to sort on the `priority` property of the objects.
-
-Insertion sort is a *stable* sort. A sort is stable when elements that have identical sort keys remain in the same relative order after sorting. This is not important for simple values such as numbers or strings, but it is important when sorting more complex objects. In the example above, if two objects have the same `priority`, regardless of the values of their other properties, those two objects don't get swapped around.
-
-## Performance
-
-Insertion sort is really fast if the array is already sorted. That sounds obvious, but this is not true for all search algorithms. In practice, a lot of data will already be largely -- if not entirely -- sorted and insertion sort works quite well in that case.
-
-The worst-case and average case performance of insertion sort is **O(n^2)**. That's because there are two nested loops in this function. Other sort algorithms, such as quicksort and merge sort, have **O(n log n)** performance, which is faster on large inputs.
+如果陣列中的元素已部分有序，插入排序法是很有效率的方法。最差狀況，因為有兩層迴圈，插入排序法的效率是**O(n^2)**。 其他的排序演算法快速quicksort and merge sort, have **O(n log n)** performance, which is faster on large inputs.
 
 Insertion sort is actually very fast for sorting small arrays. Some standard libraries have sort functions that switch from a quicksort to insertion sort when the partition size is 10 or less.
 
