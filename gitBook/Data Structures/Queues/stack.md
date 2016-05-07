@@ -1,77 +1,74 @@
-# Stack
+# 堆疊(Stack)
 
-A stack is like an array but with limited functionality. You can only *push* to add a new element to the top of the stack, *pop* to remove the element from the top, and *peek* at the top element without popping it off.
+![](\gitBook\pics\stackPushPop_2x.png)
 
-Why would you want to do this? Well, in many algorithms you want to add objects to a temporary list at some point and then pull them off this list again at a later time. Often the order in which you add and remove these objects matters.
+堆疊很像陣列但功能相對較少。使用*push*方法來新增一個新的元素到堆疊的頂端，使用*pop*方法來自堆疊之頂端移除元素，或以*peek*方法取得頂端的元素而不移出。
+在許多演算法中，需要暫時加入元素至一組資料中並在之後將其取出時，當中順序是重要時，可以使用堆疊或是佇列。
+堆疊是一個元素後進先出(LIFO)的資料結構，亦即最後一個push進來的元素會被之後的pop取出。而佇列(Queue)則為先進先出(FIFO)的資料結構。
 
-A stack gives you a LIFO or last-in first-out order. The element you pushed last is the first one to come off with the next pop. (A very similar data structure, the [queue](../Queue/), is FIFO or first-in first-out.)
+例如將整數10 push到堆疊中：
 
-For example, let's push a number on the stack:
 
 ```swift
 stack.push(10)
 ```
 
-The stack is now `[ 10 ]`. Push the next number:
+現在堆疊為`[ 10 ]`。再加入(push)一個整數：
 
 ```swift
 stack.push(3)
 ```
 
-The stack is now `[ 10, 3 ]`. Push one more number:
+現在堆疊為`[ 10, 3 ]`。再加入(push)一個整數：
 
 ```swift
 stack.push(57)
 ```
 
-The stack is now `[ 10, 3, 57 ]`. Let's pop the top number off the stack:
+現在堆疊是`[ 10, 3, 57 ]`。現在自堆疊中pop出最上方的整數：
 
 ```swift
 stack.pop()
 ```
 
-This returns `57`, because that was the most recent number we pushed. The stack is `[ 10, 3 ]` again.
+因為最後push進去的整數會被回傳，回傳值為`57`。現在堆疊又變回是`[ 10, 3 ]`。
 
 ```swift
 stack.pop()
 ```
 
-This returns `3`, and so on. If the stack is empty, popping returns `nil` or in some implementations it gives an error message ("stack underflow").
+若再pop則會回傳`3`直到堆疊已空。堆疊已空時，可以實作回傳`nil`或是揭露處物訊息如"stack underflow"。
 
-A stack is easy to create in Swift. It's just a wrapper around an array that just lets you push, pop, and peek:
+以下為堆疊的Swift實作：
 
 ```swift
-public struct Stack<T> {
-  private var array = [T]()
+public struct Stack<Element> {
+	private var array = [Element]()
 
-  public var isEmpty: Bool {
-    return array.isEmpty
-  }
+	public var isEmpty: Bool {
+		return array.isEmpty
+	}
 
-  public var count: Int {
-    return array.count
-  }
+	public var count: Int {
+		return array.count
+	}
 
-  public mutating func push(element: T) {
-    array.append(element)
-  }
+	public mutating func push(element: Element) {
+		array.append(element)
+	}
 
-  public mutating func pop() -> T? {
-    if isEmpty {
-      return nil
-    } else {
-      return array.removeLast()
-    }
-  }
+	public mutating func pop() -> Element? {
+		guard !isEmpty else { return nil } // 也可以實作fatalError("stack underflow")
+		return array.removeLast()
+	}
 
-  public func peek() -> T? {
-    return array.last
-  }
+	public func peek() -> Element? {
+		return array.last
+	}
 }
 ```
 
-Notice that a push puts the new element at the end of the array, not the beginning. Inserting at the beginning of an array is expensive, an **O(n)** operation, because it requires all existing array elements to be shifted in memory. Adding at the end is **O(1)**; it always takes the same amount of time, regardless of the size of the array.
-
-Fun fact about stacks: Each time you call a function or a method, the CPU places the return address on a stack. When the function ends, the CPU uses that return address to jump back to the caller. That's why if you call too many functions -- for example in a recursive function that never ends -- you get a so-called "stack overflow" as the CPU stack has run out of space.
+- note:
+注意push方法將新的元素加入到陣列的最後而非開頭。將新元素加入到開頭是一個**O(n)**的操作，因為陣列中的所有元素都將在記憶體中位移。而加在最後為**O(1)**使用的時間是常數與堆疊的元素多寡無關。
 
 *Written for Swift Algorithm Club by Matthijs Hollemans*
