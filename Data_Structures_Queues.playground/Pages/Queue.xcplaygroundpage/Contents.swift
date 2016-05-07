@@ -35,6 +35,7 @@
 以下為佇列的Swift實作：
 
 */
+/*
 public struct Queue<Element> {
 	private var array = [Element?]()
 	private var head = 0
@@ -71,6 +72,8 @@ public struct Queue<Element> {
 		return array[head]
 	}
 }
+*/
+
 /*:
 Enqueuing是一**O(1)**操作。Dequeue的操作是由最前面的元素移除，為 **O(n)**，因為陣列中的所有元素都將在記憶體中位移。
 
@@ -90,4 +93,64 @@ head
 
 還有其他的方法來實作佇列(Queue)，諸如串列(Linked List)、環形緩衝區(Ring Buffer)或是堆積(Heap)。
 
+# **測試**:
 */
+var checkoutLane = Queue<String>()
+checkoutLane.isEmpty
+checkoutLane.enqueue("mary")
+checkoutLane.enqueue("Tim")
+checkoutLane.enqueue("Tom")
+checkoutLane.count
+checkoutLane.isEmpty
+checkoutLane.dequeue()			// "Mary"
+checkoutLane.enqueue("Sylvia")
+checkoutLane.enqueue("Johnny")
+checkoutLane.dequeue()			// "Tim"
+checkoutLane.peek()				// "Tom"
+checkoutLane.dequeue()			// "Tom"
+checkoutLane.dequeue()			// "Sylvia"
+checkoutLane.dequeue()			// "Johnny"
+checkoutLane.dequeue()			// nil
+checkoutLane.dequeue()			// nil
+checkoutLane.isEmpty
+checkoutLane.count
+checkoutLane.enqueue("Cloudia")
+
+func testCode1() {
+	var checkoutLane: Stack<String> = Stack()
+	for _ in 0..<100 {
+		checkoutLane.push("guest")
+	}
+	for _ in 0..<80 {
+		checkoutLane.pop()
+	}
+}
+
+func testCode2() {
+	var checkoutLane = Queue<String>()
+	for _ in 0..<100 {
+		checkoutLane.enqueue("guest")
+	}
+	for _ in 0..<80 {
+		checkoutLane.dequeue()
+	}
+}
+
+func testCode3() {
+	var checkoutLane = QueueImprove<String>()
+	for _ in 0..<100 {
+		checkoutLane.enqueue("guest")
+	}
+	for _ in 0..<80 {
+		checkoutLane.dequeue()
+	}
+}
+
+timeElapsedInSecondsWhenRunningCode(testCode1)  // 約0.30~0.35秒
+timeElapsedInSecondsWhenRunningCode(testCode2)	// 約0.30~0.35秒
+timeElapsedInSecondsWhenRunningCode(testCode3)	// 約0.55~0.60秒
+
+// 從實測結果來看，改良版的Queue似乎沒有得到效率上的提升，其原因可能是多了一個變數的讀取寫入動作，是否如此呢? 需要再深入研究。
+
+
+

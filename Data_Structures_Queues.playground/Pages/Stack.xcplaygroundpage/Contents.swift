@@ -57,7 +57,48 @@ public struct Stack<Element> {
 		return array.last
 	}
 }
+
 /*:
 - note:
 注意push方法將新的元素加入到陣列的最後而非開頭。將新元素加入到開頭是一個**O(n)**的操作，因為陣列中的所有元素都將在記憶體中位移。而加在最後為**O(1)**使用的時間是常數與堆疊的元素多寡無關。
+***
+# **測試**:
 */
+
+var goodsStack = Stack<(String, Int)>()
+goodsStack.isEmpty	//init state is empty
+goodsStack.push(("cookie", 3))
+goodsStack.push(("candy", 5))
+goodsStack.push(("cake", 1))
+goodsStack.count
+goodsStack.isEmpty
+goodsStack.pop()	// (.0 "cake", .1 1)
+goodsStack.push(("coke", 3))
+goodsStack.push(("pizza", 4))
+goodsStack.pop()    // (.0 "pizza", .1 4)
+goodsStack.peek()	// (.0 "coke", .1 3)
+goodsStack.pop()	// (.0 "coke", .1 3)
+goodsStack.pop()    // (.0 "candy", .1 5)
+goodsStack.pop()	// (.0 "cookie", .1 3)
+goodsStack.pop()	// nil
+goodsStack.pop()	// nil
+goodsStack.isEmpty
+goodsStack.count
+goodsStack.push(("disk", 5))
+
+
+
+
+func testCode() {
+	var checkoutLane = Stack<String>()
+	for _ in 0..<100 {
+		checkoutLane.push("guest")
+	}
+	for _ in 0..<80 {
+		checkoutLane.pop()
+	}
+}
+
+timeElapsedInSecondsWhenRunningCode(testCode)
+
+
