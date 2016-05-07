@@ -92,20 +92,13 @@ func insertionSort<T>(array: [T], _ isOrderedBefore: (T, T) -> Bool) -> [T] {
 }
 ```
 
-Put this code in a playground and test it like so:
+實作原理說明：
 
-```swift
-let list = [ 10, -1, 3, 9, 2, 27, 8, 5, 1, 3, 0, 26 ]
-insertionSort(list)
-```
+1. 傳入Swift函式之參數值不可變，因此先複製一份與`array`內容相同的陣列，最終回傳的是一個經過排序的*陣列副本*。
 
-Here is how the code works.
+2. 函數中有兩迴圈，外迴圈依序處理陣列中的元素，變數`x`為已排序部分與未排序部分界線的索引值，可以想成是`|`分界符號的位置。
 
-1. Make a copy of the array. This is necessary because we cannot modify the contents of the `array` parameter directly. Like Swift's own `sort()`, the `insertionSort()` function will return a sorted *copy* of the original array.
-
-2. There are two loops inside this function. The outer loop looks at each of the elements in the array in turn; this is what picks the top-most number from the pile. The variable `x` is the index of where the sorted portion ends and the pile begins (the position of the `|` bar). Remember, at any given moment the beginning of the array -- from index 0 up to `x` -- is always sorted. The rest, from index `x` until the last element, is the unsorted pile.
-
-3. The inner loop looks at the element at position `x`. This is the number at the top of the pile, and it may be smaller than any of the previous elements. The inner loop steps backwards through the sorted array; every time it finds a previous number that is larger, it swaps them. When the inner loop completes, the beginning of the array is sorted again, and the sorted portion has grown by one element.
+3. 內迴圈處理`x`之前的位置，並以反向的方式半段元素位置是否交換(swap)。
 
 > **Note:** The outer loop starts at index 1, not 0. Moving the very first element from the pile to the sorted portion doesn't actually change anything, so we might as well skip it. 
 
