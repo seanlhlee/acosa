@@ -1,6 +1,6 @@
-# Binary Search
+# 二元搜尋（Binary Search）
 
-Goal: Quickly find an element in an array.
+目標：快速查找出陣列中的目標元素
 
 Let's say you have an array of numbers and you want to determine whether a specific number is in that array, and if so, at which index.
 
