@@ -5,7 +5,7 @@
 
 在許多演算法中，需要暫時加入元素至一組資料中並在之後將其取出時，當中順序是重要時，可以使用堆疊或是佇列。
 
-例如將整數10 enqueue到佇列中：
+例如使用enqueue方法將整數10到佇列中：
 
 	queue.enqueue(10)
 
@@ -26,7 +26,7 @@
 	queue.dequeue()
 
 
-若再dequeue則會回傳`3`、`57`直到堆疊已空。堆疊已空時，可以實作回傳`nil`或是揭露處物訊息如"queue underflow"。
+若再dequeue則會回傳`3`、`57`直到佇列已空。佇列已空時，可以實作回傳`nil`或是揭露處物訊息如"queue underflow"。
 
 - note:
 當操作時加入與移除的順序不重要時，選擇佇列(Queue)並非最佳選擇，堆疊(Stack)會更簡單快速。
@@ -67,15 +67,27 @@ public struct Queue<Element> {
 	}
 	
 	public func peek() -> Element? {
-		if isEmpty {
-			return nil
-		} else {
-			return array[head]
-		}
+		guard !isEmpty else { return nil }
+		return array[head]
 	}
 }
 /*:
 Enqueuing是一**O(1)**操作。Dequeue的操作是由最前面的元素移除，為 **O(n)**，因為陣列中的所有元素都將在記憶體中位移。
 
 上述的實作，使用了一點小技巧來讓dequeuing為**O(1)**之操作。
+
+此實作，因為要將陣列前頭部分可標記為空`nil`，屬性array的型別為`Element?`，而不是`Element`，並加入另一屬性`head`變數來記錄陣列前方第一個不為空的索引值。當進行dequeue操作時，先將`array[head]`標記為`nil`，並將`head`增加一。如下示意：
+
+首先標記
+[ "安琪", "恩宇", "世雄", "靜香", xxx, xxx ]
+head
+
+dequeue之後的標記
+[ xxx , "恩宇", "世雄", "靜香", xxx, xxx ]
+head
+
+如果持續進行enqueue與dequeue的動作，陣列大小會一直增加，因此實作中也在適當的情況下清理陣列閒置的記憶體空間。意義上是當陣列大小超過50且有25%的比例是空物件時，進行記憶體的釋放動作。
+
+還有其他的方法來實作佇列(Queue)，諸如串列(Linked List)、環形緩衝區(Ring Buffer)或是堆積(Heap)。
+
 */
