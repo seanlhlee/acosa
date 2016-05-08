@@ -1,4 +1,4 @@
-# Merge Sort
+# （Merge Sort）
 
 Goal: Sort an array from low to high (or high to low)
 
