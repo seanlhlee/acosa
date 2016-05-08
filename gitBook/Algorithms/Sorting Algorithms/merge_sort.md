@@ -4,10 +4,10 @@
 
 由John von Neumann於1945年發明，為相當有效率的演算法，時間複雜度**O(n log n)**。採用分制法（**divide and conquer**）的策略，運用先**分裂**後**合併**的方式來解決排序的問題。其運作方式如下：
 
-- Put the numbers in a pile. The pile is unsorted.
-- Split the pile into 2. Now you have **two unsorted piles** of numbers.
-- Keep splitting the resulting piles until you can't split anymore. In the end, you will have *n* piles with 1 number in each pile.
-- Begin to **merge** the piles together by sequentially pairing a pile with another pile. During each merge, you put the contents in sorted order. This is fairly easy because each individual pile is already sorted.
+- 放入一堆沒有順序的**n**個元素的集合
+- 將整堆分為**兩堆未排序集合**
+- 持續細分集合直到無法再拆分，最終你會有**n**個小集合
+- 以配對方式開始**合併**小集合，每次的合併都是已排序的小集合
 
 ## An example
 
