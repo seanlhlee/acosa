@@ -168,34 +168,33 @@ let array = [2,7,3,1,0,9,8,5]
 insertionSort(array, <)
 insertionSortImproved(array, >)
 
-func testCode1() {
+
+var testArr:[UInt32]  = {
 	var array = [UInt32]()
 	for _ in 0..<100 {
 		array.append(arc4random_uniform(3000))
 	}
-	insertionSort(array, <)
+	return array
+}()
+
+func testCode1() {
+	insertionSort(testArr, <)
 }
 
 func testCode2() {
-	var array = [UInt32]()
-	for _ in 0..<100 {
-		array.append(arc4random_uniform(3000))
-	}
-	insertionSortImproved(array, <)
+	insertionSortImproved(testArr, <)
 }
 
 func testCode3() {
-	var array = [UInt32]()
-	for _ in 0..<100 {
-		array.append(arc4random_uniform(3000))
-	}
-	array.sort()
+	testArr.sort()
 }
 
 
 timeElapsedInSecondsWhenRunningCode(testCode1)
 timeElapsedInSecondsWhenRunningCode(testCode2)
 timeElapsedInSecondsWhenRunningCode(testCode3)
+
+
 
 /*:
 ***

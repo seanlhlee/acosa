@@ -27,15 +27,16 @@
 
 ```swift
 func mergeSort(array: [Int]) -> [Int] {
-  guard array.count > 1 else { return array }    // 1
-
-  let middleIndex = array.count / 2              // 2
-
-  let leftArray = mergeSort(Array(array[0..<middleIndex]))             // 3
-
-  let rightArray = mergeSort(Array(array[middleIndex..<array.count]))  // 4
-
-  return merge(leftPile: leftArray, rightPile: rightArray)             // 5
+	// 1
+	guard array.count > 1 else { return array }
+	// 2
+	let middleIndex = array.count / 2
+	// 3
+	let leftArray = mergeSort(Array(array[0..<middleIndex]))
+	// 4
+	let rightArray = mergeSort(Array(array[middleIndex..<array.count]))
+	// 5
+	return merge(leftPile: leftArray, rightPile: rightArray)
 }
 ```
 
@@ -140,20 +141,21 @@ func merge(leftPile leftPile: [Int], rightPile: [Int]) -> [Int] {
 
 ## Bottom-up實作
 
-之前的實作為先拆分再合併的"top-down"方式，也可以忽略拆分的過程直接自陣列中的個別元素開始合併，此方式稱為"bottom-up"實作。
+之前的實作為先分解再合併的"top-down"方式，也可以忽略分解的過程直接自陣列中的個別元素開始合併，此方式稱為"bottom-up"實作。
 
 ```swift
 func mergeSortBottomUp<T>(a: [T], _ isOrderedBefore: (T, T) -> Bool) -> [T] {
   let n = a.count
-
-  var z = [a, a]      // 1
+  // 1
+  var z = [a, a]      
   var d = 0
-    
+  // 2
   var width = 1
-  while width < n {   // 2
+  while width < n {   
   
     var i = 0
-    while i < n {     // 3
+    // 3
+    while i < n {    
 
       var j = i
       var l = i
@@ -161,8 +163,8 @@ func mergeSortBottomUp<T>(a: [T], _ isOrderedBefore: (T, T) -> Bool) -> [T] {
       
       let lmax = min(l + width, n)
       let rmax = min(r + width, n)
-      
-      while l < lmax && r < rmax {                // 4
+      // 4
+      while l < lmax && r < rmax {             
         if isOrderedBefore(z[d][l], z[d][r]) {
           z[1 - d][j] = z[d][l]
           l += 1
@@ -185,9 +187,9 @@ func mergeSortBottomUp<T>(a: [T], _ isOrderedBefore: (T, T) -> Bool) -> [T] {
 
       i += width*2
     }
-    
+    // 5
     width *= 2
-    d = 1 - d      // 5
+    d = 1 - d     
   }
   return z[d]
 }
@@ -212,7 +214,7 @@ mergeSortBottomUp(array, <)   // [1, 2, 4, 5, 9]
 
 ## 效能
 
-合併排序法的效率與資料中是否部分排序無關，因為總是要將原籍和拆分到無法拆分，所以其平均、最佳與最差情快的時間複雜度均為**O(n log n)**。 
+合併排序法的效率與資料中是否部分排序無關，因為總是要將原集合分解到無法拆分，所以其平均、最佳與最差情況的時間複雜度均為**O(n log n)**。 
 
 ## 參考資料
 
