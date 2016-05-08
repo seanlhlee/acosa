@@ -1,12 +1,8 @@
 # 合併排序法（Merge Sort）
 
-Goal: Sort an array from low to high (or high to low)
+目標：將一個陣列中的元素由高到低（或高至低）排序。
 
-Invented in 1945 by John von Neumann, merge sort is a fairly efficient sorting algorithm with a best, worst, and average time complexity of **O(n log n)**.
-
-The idea behind merge sort is to **divide and conquer**: to divide a big problem into smaller problems and solving many small problems instead of solving a big one. I think of merge sort as **split first** and **merge after**. 
-
-Assume you're given an array of *n* numbers and you need to put them in the right order. The merge sort algorithm works as follows:
+由John von Neumann於1945年發明，為相當有效率的演算法，時間複雜度**O(n log n)**。採用分制法（**divide and conquer**）的策略，運用先**分裂**後**合併**的方式來解決排序的問題。其運作方式如下：
 
 - Put the numbers in a pile. The pile is unsorted.
 - Split the pile into 2. Now you have **two unsorted piles** of numbers.
