@@ -219,20 +219,15 @@ let array = [2, 1, 5, 4, 9]
 mergeSortBottomUp(array, <)   // [1, 2, 4, 5, 9]
 ```
 
-## Performance
+## 效能
 
-The speed of merge sort is dependent on the size of the array it needs to sort. The larger the array, the more work it needs to do. 
-
-Whether or not the initial array is sorted already doesn't affect the speed of merge sort since you'll be doing the same amount splits and comparisons regardless of the initial order of the elements.
-
-Therefore, the time complexity for the best, worst, and average case will always be **O(n log n)**. 
+合併排序法的效率與資料中是否部分排序無關，因為總是要將原籍和拆分到無法拆分，所以其平均、最佳與最差情快的時間複雜度均為**O(n log n)**。 
 
 A disadvantage of merge sort is that it needs a temporary "working" array equal in size to the array being sorted. It is not an **in-place** sort, unlike for example [quicksort](../Quicksort/).
 
 Most implementations of merge sort produce a **stable** sort. This means that array elements that have identical sort keys will stay in the same order relative to each other after sorting. This is not important for simple values such as numbers or strings, but it can be an issue when sorting more complex objects.
 
-## See also
+## 參考資料
 
-[Merge sort on Wikipedia](https://en.wikipedia.org/wiki/Merge_sort)
+[維基百科: Merge sort](https://en.wikipedia.org/wiki/Merge_sort)
 
-*Written by Kelvin Lau. Additions by Matthijs Hollemans.*
