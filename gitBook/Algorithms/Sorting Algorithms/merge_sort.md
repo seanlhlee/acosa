@@ -21,9 +21,9 @@
 
 分解完成之後，以**排序**的方式來**合併**這些小集合。`[2]` `[1]` `[5]` `[4]` `[9]`經第一輪合併後是`[1, 2]`、`[4, 5]`和`[9]`，接著下一輪合併`[1, 2]`和`[4, 5]`成為`[1, 2, 4, 5]`並留下`[9]`未合併，最後再將這兩個集合合併為`[1, 2, 4, 5, 9]`。
 
-## Top-down implementation
+## 實作
 
-Here's what merge sort may look like in Swift:
+以下為以Swift實作的合併排序法：
 
 ```swift
 func mergeSort(array: [Int]) -> [Int] {
