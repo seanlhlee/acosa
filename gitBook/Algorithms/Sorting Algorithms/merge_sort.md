@@ -26,17 +26,17 @@
 以下為以Swift實作的合併排序法：
 
 ```swift
-func mergeSort(array: [Int]) -> [Int] {
+func mergeSort<T>(array: [T], _ isOrderedBefore: (T, T) -> Bool) -> [T] {
 	// 1
 	guard array.count > 1 else { return array }
 	// 2
 	let middleIndex = array.count / 2
 	// 3
-	let leftArray = mergeSort(Array(array[0..<middleIndex]))
+	let leftArray = mergeSort(Array(array[0..<middleIndex]), isOrderedBefore)
 	// 4
-	let rightArray = mergeSort(Array(array[middleIndex..<array.count]))
+	let rightArray = mergeSort(Array(array[middleIndex..<array.count]), isOrderedBefore)
 	// 5
-	return merge(leftPile: leftArray, rightPile: rightArray)
+	return merge(leftPile: leftArray, rightPile: rightArray, isOrderedBefore)
 }
 ```
 
@@ -55,42 +55,35 @@ func mergeSort(array: [Int]) -> [Int] {
 以下為合併部分的演算法：
 
 ```swift
-func merge(leftPile leftPile: [Int], rightPile: [Int]) -> [Int] {
-  // 1
-  var leftIndex = 0
-  var rightIndex = 0
-
-  // 2 
-  var orderedPile = [Int]()
-
-  // 3
-  while leftIndex < leftPile.count && rightIndex < rightPile.count {
-    if leftPile[leftIndex] < rightPile[rightIndex] {
-      orderedPile.append(leftPile[leftIndex])
-      leftIndex += 1
-    } else if leftPile[leftIndex] > rightPile[rightIndex] {
-      orderedPile.append(rightPile[rightIndex])
-      rightIndex += 1
-    } else {
-      orderedPile.append(leftPile[leftIndex])
-      leftIndex += 1
-      orderedPile.append(rightPile[rightIndex])
-      rightIndex += 1
-    }
-  }
-
-  // 4
-  while leftIndex < leftPile.count {
-    orderedPile.append(leftPile[leftIndex])
-    leftIndex += 1
-  }
-
-  while rightIndex < rightPile.count {
-    orderedPile.append(rightPile[rightIndex])
-    rightIndex += 1
-  }
-
-  return orderedPile
+func merge<T>(leftPile leftPile: [T], rightPile: [T], _ isOrderedBefore: (T, T) -> Bool) -> [T] {
+	// 1
+	var leftIndex = 0
+	var rightIndex = 0
+	
+	// 2
+	var orderedPile = [T]()
+	
+	// 3
+	while leftIndex < leftPile.count && rightIndex < rightPile.count {
+		if isOrderedBefore(leftPile[leftIndex], rightPile[rightIndex]) {
+			orderedPile.append(leftPile[leftIndex])
+			leftIndex += 1
+		} else {
+			orderedPile.append(rightPile[rightIndex])
+			rightIndex += 1
+		}
+	}
+	
+	var index = leftIndex < leftPile.count ? leftIndex : rightIndex
+	var remainingPile = leftIndex < leftPile.count ? leftPile : rightPile
+	
+	// 4
+	while index < remainingPile.count {
+		orderedPile.append(remainingPile[index])
+		index += 1
+	}
+	
+	return orderedPile
 }
 ```
 
