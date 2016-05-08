@@ -21,7 +21,7 @@
 
 分解完成之後，以**排序**的方式來**合併**這些小集合。`[2]` `[1]` `[5]` `[4]` `[9]`經第一輪合併後是`[1, 2]`、`[4, 5]`和`[9]`，接著下一輪合併`[1, 2]`和`[4, 5]`成為`[1, 2, 4, 5]`並留下`[9]`未合併，最後再將這兩個集合合併為`[1, 2, 4, 5, 9]`。
 
-## 實作
+## Top-down實作
 
 以下為以Swift實作的合併排序法：
 
@@ -39,19 +39,19 @@ func mergeSort(array: [Int]) -> [Int] {
 }
 ```
 
-A step-by-step explanation of how the code works:
+說明:
 
-1. If the array is empty or only contains a single element, there's no way to split it into smaller pieces. You'll just return the array.
+1. 當陣列為空或是僅有單一元素，無法再差分更小，直接回傳陣列
 
-2. Find the middle index. 
+2. 找到陣列中央的索引值 
 
-3. Using the middle index from the previous step, recursively split the left side of the array.
+3. 遞迴產生左側的子集合
 
-4. Also recursively split the right side of the array.
+4. 遞迴產生右側的子集合
 
-5. Finally, merge all the values together, making sure that it's always sorted.
+5. 合併所有的子集合
 
-Here's the merging algorithm:
+以下為合併部分的演算法：
 
 ```swift
 func merge(leftPile leftPile: [Int], rightPile: [Int]) -> [Int] {
@@ -93,35 +93,35 @@ func merge(leftPile leftPile: [Int], rightPile: [Int]) -> [Int] {
 }
 ```
 
-This method may look scary but it is quite straightforward:
+說明：
 
-1. You need two indexes to keep track of your progress for the two arrays while merging.
+1. 需要兩個索引值來追蹤合併的進度
 
-2. This is the merged array. It's empty right now, but you'll build it up in subsequent steps by appending elements from the other arrays.
+2. 一開始合併前是一個空陣列，後續合併的過程會由其他陣列加入。
 
-3. This while loop will compare the elements from the left and right sides, and append them to the `orderedPile` while making sure that the result stays in order.
+3. 第一個`while loop`比較欲合併兩個子集合並決定先合併的子集合使其結果為排序的。 
 
-4. If control exits from the previous while loop, it means that either `leftPile` or `rightPile` has its contents completely merged into the `orderedPile`. At this point, you no longer need to do comparisons. Just append the rest of the contents of the other array until there's no more to append.
+4. 當離開第一個`while loop`表示`orderedPile`為排序的，只需將剩下的合併。
 
-As an example of how `merge()` works, suppose that we have the following piles: `leftPile = [1, 7, 8]` and `rightPile = [3, 6, 9]`. Note that each of these piles is individually sorted already -- that is always true with merge sort. These are merged into one larger sorted pile in the following steps:
+以下為一個說明`merge()`函式運作的例子，假設我們有兩個子集合分別是`leftPile = [1, 7, 8]`與`rightPile = [3, 6, 9]`，此兩子集合自身為已排序，接下來的過程：
 
 	leftPile       rightPile       orderedPile
 	[ 1, 7, 8 ]    [ 3, 6, 9 ]     [ ]
       l              r
 
-The left index, here represented as `l`, points at the first item from the left pile, `1`. The right index, `r`, points at `3`. Therefore, the first item we add to `orderedPile` is `1`. We also move the left index `l` to the next item.
+以`l`來代表左集合的索引值，指向左集合的第一個元素`1`，以`r`來代表右集合的索引值，指向右集合的第一個元素`3`，經過比較`orderedPile`會先加入`1`這個元素，並將左側索引加1指向下一個元素。
 
 	leftPile       rightPile       orderedPile
 	[ 1, 7, 8 ]    [ 3, 6, 9 ]     [ 1 ]
       -->l           r
 
-Now `l` points at `7` but `r` is still at `3`. We add the smallest item to the ordered pile, so that's `3`. The situation is now:
+現在`l`指向`7`而`r`仍指向`3`，因此將較小`3`的合併到`orderedPile`：
 
 	leftPile       rightPile       orderedPile
 	[ 1, 7, 8 ]    [ 3, 6, 9 ]     [ 1, 3 ]
          l           -->r
 
-This process repeats. At each step we pick the smallest item from either `leftPile` or `rightPile` and add it to `orderedPile`:
+過程持續進行，每一次都左子集合`leftPile`與右子集合`rightPile`中的元素較小者合併至`orderedPile`：
 
 	leftPile       rightPile       orderedPile
 	[ 1, 7, 8 ]    [ 3, 6, 9 ]     [ 1, 3, 6 ]
@@ -135,15 +135,12 @@ This process repeats. At each step we pick the smallest item from either `leftPi
 	[ 1, 7, 8 ]    [ 3, 6, 9 ]     [ 1, 3, 6, 7, 8 ]
             -->l           r
 
-Now there are no more items in the left pile. We simply add the remaining items from the right pile, and we're done. The merged pile is `[ 1, 3, 6, 7, 8, 9 ]`. 
+到這裡，左子集合已空，我們只需將右子集合未完成部分加入就完工了，最後是`[ 1, 3, 6, 7, 8, 9 ]`。
 
-Notice that this algorithm is very simple: it moves from left-to-right through the two piles and at every step picks the smallest item. This works because we guarantee that each of the piles is already sorted.
 
-## Bottom-up implementation
+## Bottom-up實作
 
-The implementation of merge sort you've seen so far is called "top-down" because it first splits the array into smaller piles and then merges them. When sorting an array (as opposed to, say, a linked list) you can actually skip the splitting step and immediately start merging the individual array elements. This is called the "bottom-up" approach.
-
-Time to step up the game a little. :-) Here is a complete bottom-up implementation in Swift:
+之前的實作為先拆分再合併的"top-down"方式，也可以忽略拆分的過程直接自陣列中的個別元素開始合併，此方式稱為"bottom-up"實作。
 
 ```swift
 func mergeSortBottomUp<T>(a: [T], _ isOrderedBefore: (T, T) -> Bool) -> [T] {
@@ -194,38 +191,28 @@ func mergeSortBottomUp<T>(a: [T], _ isOrderedBefore: (T, T) -> Bool) -> [T] {
   }
   return z[d]
 }
-```
 
-It looks a lot more intimidating than the top-down version but notice that the main body includes the same three `while` loops from `merge()`.
-
-Notable points:
-
-1. Merge sort needs a temporary working array because you can't merge the left and right piles and at the same time overwrite their contents. But allocating a new array for each merge is wasteful. Therefore, we're using two working arrays and we'll switch between them using the value of `d`, which is either 0 or 1. The array `z[d]` is used for reading, `z[1 - d]` is used for writing. This is called *double-buffering*.
-
-2. Conceptually, the bottom-up version works the same way as the top-down version. First, it merges small piles of 1 element each, then it merges piles of 2 elements each, then piles of 4 elements each, and so on. The size of the pile is given by `width`. Initially, `width` is `1` but at the end of each loop iteration we multiply it by 2. So this outer loop determines the size of the piles being merged. And in each step, the subarrays to merge become larger.
-
-3. The inner loop steps through the piles and merges each pair of piles into a larger one. The result is written in the array given by `z[1 - d]`.
-
-4. This is the same logic as in the top-down version. The main difference is that we're using double-buffering, so values are read from `z[d]` and written into `z[1 - d]`. It also uses an `isOrderedBefore` function to compare the elements rather than just `<`, so this merge sort is generic and you can use it to sort any kind of object you want.
-
-5. At this point, the piles of size `width` from array `z[d]` have been merged into larger piles of size `width * 2` in array `z[1 - d]`. Here we swap the active array, so that in the next step we'll read from the new piles we've just created.
-
-This function is generic, so you can use it to sort any type you desire, as long as you provide a proper `isOrderedBefore` closure to compare the elements.
-
-Example of how to use it:
-
-```swift
 let array = [2, 1, 5, 4, 9]
 mergeSortBottomUp(array, <)   // [1, 2, 4, 5, 9]
 ```
 
+看起來比top-down的做法嚇人，與`merge()`函式包含了三個相同功能的`while`迴圈。
+
+要點說明：
+
+1. 合併排序需要一個暫存的工作陣列，因為無法在合併的過程中同時改寫其內容。每次合併都建一個工作陣列又太浪費，因此使用*雙緩衝（double-buffering）*技巧建立兩個工作陣列，以非0即1的變數`d`來切換工作陣列，`z[d]`用來讀取，`z[1 - d]`用作寫入。
+
+2. 觀念上，bottom-up方式與top-down方式有著相同的工作原理。首先先合併只有一個元素最小子集合，然後合併兩個元素的子集合，之後是四個...這樣下去。實作中我們以變數`width`來代表子集合的大小。開始時`width`是`1`，迴圈的每個步驟完成後就乘以2，最外部的迴圈即以`width`的值來進行要合併子集合的大小。
+
+3. 內迴圈則是合併配對的子集合並將合併寫入`z[1 - d]`。
+
+4. 正個運作邏輯與top-down完全相同，差異在於使用了*雙緩衝（double-buffering）*，以`z[d]`讀取並寫入至`z[1 - d]`。同時也使用`isOrderedBefore`的函式(或閉包)作為元素比較排序的方法來使合併排序可泛用於各種型別。
+
+5. 最後一點，當從`z[d]`合併`width`子集合大小至`z[1 - d]`工作陣列後，`z[1 - d]`成為子集合大小為`width * 2`的下一輪需要合併的對象，因此切換兩個工作陣列的角色，意即上一輪中寫入的角色會成為下一輪讀取的工作陣列。
+
 ## 效能
 
 合併排序法的效率與資料中是否部分排序無關，因為總是要將原籍和拆分到無法拆分，所以其平均、最佳與最差情快的時間複雜度均為**O(n log n)**。 
-
-A disadvantage of merge sort is that it needs a temporary "working" array equal in size to the array being sorted. It is not an **in-place** sort, unlike for example [quicksort](../Quicksort/).
-
-Most implementations of merge sort produce a **stable** sort. This means that array elements that have identical sort keys will stay in the same order relative to each other after sorting. This is not important for simple values such as numbers or strings, but it can be an issue when sorting more complex objects.
 
 ## 參考資料
 
