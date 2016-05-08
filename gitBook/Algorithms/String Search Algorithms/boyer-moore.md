@@ -1,4 +1,4 @@
-# Boyer-Moore String Search
+# Boyer-Moore字串搜尋法
 
 Goal: Write a string search algorithm in pure Swift without importing Foundation or using `NSString`'s `rangeOfString()` method. 
  
