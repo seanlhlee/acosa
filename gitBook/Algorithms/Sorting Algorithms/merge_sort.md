@@ -2,36 +2,24 @@
 
 目標：將一個陣列中的元素由高到低（或高至低）排序。
 
-由John von Neumann於1945年發明，為相當有效率的演算法，時間複雜度**O(n log n)**。採用分制法（**divide and conquer**）的策略，運用先**分裂**後**合併**的方式來解決排序的問題。其運作方式如下：
+由John von Neumann於1945年發明，為相當有效率的演算法，時間複雜度**O(n log n)**。採用分治法（**divide and conquer**）的策略，運用先**分解**後**合併**的方式來解決排序的問題。其運作方式如下：
 
 - 放入一堆沒有順序的**n**個元素的集合
 - 將整堆分為**兩堆未排序集合**
 - 持續細分集合直到無法再拆分，最終你會有**n**個小集合
 - 以配對方式開始**合併**小集合，每次的合併都是已排序的小集合
 
-## An example
+## 例子
 
-### Splitting
+### 分解
 
-Let's say the numbers to sort are `[2, 1, 5, 4, 9]`. This is your unsorted pile. The goal is to keep splitting the pile until you can't split anymore. 
+假設有一個未排序整數集合`[2, 1, 5, 4, 9]`，先將其分成`[2, 1,]`和`[5, 4, 9]`兩個集合。其中`[2, 1]`再分解為`[2]`和`[1]`；而`[5, 4, 9]`分解成`[5]`和`[4, 9]`，當中`[4, 9]`可再分解為`[4]`和`[9]`。 
 
-First, split the array into two halves: `[2, 1,]` and `[5, 4, 9]`. Can you keep splitting them? Yes you can!
+分解完之後，我們有下列小集合：`[2]` `[1]` `[5]` `[4]` `[9]`。
 
-Focus on the left pile. `[2, 1]` will split into `[2]` and `[1]`. Can you keep splitting them? No. Time to check the other pile.
+### 合併
 
-`[5, 4, 9]` splits to `[5]` and `[4, 9]`. Unsurprisingly, `[5]` can't be split anymore, but `[4, 9]` splits into `[4]` and `[9]`. 
-
-The splitting process ends with the following piles: `[2]` `[1]` `[5]` `[4]` `[9]`. Notice that each pile consists of just one element.
-
-### Merging
-
-Now that you've split the array, you'll **merge** the piles together **while sorting them**. Remember, the idea is to solve many small problems rather than a big one. For each merge iteration you'll only be concerned at merging one pile with another.
-
-Given the piles `[2]` `[1]` `[5]` `[4]` `[9]`, the first pass will result in `[1, 2]` and `[4, 5]` and `[9]`. Since `[9]` is the odd one out, you can't merge it with anything during this pass. 
-
-The next pass will merge `[1, 2]` and `[4, 5]` together. This results in `[1, 2, 4, 5]`, with the `[9]` left out again since it's the odd one out. 
-
-You're left with only two piles and `[9]` finally gets its chance to merge, resulting in the sorted array `[1, 2, 4, 5, 9]`. 
+分解完成之後，以**排序**的方式來**合併**這些小集合。`[2]` `[1]` `[5]` `[4]` `[9]`經第一輪合併後是`[1, 2]`、`[4, 5]`和`[9]`，接著下一輪合併`[1, 2]`和`[4, 5]`成為`[1, 2, 4, 5]`並留下`[9]`未合併，最後再將這兩個集合合併為`[1, 2, 4, 5, 9]`。
 
 ## Top-down implementation
 
