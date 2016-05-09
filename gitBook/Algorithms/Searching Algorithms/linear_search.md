@@ -1,4 +1,4 @@
-# Linear Search
+# 線性搜尋法（Linear Search）
 
 Goal: Find a particular value in an array.
 
