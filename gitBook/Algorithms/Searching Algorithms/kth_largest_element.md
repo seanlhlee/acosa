@@ -10,14 +10,13 @@ The following solution is semi-naive. Its time complexity is **O(n log n)** sinc
 
 ```swift
 func kthLargest(a: [Int], k: Int) -> Int? {
-  let len = a.count
-  if k > 0 && k <= len {
-    let sorted = a.sort()
-    return sorted[len - k]
-  } else {
-    return nil
-  }
+	guard k > 0 && k <= a.count else { return nil }
+	let sorted = a.sort(>)
+	return sorted[k - 1]
 }
+
+let a = [ 7, 92, 23, 9, -1, 0, 11, 6 ]
+kthLargest(a, k: 4)	// 9
 ```
 
 The `kthLargest()` function takes two parameters: the array `a` consisting of integers, and `k`. It returns the *k*-th largest element.
@@ -31,16 +30,16 @@ Let's take a look at an example and run through the algorithm to see how it work
 Initially there's no direct way to find the k-th largest element, but after sorting the array it's rather straightforward. Here's the sorted array:
 
 ```swift
-[ -1, 0, 6, 7, 9, 11, 23, 92 ]
+[92, 23, 11, 9, 7, 6, 0, -1]
 ```
 
-Now, all we must do is take the value at index `a.count - k`:
+Now, all we must do is take the value at index `k - 1`:
 
 ```swift
-a[a.count - k] = a[8 - 4] = a[4] = 9
+sorted[k - 1] = sorted[4] = 9
 ```
 
-Of course, if you were looking for the k-th *smallest* element, you'd use `a[k]`.
+Of course, if you were looking for the k-th *smallest* element, you'd use `a.sort(<)` to sort the array.
 
 ## A faster solution
 
@@ -54,76 +53,83 @@ Here's how it works: We choose a random pivot, partition the array around that p
 
 Let's look at the original example again. We're looking for the 4-th largest element in this array:
 
-	[ 7, 92, 23, 9, -1, 0, 11, 6 ]
+[ 7, 92, 23, 9, -1, 0, 11, 6 ]
 
 The algorithm is a bit easier to follow if we look for the k-th *smallest* item instead, so let's take `k = 4` and look for the 4-th smallest element.
 
 Note that we don't have to sort the array first. We pick one of the elements at random to be the pivot, let's say `11`, and partition the array around that. We might end up with something like this:
 
-	[ 7, 9, -1, 0, 6, 11, 92, 23 ]
-	 <------ smaller    larger -->
+[ 7, 9, -1, 0, 6, 11, 92, 23 ]
+<------ smaller    larger -->
 
 As you can see, all values smaller than `11` are on the left; all values larger are on the right. The pivot value `11` is now in its final place. The index of the pivot is 5, so the 4-th smallest element must be in the left partition somewhere. We can ignore the rest of the array from now on:
 
-	[ 7, 9, -1, 0, 6, x, x, x ]
+[ 7, 9, -1, 0, 6, x, x, x ]
 
 Again let's pick a random pivot, let's say `6`, and partition the array around it. We might end up with something like this:
 
-	[ -1, 0, 6, 9, 7, x, x, x ]
+[ -1, 0, 6, 9, 7, x, x, x ]
 
 Pivot `6` ended up at index 2, so obviously the 4-th smallest item must be in the right partition. We can ignore the left partition:
 
-	[ x, x, x, 9, 7, x, x, x ]
+[ x, x, x, 9, 7, x, x, x ]
 
 Again we pick a pivot value at random, let's say `9`, and partition the array:
 
-	[ x, x, x, 7, 9, x, x, x ]
+[ x, x, x, 7, 9, x, x, x ]
 
 The index of pivot `9` is 4, and that's exactly the *k* we're looking for. We're done! Notice how this only took a few steps and we did not have to sort the array first.
 
 The following function implements these ideas:
 
 ```swift
-public func randomizedSelect<T: Comparable>(array: [T], order k: Int) -> T {
-  var a = array
-  
-  func randomPivot<T: Comparable>(inout a: [T], _ low: Int, _ high: Int) -> T {
-    let pivotIndex = random(min: low, max: high)
-    swap(&a, pivotIndex, high)
-    return a[high]
-  }
-
-  func randomizedPartition<T: Comparable>(inout a: [T], _ low: Int, _ high: Int) -> Int {
-    let pivot = randomPivot(&a, low, high)
-    var i = low
-    for j in low..<high {
-      if a[j] <= pivot {
-        swap(&a, i, j)
-        i += 1
-      }
-    }
-    swap(&a, i, high)
-    return i
-  }
-
-  func randomizedSelect<T: Comparable>(inout a: [T], _ low: Int, _ high: Int, _ k: Int) -> T {
-    if low < high {
-      let p = randomizedPartition(&a, low, high)
-      if k == p {
-        return a[p]
-      } else if k < p {
-        return randomizedSelect(&a, low, p - 1, k)
-      } else {
-        return randomizedSelect(&a, p + 1, high, k)
-      }
-    } else {
-      return a[low]
-    }
-  }
-  
-  precondition(a.count > 0)
-  return randomizedSelect(&a, 0, a.count - 1, k)
+import Foundation
+// swap elements position directly in an array
+public func swap<T>(inout a: [T], _ i: Int, _ j: Int) {
+	if i != j {
+		swap(&a[i], &a[j])
+	}
 }
+
+public func randomizedSelect<T: Comparable>(array: [T], order k: Int) -> T? {
+	var a = array
+	guard k > 0 && k <= a.count else { return nil }
+	
+	func randomPivot<T: Comparable>(inout a: [T], _ low: Int, _ high: Int) -> T {
+		let pivotIndex = Int(arc4random_uniform(UInt32(high - low))) + low
+		swap(&a, pivotIndex, high)
+		return a[high]
+	}
+	
+	func randomizedPartition<T: Comparable>(inout a: [T], _ low: Int, _ high: Int) -> Int {
+		let pivot = randomPivot(&a, low, high)
+		var i = low
+		for j in low..<high {
+			if a[j] >= pivot {
+				swap(&a, i, j)
+				i += 1
+			}
+		}
+		swap(&a, i, high)
+		return i
+	}
+	
+	func randomizedSelect<T: Comparable>(inout a: [T], _ low: Int, _ high: Int, _ k: Int) -> T {
+		guard low < high else { return a[low] }
+		let p = randomizedPartition(&a, low, high)
+		if k == p {
+			return a[p]
+		} else if k < p {
+			return randomizedSelect(&a, low, p - 1, k)
+		} else {
+			return randomizedSelect(&a, p + 1, high, k)
+		}
+	}
+	
+	return randomizedSelect(&a, 0, a.count - 1, k-1)   //k-1 => k-th form 1st not 0
+}
+
+randomizedSelect(a, order: 4)	// 9
 ```
 
 To keep things readable, the functionality is split into three inner functions:
@@ -137,5 +143,3 @@ To keep things readable, the functionality is split into three inner functions:
 Pretty cool, huh? Normally quicksort is an **O(n log n)** algorithm, but because we only partition smaller and smaller slices of the array, the running time of `randomizedSelect()` works out to **O(n)**.
 
 > **Note:** This function calculates the *k*-th smallest item in the array, where *k* starts at 0. If you want the *k*-th largest item, call it with `a.count - k`.
-
-*Written by Daniel Speiser. Additions by Matthijs Hollemans.*
