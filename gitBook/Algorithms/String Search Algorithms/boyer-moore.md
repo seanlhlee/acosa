@@ -1,10 +1,6 @@
 # Boyer-Moore字串搜尋法
 
-Goal: Write a string search algorithm in pure Swift without importing Foundation or using `NSString`'s `rangeOfString()` method. 
- 
-In other words, we want to implement an `indexOf(pattern: String)` extension on `String` that returns the `String.Index` of the first occurrence of the search pattern, or `nil` if the pattern could not be found inside the string.
- 
-For example:
+目標：不加載Foundation，也不使用`NSString`中之`rangeOfString()` 函式，以純然Swift程式語言撰寫字串搜尋的演算法，意即實作擴展`String`型別的`indexOf(pattern: String)`方法，並回傳符合第一個被找到的索引值`String.Index`，或當找不到時回傳`nil`。例如：
 
 ```swift
 // Input: 
@@ -22,7 +18,7 @@ animals.indexOf("🐮")
 <String.Index?> 6
 ```
 
-> **Note:** The index of the cow is 6, not 3 as you might expect, because the string uses more storage per character for emoji. The actual value of the `String.Index` is not so important, just that it points at the right character in the string.
+> **注意：** 例子中的🐮索引值為6而非3，是因為Swift的字串使用了更多的記憶體來表示一個表情符號。`String.Index`的值並不重要，只是一個字串中指到正確字元位置的值。
 
 The [brute-force approach](../Brute-Force String Search/) works OK, but it's not very efficient, especially on large chunks of text. As it turns out, you don't need to look at *every* character from the source string -- you can often skip ahead multiple characters.
 
