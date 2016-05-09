@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<playground version='6.0' target-platform='ios'>
+<playground version='6.0' target-platform='ios' display-mode='rendered'>
     <pages>
         <page name='Brute-Force String Search'/>
-        <page name='Untitled Page'/>
-        <page name='Untitled Page 3'/>
+        <page name='Boyer-Moore'/>
+        <page name='Longest Common Subsequence'/>
     </pages>
 </playground>
