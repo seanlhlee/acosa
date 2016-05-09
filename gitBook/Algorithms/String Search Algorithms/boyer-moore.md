@@ -20,9 +20,7 @@ animals.indexOf("🐮")
 
 > **注意：** 例子中的🐮索引值為6而非3，是因為Swift的字串使用了更多的記憶體來表示一個表情符號。`String.Index`的值並不重要，只是一個字串中指到正確字元位置的值。
 
-The [brute-force approach](../Brute-Force String Search/) works OK, but it's not very efficient, especially on large chunks of text. As it turns out, you don't need to look at *every* character from the source string -- you can often skip ahead multiple characters.
-
-The skip-ahead algorithm is called [Boyer-Moore](https://en.wikipedia.org/wiki/Boyer–Moore_string_search_algorithm) and it has been around for a long time. It is considered the benchmark for all string search algorithms.
+[*字串暴力搜尋法（Brute-Force String Search）*](gitBook/Algorithms/String Search Algorithms/brute-force_string_search.md)可以達到目標要求，但非常沒有效率。實際上要達到功能要求，可以跳過許多的字元，不需對來源字串進行地毯式搜索。這種算法稱為[Boyer-Moore](https://en.wikipedia.org/wiki/Boyer–Moore_string_search_algorithm)演算法，已經存在很長一段時間，被認為是所有的字符串搜索算法的基準。
 
 Here's how you could write it in Swift:
 
