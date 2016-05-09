@@ -88,21 +88,13 @@ The following function implements these ideas:
 
 */
 import Foundation
-// swap elements position directly in an array
-public func swap<T>(inout a: [T], _ i: Int, _ j: Int) {
-	if i != j {
-		swap(&a[i], &a[j])
-	}
-}
-
-
 
 public func randomizedSelect<T: Comparable>(array: [T], order k: Int) -> T? {
 	var a = array
 	guard k > 0 && k <= a.count else { return nil }
 	
 	func randomPivot<T: Comparable>(inout a: [T], _ low: Int, _ high: Int) -> T {
-		let pivotIndex = Int(arc4random_uniform(UInt32(high - low))) + low
+		let pivotIndex = random(min: low, max: high)
 		swap(&a, pivotIndex, high)
 		return a[high]
 	}
@@ -136,16 +128,6 @@ public func randomizedSelect<T: Comparable>(array: [T], order k: Int) -> T? {
 }
 
 randomizedSelect(a, order: 4)	// 9
-
-
-
-
-
-
-
-
-
-
 
 /*:
 
