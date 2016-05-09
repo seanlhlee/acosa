@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Timeline
+   version = "3.0">
+   <TimelineItems>
+      <LoggerValueHistoryTimelineItem
+         documentLocation = "#CharacterRangeLen=19&amp;CharacterRangeLoc=4780&amp;EndingColumnNumber=20&amp;EndingLineNumber=203&amp;StartingColumnNumber=1&amp;StartingLineNumber=203&amp;Timestamp=484467733.211525"
+         selectedRepresentationIndex = "0"
+         shouldTrackSuperviewWidth = "NO">
+      </LoggerValueHistoryTimelineItem>
+      <LoggerValueHistoryTimelineItem
+         documentLocation = "#CharacterRangeLen=23&amp;CharacterRangeLoc=4497&amp;EndingColumnNumber=24&amp;EndingLineNumber=190&amp;StartingColumnNumber=1&amp;StartingLineNumber=190&amp;Timestamp=484467733.21175"
+         selectedRepresentationIndex = "0"
+         shouldTrackSuperviewWidth = "NO">
+      </LoggerValueHistoryTimelineItem>
+      <LoggerValueHistoryTimelineItem
+         documentLocation = "#CharacterRangeLen=17&amp;CharacterRangeLoc=4634&amp;EndingColumnNumber=18&amp;EndingLineNumber=197&amp;StartingColumnNumber=1&amp;StartingLineNumber=197&amp;Timestamp=484467733.211906"
+         selectedRepresentationIndex = "0"
+         shouldTrackSuperviewWidth = "NO">
+      </LoggerValueHistoryTimelineItem>
+      <LoggerValueHistoryTimelineItem
+         documentLocation = "#CharacterRangeLen=1&amp;CharacterRangeLoc=789&amp;EndingColumnNumber=15&amp;EndingLineNumber=29&amp;StartingColumnNumber=5&amp;StartingLineNumber=29&amp;Timestamp=484466627.391046"
+         selectedRepresentationIndex = "0"
+         shouldTrackSuperviewWidth = "NO">
+      </LoggerValueHistoryTimelineItem>
+      <LoggerValueHistoryTimelineItem
+         documentLocation = "file:///Volumes/Sean/Dropbox/SWIFT%20-%20SeanLee/SWIFT%20on%20desktop/gitBook%20-%20A%20Collection%20of%20Swift%20Algorithms/Algorithms_String_Searching_Algorithms.playground/Pages/Boyer-Moore.xcplaygroundpage#CharacterRangeLen=25&amp;CharacterRangeLoc=4573&amp;EndingLineNumber=193&amp;StartingLineNumber=193&amp;Timestamp=484467733.212191"
+         selectedRepresentationIndex = "0"
+         shouldTrackSuperviewWidth = "NO">
+      </LoggerValueHistoryTimelineItem>
+   </TimelineItems>
+</Timeline>

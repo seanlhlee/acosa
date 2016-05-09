@@ -62,6 +62,7 @@ extension String {
 				if let k = backwards() { return k }
 				// 不符合繼續往後查找
 				i = i.successor()
+				i
 			} else {
 				// 若目前字元與目標字串最後一個字元不同，則根據跳過字元數的對照表決定跳過的字數
 				// 如果這個字元與目標字串中字源完全不相符，則可跳過整個目標字串的長度。
@@ -69,9 +70,27 @@ extension String {
 				i = i.advancedBy(skipTable[c] ?? patternLength)
 			}
 		}
+
+		return nil
+	}
+	
+	// 增加回傳整數索引值的方法，此方法需有Utility.swift檔案中定義的整數索引方法才可用
+	func indexIntOf(pattern: String) -> Int? {
+		if let strIdx = indexOf(pattern) {
+			var i = 0
+			while i < characters.count {
+				if self.startIndex.advancedBy(i) == strIdx {ß
+					return i
+				}
+				i += 1
+			}
+		}
 		return nil
 	}
 }
+
+
+
 /*:
 
 這演算法類似在來源字串中找到匹配目標字串*最後*一個字元與之對齊的方式運行，運作方式如下：
@@ -155,7 +174,7 @@ extension String {
 
 ## 參考資料
 
-[維基百科: Boyer-Moore String Searching Algorithm](https://en.wikipedia.org/wiki/Boyer–Moore_string_search_algorithm)
+維基百科: [Boyer-Moore String Searching Algorithm](https://en.wikipedia.org/wiki/Boyer–Moore_string_search_algorithm)
 
 ["Faster String Searches"](http://www.drdobbs.com/database/faster-string-searches/184408171) *by Costas Menico*
 
@@ -163,6 +182,31 @@ extension String {
 
 [Boyer-Moore字串搜尋法細節分析](http://www.inf.fh-flensburg.de/lang/algorithmen/pattern/bmen.htm)
 
+# 測試：
+*/
+
+
+
+let animals = "🐶🐔🐷🐮🐱"
+animals.visualizeView()
+animals.indexOf("🐮")
+animals.indexOf_Horspool("🐮")
+animals.indexIntOf("🐮")
+animals[3]
+
+let s = "Hello, World"
+s.visualizeView()
+s.indexOf("World")
+s.indexOf_Horspool("World")
+s[7...11]
+
+let str = "This is my dictionary bought from a book store yesterday."
+str.visualizeView()
+str.indexOf("book")
+str.indexOf_Horspool("book")
+str[36...39]
+
+/*:
 ***
 [Previous](@previous) | [Next](@next)
 */
