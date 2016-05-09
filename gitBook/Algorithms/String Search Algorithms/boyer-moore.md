@@ -152,10 +152,12 @@ extension String {
 
 在實踐中，Horspool版效能上好一點點，但是你需要做出權衡。
 
-Credits: This code is based on the article ["Faster String Searches" by Costas Menico](http://www.drdobbs.com/database/faster-string-searches/184408171) from Dr Dobb's magazine, July 1989 -- Yes, 1989! Sometimes it's useful to keep those old magazines around.
+## 參考資料
 
-Credits: This code is based on the paper: [R. N. Horspool (1980). "Practical fast searching in strings". Software - Practice & Experience 10 (6): 501–506.](http://www.cin.br/~paguso/courses/if767/bib/Horspool_1980.pdf)
+[維基百科: Boyer-Moore String Searching Algorithm](https://en.wikipedia.org/wiki/Boyer–Moore_string_search_algorithm)
 
-See also: [a detailed analysis](http://www.inf.fh-flensburg.de/lang/algorithmen/pattern/bmen.htm) of the algorithm.
+["Faster String Searches"](http://www.drdobbs.com/database/faster-string-searches/184408171) *by Costas Menico*
 
-*Written for Swift Algorithm Club by Matthijs Hollemans*
+["Practical fast searching in strings"](http://www.cin.br/~paguso/courses/if767/bib/Horspool_1980.pdf) *by R. N. Horspool (1980)*
+
+[Boyer-Moore字串搜尋法細節分析](http://www.inf.fh-flensburg.de/lang/algorithmen/pattern/bmen.htm)
