@@ -55,16 +55,28 @@ It will be useful to add a `description` method so you can print the tree:
 
 ```swift
 extension BinaryTree: CustomStringConvertible {
-  public var description: String {
-    switch self {
-    case let .Node(left, value, right):
-      return "value: \(value), left = [" + left.description + "], right = [" 
-                                         + right.description + "]"
-    case .Empty:
-      return ""
-    }
-  }
+	public var description: String {
+		switch self {
+		case let .Node(left, value, right):
+			return "value: \(value), left = [" + left.description + "], right = ["
+				+ right.description + "]"
+		case .Empty:
+			return ""
+		}
+	}
+	public var shortDescription: String {
+		switch self {
+		case .Node(.Empty, let x, .Empty):
+			return "\(x)"
+		case let .Node(left, value, right):
+			return "(" + left.shortDescription + "\(value)" + right.shortDescription + ")"
+		case .Empty:
+			return ""
+		}
+	}
 }
+print(tree)
+print(tree.shortDescription)
 ```
 
 If you `print(tree)` you should see something like this:
@@ -90,14 +102,18 @@ With a bit of imagination, you can see the tree structure. ;-) It helps if you i
 Another useful method is counting the number of nodes in the tree:
 
 ```swift
-  public var count: Int {
-    switch self {
-    case let .Node(left, _, right):
-      return left.count + 1 + right.count
-    case .Empty:
-      return 0
-    }
-  }
+extension BinaryTree {
+	public var count: Int {
+		switch self {
+		case let .Node(left, _, right):
+			return left.count + 1 + right.count
+		case .Empty:
+			return 0
+		}
+	}
+}
+
+tree.count
 ```
 
 On the tree from the example, `tree.count` should be 12.
@@ -111,29 +127,31 @@ Something you often need to do with trees is traverse them, i.e. look at all the
 Here is how you'd implement that:
 
 ```swift
-  public func traverseInOrder(@noescape process: T -> Void) {
-    if case let .Node(left, value, right) = self {
-      left.traverseInOrder(process)
-      process(value)
-      right.traverseInOrder(process)
-    }
-  }
-  
-  public func traversePreOrder(@noescape process: T -> Void) {
-    if case let .Node(left, value, right) = self {
-      process(value)
-      left.traversePreOrder(process)
-      right.traversePreOrder(process)
-    }
-  }
-  
-  public func traversePostOrder(@noescape process: T -> Void) {
-    if case let .Node(left, value, right) = self {
-      left.traversePostOrder(process)
-      right.traversePostOrder(process)
-      process(value)
-    }
-  }
+extension BinaryTree {
+	public func traverseInOrder(@noescape process: T -> Void) {
+		if case let .Node(left, value, right) = self {
+			left.traverseInOrder(process)
+			process(value)
+			right.traverseInOrder(process)
+		}
+	}
+	
+	public func traversePreOrder(@noescape process: T -> Void) {
+		if case let .Node(left, value, right) = self {
+			process(value)
+			left.traversePreOrder(process)
+			right.traversePreOrder(process)
+		}
+	}
+	
+	public func traversePostOrder(@noescape process: T -> Void) {
+		if case let .Node(left, value, right) = self {
+			left.traversePostOrder(process)
+			right.traversePostOrder(process)
+			process(value)
+		}
+	}
+}
 ```
 
 As is common when working with tree structures, these functions call themselves recursively.
