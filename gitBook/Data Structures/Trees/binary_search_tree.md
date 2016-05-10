@@ -157,27 +157,29 @@ The `count` property determines how many nodes are in the subtree described by t
 A tree node by itself is pretty useless, so here is how you would add new nodes to the tree:
 
 ```swift
-  public func insert(value: T) {
-    insert(value, parent: self)
-  }
-  
-  private func insert(value: T, parent: BinarySearchTree) {
-    if value < self.value {
-      if let left = left {
-        left.insert(value, parent: left)
-      } else {
-        left = BinarySearchTree(value: value)
-        left?.parent = parent
-      }
-    } else {
-      if let right = right {
-        right.insert(value, parent: right)
-      } else {
-        right = BinarySearchTree(value: value)
-        right?.parent = parent
-      }
-    }
-  }
+extension BinarySearchTree {
+	public func insert(value: T) {
+		insert(value, parent: self)
+	}
+	
+	private func insert(value: T, parent: BinarySearchTree) {
+		if value < self.value {
+			if let left = left {
+				left.insert(value, parent: left)
+			} else {
+				left = BinarySearchTree(value: value)
+				left?.parent = parent
+			}
+		} else {
+			if let right = right {
+				right.insert(value, parent: right)
+			} else {
+				right = BinarySearchTree(value: value)
+				right?.parent = parent
+			}
+		}
+	}
+}
 ```
 
 Like so many other tree operations, insertion is easiest to implement with recursion. We compare the new value to the values of the existing nodes and decide whether to add it to the left branch or the right branch.
@@ -202,13 +204,15 @@ tree.insert(1)
 For convenience, let's add an init method that calls `insert()` for all the elements in an array:
 
 ```swift
-  public convenience init(array: [T]) {
-    precondition(array.count > 0)
-    self.init(value: array.first!)
-    for v in array.dropFirst() {
-      insert(v, parent: self)
-    }
-  }
+extension BinarySearchTree {
+	public convenience init(array: [T]) {
+		precondition(array.count > 0)
+		self.init(value: array.first!)
+		for v in array.dropFirst() {
+			insert(v, parent: self)
+		}
+	}
+}
 ```
 
 Now you can simply do this:
@@ -225,17 +229,11 @@ When working with somewhat complicated data structures such as this, it's useful
 
 ```swift
 extension BinarySearchTree: CustomStringConvertible {
-  public var description: String {
-    var s = ""
-    if let left = left {
-      s += "(\(left.description)) <- "
-    }
-    s += "\(value)"
-    if let right = right {
-      s += " -> (\(right.description))"
-    }
-    return s
-  }
+	public var description: String {
+		let leftStr = left != nil ? "(\(left!.description)) <- " : ""
+		let rightStr = right != nil ? " -> (\(right!.description))" : ""
+		return leftStr + "\(value)" + rightStr
+	}
 }
 ```
 
@@ -245,7 +243,7 @@ When you do a `print(tree)`, you should get something like this:
 
 The root node is in the middle. With some imagination, you should see that this indeed corresponds to the following tree:
 
-![The tree](/gitBook/pics/Tree2.png)
+![The tree](/gitBook/pics/Tree12.png)
 
 By the way, you may be wondering what happens when you insert duplicate items? We always insert those in the right branch. Try it out!
 
