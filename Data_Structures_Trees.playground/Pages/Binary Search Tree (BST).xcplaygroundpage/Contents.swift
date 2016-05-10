@@ -97,11 +97,19 @@ Here's a first stab at a `BinarySearchTree` class:
 
 */
 import Foundation
-public class BinarySearchTree<T: Comparable> {
+public class BinarySearchTree<T: Comparable>: Equatable {
 	private(set) public var value: T
 	private(set) public var parent: BinarySearchTree?
-	private(set) public var left: BinarySearchTree?
-	private(set) public var right: BinarySearchTree?
+	private(set) public var left: BinarySearchTree? {
+		didSet {
+			left?.parent = self
+		}
+	}
+	private(set) public var right: BinarySearchTree? {
+		didSet {
+			right?.parent = self
+		}
+	}
 	
 	public init(value: T) {
 		self.value = value
@@ -143,6 +151,19 @@ public class BinarySearchTree<T: Comparable> {
 		return (left?.count ?? 0) + 1 + (right?.count ?? 0)
 	}
 }
+
+public func ==<T>(lhs: BinarySearchTree<T>, rhs: BinarySearchTree<T>) -> Bool {
+	guard lhs.value == rhs.value else { return false }
+	guard lhs.count == rhs.count else { return false }
+	return lhs.left == rhs.left && lhs.right == rhs.right
+}
+
+let tree = BinarySearchTree<Int>(value: 7)
+tree.count
+tree.left = BinarySearchTree<Int>(value: 2)
+tree.right = BinarySearchTree<Int>(value: 10)
+tree.count
+
 /*:
 
 This class describes just a single node, not the entire tree. It's a generic type, so the node can store any kind of data. It also has references to its `left` and `right` child nodes and a `parent` node.
@@ -161,29 +182,37 @@ The `count` property determines how many nodes are in the subtree described by t
 
 A tree node by itself is pretty useless, so here is how you would add new nodes to the tree:
 
-```swift
-public func insert(value: T) {
-	insert(value, parent: self)
-}
-
-private func insert(value: T, parent: BinarySearchTree) {
-	if value < self.value {
-		if let left = left {
-			left.insert(value, parent: left)
+*/
+extension BinarySearchTree {
+	public func insert(value: T) {
+		if value < self.value {
+			if let left = left {
+				left.insert(value)
+			} else {
+				left = BinarySearchTree(value: value)
+			}
 		} else {
-			left = BinarySearchTree(value: value)
-			left?.parent = parent
-		}
-	} else {
-		if let right = right {
-			right.insert(value, parent: right)
-		} else {
-			right = BinarySearchTree(value: value)
-			right?.parent = parent
+			if let right = right {
+				right.insert(value)
+			} else {
+				right = BinarySearchTree(value: value)
+			}
 		}
 	}
 }
-```
+
+tree.insert(1)
+tree.insert(5)
+tree.insert(9)
+tree.count
+tree.left?.value
+tree.right?.value
+tree.left?.left?.value
+tree.left?.right?.parent
+tree.left?.right?.left
+tree.left?.right?.right
+tree.right?.left?.value
+/*:
 
 Like so many other tree operations, insertion is easiest to implement with recursion. We compare the new value to the values of the existing nodes and decide whether to add it to the left branch or the right branch.
 
@@ -206,15 +235,20 @@ tree.insert(1)
 
 For convenience, let's add an init method that calls `insert()` for all the elements in an array:
 
-```swift
-public convenience init(array: [T]) {
-	precondition(array.count > 0)
-	self.init(value: array.first!)
-	for v in array.dropFirst() {
-		insert(v, parent: self)
+*/
+extension BinarySearchTree {
+	public convenience init(array: [T]) {
+		precondition(array.count > 0)
+		self.init(value: array.first!)
+		for v in array.dropFirst() {
+			insert(v)
+		}
 	}
 }
-```
+
+let treeX = BinarySearchTree(array: [7, 2, 5, 10, 9, 1])
+
+/*:
 
 Now you can simply do this:
 
@@ -228,21 +262,23 @@ The first value in the array becomes the root of the tree.
 
 When working with somewhat complicated data structures such as this, it's useful to have human-readable debug output.
 
-```swift
+*/
 extension BinarySearchTree: CustomStringConvertible {
 	public var description: String {
-		var s = ""
-		if let left = left {
-			s += "(\(left.description)) <- "
-		}
-		s += "\(value)"
-		if let right = right {
-			s += " -> (\(right.description))"
-		}
-		return s
+		let leftStr = left != nil ? "(\(left!.description)) <- " : ""
+		let rightStr = right != nil ? " -> (\(right!.description))" : ""
+		return leftStr + "\(value)" + rightStr
 	}
 }
-```
+
+treeX.insert(4)
+treeX.insert(4)
+treeX.insert(4)
+tree.left?.right?.value
+print(treeX)
+
+
+/*:
 
 When you do a `print(tree)`, you should get something like this:
 
@@ -260,17 +296,23 @@ What do we do now that we have some values in our tree? Search for them, of cour
 
 Here is the implementation of `search()`:
 
-```swift
-public func search(value: T) -> BinarySearchTree? {
-	if value < self.value {
-		return left?.search(value)
-	} else if value > self.value {
-		return right?.search(value)
-	} else {
-		return self  // found it!
+*/
+extension BinarySearchTree {
+	public func search(value: T) -> BinarySearchTree? {
+		guard value != self.value else { return self }
+		return value < self.value ? left?.search(value) : right?.search(value)
+	}
+	public func contains(value: T) -> Bool {
+		return search(value) != nil
 	}
 }
-```
+
+treeX.search(7)
+treeX.search(6)
+treeX.contains(7)
+treeX.contains(6)
+
+/*:
 
 I hope the logic is clear: this starts at the current node (usually the root) and compares the values. If the search value is less than the node's value, we continue searching in the left branch; if the search value is greater, we dive into the right branch.
 
@@ -315,25 +357,34 @@ The first three lines all return the corresponding `BinaryTreeNode` object. The 
 
 Remember there are 3 different ways to look at all nodes in the tree? Here they are:
 
-```swift
-public func traverseInOrder(@noescape process: T -> Void) {
-	left?.traverseInOrder(process)
-	process(value)
-	right?.traverseInOrder(process)
+*/
+extension BinarySearchTree {
+	public func traverseInOrder(@noescape process: T -> Void) {
+		left?.traverseInOrder(process)
+		process(value)
+		right?.traverseInOrder(process)
+	}
+	
+	public func traversePreOrder(@noescape process: T -> Void) {
+		process(value)
+		left?.traversePreOrder(process)
+		right?.traversePreOrder(process)
+	}
+	
+	public func traversePostOrder(@noescape process: T -> Void) {
+		left?.traversePostOrder(process)
+		right?.traversePostOrder(process)
+		process(value)
+	}
 }
 
-public func traversePreOrder(@noescape process: T -> Void) {
-	process(value)
-	left?.traversePreOrder(process)
-	right?.traversePreOrder(process)
-}
-
-public func traversePostOrder(@noescape process: T -> Void) {
-	left?.traversePostOrder(process)
-	right?.traversePostOrder(process)
-	process(value)
-}
-```
+tree.traverseInOrder{ print($0, terminator: " ") }  // 1 2 5 7 9 10
+print()
+tree.traversePreOrder{ print($0, terminator: " ") } // 7 2 1 5 10 9
+print()
+tree.traversePostOrder{ print($0, terminator: " ") } // 1 5 2 9 10 7
+print()
+/*:
 
 They all do pretty much the same thing but in different orders. Notice once again that all the work is done recursively. Thanks to Swift's optional chaining, the calls to `traverseInOrder()` etc are ignored when there is no left or right child.
 
@@ -354,23 +405,39 @@ This prints the following:
 
 You can also add things like `map()` and `filter()` to the tree. For example, here's an implementation of map:
 
-```swift
-public func map(@noescape formula: T -> T) -> [T] {
-	var a = [T]()
-	if let left = left { a += left.map(formula) }
-	a.append(formula(value))
-	if let right = right { a += right.map(formula) }
-	return a
+*/
+extension BinarySearchTree {
+	public func map(@noescape formula: T -> T) -> BinarySearchTree {
+		let me = BinarySearchTree(value: formula(value) )
+		me.left = left != nil ? left!.map(formula) : nil
+		me.right = right != nil ? right!.map(formula) : nil
+		return me
+	}
+	
+	public func mapToArray(@noescape formula: T -> T) -> [T] {
+		let leftArr = left != nil ? left!.mapToArray(formula) : []
+		let rightArr = right != nil ? right!.mapToArray(formula) : []
+		return leftArr + [ formula(value) ] + rightArr
+	}
+	
+	public func toArray() -> [T] {
+		return mapToArray{ $0 }
+	}
 }
-```
 
-This calls the `formula` closure on each node in the tree and collects the results in an array. `map()` works by traversing the tree in-order.
+print(tree.mapToArray{ $0 * 8 })
+print(tree.map{ $0 * 8 })
+tree.toArray()  // [1, 2, 5, 7, 9, 10]
+
+/*:
+
+This calls the `formula` closure on each node in the tree and collects the results in an array. `mapToArray()` works by traversing the tree in-order.
 
 An extremely simple example of how to use `map()`:
 
 ```swift
 public func toArray() -> [T] {
-	return map { $0 }
+	return mapToArray{ $0 }
 }
 ```
 
@@ -385,33 +452,44 @@ As an exercise for yourself, see if you can implement filter and reduce.
 ### Deleting nodes
 
 You've seen that deleting nodes can be tricky. We can make the code much more readable by defining some helper functions.
-
-```swift
-private func reconnectParentToNode(node: BinarySearchTree?) {
-	if let parent = parent {
-		if isLeftChild {
-			parent.left = node
-		} else {
-			parent.right = node
-		}
-	}
-	node?.parent = parent
-}
-```
+*/
+// 作廢
+//extension BinarySearchTree {
+//	private func reconnectParentToNode(node: BinarySearchTree?) {
+//		if let parent = parent {
+//			if isLeftChild {
+//				parent.left = node
+//			} else {
+//				parent.right = node
+//			}
+//		}
+//		node?.parent = parent
+//	}
+//}
+/*:
 
 Making changes to the tree involves changing a bunch of `parent` and `left` and `right` pointers. This function helps with that. It takes the parent of the current node -- that is `self` -- and connects it to another node. Usually that other node will be one of the children of `self`.
 
 We also need a function that returns the leftmost descendent of a node:
 
-```swift
-public func minimum() -> BinarySearchTree {
-	var node = self
-	while case let next? = node.left {
-		node = next
+*/
+extension BinarySearchTree {
+	public func minimum() -> BinarySearchTree {
+		var node = self
+		while case let next? = node.left {
+			node = next
+		}
+		return node
 	}
-	return node
+	public func maximum() -> BinarySearchTree {
+		var node = self
+		while case let next? = node.right {
+			node = next
+		}
+		return node
+	}
 }
-```
+/*:
 
 To see how this works, take the following tree:
 
@@ -421,45 +499,37 @@ For example, if we look at node `10`, its leftmost descendent is `6`. We get the
 
 We won't need it for deleting, but for completeness' sake, here is the opposite of `minimum()`:
 
-```swift
-public func maximum() -> BinarySearchTree {
-	var node = self
-	while case let next? = node.right {
-		node = next
-	}
-	return node
-}
-```
-
 It returns the rightmost descendent of the node. We find it by following `right` pointers until we get to the end. In the above example, the rightmost descendent of node `2` is `5`. The maximum value in the entire tree is `11`, because that is the rightmost descendent of the root node `7`.
 
 Finally, we can write the code that removes a node from the tree:
-
-```swift
-public func remove() -> BinarySearchTree? {
-	let replacement: BinarySearchTree?
-	
-	if let left = left {
-		if let right = right {
-			replacement = removeNodeWithTwoChildren(left, right)  // 1
-		} else {
-			replacement = left           // 2
-		}
-	} else if let right = right {    // 3
-		replacement = right
-	} else {
-		replacement = nil              // 4
-	}
-	
-	reconnectParentToNode(replacement)
-	
-	parent = nil
-	left = nil
-	right = nil
-	
-	return replacement
-}
-```
+*/
+// 作廢
+//extension BinarySearchTree {
+//	public func remove() -> BinarySearchTree? {
+//		let replacement: BinarySearchTree?
+//		
+//		if let left = left {
+//			if let right = right {
+//				replacement = removeNodeWithTwoChildren(left, right)  // 1
+//			} else {
+//				replacement = left           // 2
+//			}
+//		} else if let right = right {    // 3
+//			replacement = right
+//		} else {
+//			replacement = nil              // 4
+//		}
+//		
+//		reconnectParentToNode(replacement)
+//		
+//		parent = nil
+//		left = nil
+//		right = nil
+//		
+//		return replacement
+//	}
+//}
+/*:
 
 It doesn't look so scary after all. ;-) There are four situations to handle:
 
@@ -472,24 +542,81 @@ First, we determine which node will replace the one we're removing and then we c
 
 The only tricky situation here is `// 1` and that logic has its own helper method:
 
-```swift
-private func removeNodeWithTwoChildren(left: BinarySearchTree, _ right: BinarySearchTree) -> BinarySearchTree {
-	let successor = right.minimum()
-	successor.remove()
-	
-	successor.left = left
-	left.parent = successor
-	
-	if right !== successor {
-		successor.right = right
-		right.parent = successor
-	} else {
-		successor.right = nil
+*/
+// 作廢
+//extension BinarySearchTree {
+//	private func removeNodeWithTwoChildren(left: BinarySearchTree, _ right: BinarySearchTree) -> BinarySearchTree {
+//		let successor = right.minimum()
+//		successor.remove()
+//		
+//		successor.left = left
+//		left.parent = successor
+//		
+//		if right !== successor {
+//			successor.right = right
+//			right.parent = successor
+//		} else {
+//			successor.right = nil
+//		}
+//		
+//		return successor
+//	}
+//}
+
+extension BinarySearchTree {
+	public func remove(value: T) -> BinarySearchTree? {
+		return search(value)?._remove()
 	}
 	
-	return successor
+	private func _remove() -> BinarySearchTree? {
+		func breakRelation(node: BinarySearchTree?) -> BinarySearchTree? {
+			guard let node = node else { return nil }
+			if node.isLeftChild {
+				node.parent?.left = nil
+			} else if node.isRightChild {
+				node.parent?.right = nil
+			}
+			node.parent = nil
+			return node
+		}
+		let replacement = right?.minimum()
+		if isLeftChild {
+			parent?.left = breakRelation(replacement)
+		} else if isRightChild {
+			parent?.right = breakRelation(replacement)
+		} else {
+			self.value = (replacement?.value)!
+			breakRelation(replacement)
+		}
+		return replacement
+	}
 }
-```
+
+
+
+
+tree.insert(4)
+tree.insert(4)
+tree.insert(4)
+tree == treeX
+print(tree)
+tree.search(7)
+tree.remove(4)
+tree.remove(9)
+print(tree)
+
+
+print(treeX)
+treeX.search(7)
+treeX.search(4)?._remove()
+treeX.search(9)?._remove()
+print(treeX)
+
+tree == treeX
+tree._remove()
+print(tree)
+
+/*:
 
 If the node to remove has two children, it must be replaced by the smallest child that is larger than this node's value. That always happens to be the leftmost descendent of the right child, i.e. `right.minimum()`. We take that node out of its original position in the tree and put it into the place of the node we're removing.
 
@@ -521,15 +648,19 @@ Like most binary search tree operations, removing a node runs in **O(h)** time, 
 
 Recall that the height of a node is the distance to its lowest leaf. We can calculate that with the following function:
 
-```swift
-public func height() -> Int {
-	if isLeaf {
-		return 0
-	} else {
+*/
+extension BinarySearchTree {
+	public func height() -> Int {
+		guard !isLeaf else { return 0 }
 		return 1 + max(left?.height() ?? 0, right?.height() ?? 0)
 	}
 }
-```
+tree.remove(4)
+tree.remove(4)
+tree.height()
+print(tree)
+
+/*:
 
 We look at the heights of the left and right branches and take the highest one. Again, this is a recursive procedure. Since this looks at all children of this node, performance is **O(n)**.
 
@@ -542,18 +673,21 @@ tree.height()  // 2
 ```
 
 You can also calculate the *depth* of a node, which is the distance to the root. Here is the code:
-
-```swift
-public func depth() -> Int {
-	var node = self
-	var edges = 0
-	while case let parent? = node.parent {
-		node = parent
-		edges += 1
+*/
+extension BinarySearchTree {
+	public func depth() -> Int {
+		var node = self
+		var edges = 0
+		while case let parent? = node.parent {
+			node = parent
+			edges += 1
+		}
+		return edges
 	}
-	return edges
 }
-```
+let node1 = tree.search(1)
+node1?.depth()
+/*:
 
 It steps upwards through the tree, following the `parent` pointers until we reach the root node (whose `parent` is nil). This takes **O(h)** time. Example:
 
@@ -573,41 +707,41 @@ Note that you can't find the number that comes before `7` by just looking at its
 
 The `predecessor()` function returns the node whose value precedes the current value in sorted order:
 
-```swift
-public func predecessor() -> BinarySearchTree<T>? {
-	if let left = left {
-		return left.maximum()
-	} else {
-		var node = self
-		while case let parent? = node.parent {
-			if parent.value < value { return parent }
-			node = parent
+*/
+extension BinarySearchTree {
+	public func predecessor() -> BinarySearchTree<T>? {
+		if let left = left {
+			return left.maximum()
+		} else {
+			var node = self
+			while case let parent? = node.parent {
+				if parent.value < value { return parent }
+				node = parent
+			}
+			return nil
 		}
-		return nil
+	}
+	public func successor() -> BinarySearchTree<T>? {
+		if let right = right {
+			return right.minimum()
+		} else {
+			var node = self
+			while case let parent? = node.parent {
+				if parent.value > value { return parent }
+				node = parent
+			}
+			return nil
+		}
 	}
 }
-```
+tree.predecessor()
+/*:
 
 It's easy if we have a left subtree. In that case, the immediate predecessor is the maximum value in that subtree. You can verify in the above picture that `5` is indeed the maximum value in `7`'s left branch.
 
 However, if there is no left subtree then we have to look at our parent nodes until we find a smaller value. So if we want to know what the predecessor is of node `9`, we keep going up until we find the first parent with a smaller value, which is `7`.
 
 The code for `successor()` works the exact same way but mirrored:
-
-```swift
-public func successor() -> BinarySearchTree<T>? {
-	if let right = right {
-		return right.minimum()
-	} else {
-		var node = self
-		while case let parent? = node.parent {
-			if parent.value > value { return parent }
-			node = parent
-		}
-		return nil
-	}
-}
-```
 
 Both these methods run in **O(h)** time.
 
@@ -628,15 +762,16 @@ The value of the root node is `7`, so a node with value `100` is supposed to be 
 As a result, doing `tree.search(100)` gives nil.
 
 You can check whether a tree is a valid binary search tree with the following method:
-
-```swift
-public func isBST(minValue minValue: T, maxValue: T) -> Bool {
-	if value < minValue || value > maxValue { return false }
-	let leftBST = left?.isBST(minValue: minValue, maxValue: value) ?? true
-	let rightBST = right?.isBST(minValue: value, maxValue: maxValue) ?? true
-	return leftBST && rightBST
+*/
+extension BinarySearchTree {
+	public func isBST(minValue minValue: T, maxValue: T) -> Bool {
+		if value < minValue || value > maxValue { return false }
+		let leftBST = left?.isBST(minValue: minValue, maxValue: value) ?? true
+		let rightBST = right?.isBST(minValue: value, maxValue: maxValue) ?? true
+		return leftBST && rightBST
+	}
 }
-```
+/*:
 
 This verifies that the left branch does indeed contain values that are less than the current node's value, and that the right branch only contains values that are larger.
 
