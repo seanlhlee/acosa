@@ -46,13 +46,10 @@ It will be useful to add a `description` method so you can print the tree:
 
 ```swift
 extension TreeNode: CustomStringConvertible {
-  public var description: String {
-    var s = "\(value)"
-    if !children.isEmpty {
-      s += " {" + children.map { $0.description }.joinWithSeparator(", ") + "}"
-    }
-    return s
-  }
+	public var description: String {
+		let childStr = !children.isEmpty ? " {" + children.map { $0.description }.joinWithSeparator(" ∣ ") + "}" : ""
+		return "\(value)" + childStr
+	}
 }
 ```
 
@@ -94,6 +91,8 @@ teaNode.addChild(chaiTeaNode)
 
 sodaNode.addChild(gingerAleNode)
 sodaNode.addChild(bitterLemonNode)
+
+print(tree)
 ```
 
 If you print out the value of `tree`, you'll get:
@@ -129,17 +128,15 @@ Here's the code:
 
 ```swift
 extension TreeNode where T: Equatable {
-  func search(value: T) -> TreeNode? {
-    if value == self.value {
-      return self
-    }
-    for child in children {
-      if let found = child.search(value) {
-        return found
-      }
-    }
-    return nil
-  }
+	func search(value: T) -> TreeNode? {
+		guard value != self.value else { return self }
+		for child in children {
+			if let found = child.search(value) {
+				return found
+			}
+		}
+		return nil
+	}
 }
 ```
 
