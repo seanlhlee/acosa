@@ -213,7 +213,7 @@ extension BinarySearchTree: CustomDebugStringConvertible {
 }
 print(tree)
 
-/*
+/*:
 
 When you do `print(tree)` it will look something like this:
 
@@ -229,7 +229,7 @@ However, if one branch is significantly longer than the other, searching becomes
 
 One way to make the binary search tree balanced is to insert the nodes in a totally random order. On average that should balance out the tree quite nicely. But it doesn't guarantee success, nor is it always practical.
 
-The other solution is to use a *self-balancing* binary tree. This type of data structure adjusts the tree to keep it balanced after you insert or delete nodes. See [AVL tree](../AVL Tree) and [red-black tree](../Red-Black Tree) for examples.
+The other solution is to use a *self-balancing* binary tree. This type of data structure adjusts the tree to keep it balanced after you insert or delete nodes. See [AVL tree](@next) and **red-black tree** for examples.
 
 ## See also
 

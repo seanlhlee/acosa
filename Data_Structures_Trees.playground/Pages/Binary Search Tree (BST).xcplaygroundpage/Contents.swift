@@ -582,12 +582,15 @@ extension BinarySearchTree {
 		let replacement = right?.minimum()
 		if isLeftChild {
 			parent?.left = breakRelation(replacement)
+
 		} else if isRightChild {
 			parent?.right = breakRelation(replacement)
 		} else {
 			self.value = (replacement?.value)!
 			breakRelation(replacement)
 		}
+		replacement?.left = left
+		replacement?.right = right
 		return replacement
 	}
 }
@@ -675,7 +678,10 @@ tree.height()  // 2
 You can also calculate the *depth* of a node, which is the distance to the root. Here is the code:
 */
 extension BinarySearchTree {
-	public func depth() -> Int {
+	public func depth(value: T) -> Int? {
+		return search(value)?._depth()
+	}
+	private func _depth() -> Int {
 		var node = self
 		var edges = 0
 		while case let parent? = node.parent {
@@ -685,8 +691,8 @@ extension BinarySearchTree {
 		return edges
 	}
 }
-let node1 = tree.search(1)
-node1?.depth()
+tree.depth(1)
+tree.depth(12)
 /*:
 
 It steps upwards through the tree, following the `parent` pointers until we reach the root node (whose `parent` is nil). This takes **O(h)** time. Example:
@@ -802,15 +808,43 @@ However, if one branch is significantly longer than the other, searching becomes
 
 One way to make the binary search tree balanced is to insert the nodes in a totally random order. On average that should balance out the tree quite nicely. But it doesn't guarantee success, nor is it always practical.
 
-The other solution is to use a *self-balancing* binary tree. This type of data structure adjusts the tree to keep it balanced after you insert or delete nodes. See [AVL tree](../AVL Tree) and [red-black tree](../Red-Black Tree) for examples.
+The other solution is to use a *self-balancing* binary tree. This type of data structure adjusts the tree to keep it balanced after you insert or delete nodes. See [AVL tree](@next) and **red-black tree** for examples.
 
 
 ## See also
 
 [Binary Search Tree on Wikipedia](https://en.wikipedia.org/wiki/Binary_search_tree)
 
+# 測試：
+*/
+let aTree = BinarySearchTree(value: 8)
+aTree.isRoot
+aTree.insert(4)
+aTree.insert(12)
+aTree.insert(2)
+aTree.insert(6)
+aTree.insert(10)
+aTree.insert(14)
+aTree.insert(1)
+aTree.insert(3)
+aTree.insert(5)
+aTree.insert(7)
+aTree.insert(9)
+aTree.insert(11)
+aTree.insert(13)
+aTree.insert(15)
+aTree.search(8)?.isRoot
+print(aTree) //(((1) <- 2 -> (3)) <- 4 -> ((5) <- 6 -> (7))) <- 8 -> (((9) <- 10 -> (11)) <- 12 -> ((13) <- 14 -> (15)))
+aTree._remove()
+print(aTree)
+aTree.height()
+aTree.depth(1)
+aTree.depth(12)
+aTree.search(5)?.isRoot
+aTree.search(9)?.isRoot
+aTree.search(8)?.isRoot
 
-
+/*:
 ***
 [Previous](@previous) | [Next](@next)
 */
