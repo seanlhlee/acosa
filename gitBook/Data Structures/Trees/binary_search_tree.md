@@ -462,6 +462,8 @@ extension BinarySearchTree {
 			self.value = (replacement?.value)!
 			breakRelation(replacement)
 		}
+        replacement?.left = left
+		replacement?.right = right
 		return replacement
 	}
 }
