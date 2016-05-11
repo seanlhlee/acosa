@@ -684,87 +684,85 @@ The enum has three cases:
 As usual, we'll implement most functionality recursively. We'll treat each case of the enum slightly differently. For example, this is how you could calculate the number of nodes in the tree and the height of the tree:
 
 ```swift
-  public var count: Int {
-    switch self {
-    case .Empty: return 0
-    case .Leaf: return 1
-    case let .Node(left, _, right): return left.count + 1 + right.count
-    }
-  }
-  
-  public var height: Int {
-    switch self {
-    case .Empty: return 0
-    case .Leaf: return 1
-    case let .Node(left, _, right): return 1 + max(left.height, right.height)
-    }
-  }
+extension BinarySearchTree {
+	public var count: Int {
+		switch self {
+		case .Empty: return 0
+		case .Leaf: return 1
+		case let .Node(left, _, right): return left.count + 1 + right.count
+		}
+	}
+	
+	public var height: Int {
+		switch self {
+		case .Empty: return 0
+		case .Leaf: return 1
+		case let .Node(left, _, right): return 1 + max(left.height, right.height)
+		}
+	}
+}
 ```
 
 Inserting new nodes looks like this:
 
 ```swift
-  public func insert(newValue: T) -> BinarySearchTree {
-    switch self {
-    case .Empty:
-      return .Leaf(newValue)
-      
-    case .Leaf(let value):
-      if newValue < value {
-        return .Node(.Leaf(newValue), value, .Empty)
-      } else {
-        return .Node(.Empty, value, .Leaf(newValue))
-      }
-
-    case .Node(let left, let value, let right):
-      if newValue < value {
-        return .Node(left.insert(newValue), value, right)
-      } else {
-        return .Node(left, value, right.insert(newValue))
-      }
-    }
-  }
-```
-
-Try it out in a playground:
-
-```swift
+extension BinarySearchTree {
+	public mutating func insert(newValue: T) -> BinarySearchTree {
+		switch self {
+		case .Empty:
+			self = .Leaf(newValue)
+			
+		case .Leaf(let value):
+			if newValue < value {
+				self = .Node(.Leaf(newValue), value, .Empty)
+			} else {
+				self = .Node(.Empty, value, .Leaf(newValue))
+			}
+			
+		case .Node(var left, let value, var right):
+			if newValue < value {
+				self = .Node(left.insert(newValue), value, right)
+			} else {
+				self = .Node(left, value, right.insert(newValue))
+			}
+		}
+		return self
+	}
+}
+// Try it out in a playground:
 var tree = BinarySearchTree.Leaf(7)
-tree = tree.insert(2)
-tree = tree.insert(5)
-tree = tree.insert(10)
-tree = tree.insert(9)
-tree = tree.insert(1)
+tree.insert(2)
+tree.insert(5)
+tree.insert(10)
+tree.insert(9)
+tree.insert(1)
+tree
 ```
 
-Notice that each time you insert something, you get back a completely new tree object. That's why you need to assign the result back to the `tree` variable.
+Notice that here we implement a mutating method. You can emplement a none-mutated version of `insert()` methode, each time you insert something, you get back a completely new tree object. Therefore you need to assign the result back to the `tree` variable.
 
 Here is the all-important search function:
 
 ```swift
-  public func search(x: T) -> BinarySearchTree? {
-    switch self {
-    case .Empty:
-      return nil
-    case .Leaf(let y):
-      return (x == y) ? self : nil
-    case let .Node(left, y, right):
-      if x < y {
-        return left.search(x)
-      } else if y < x {
-        return right.search(x)
-      } else {
-        return self
-      }
-    }
-  }
-```
+extension BinarySearchTree {
+	public func search(x: T) -> BinarySearchTree? {
+		switch self {
+		case .Empty:
+			return nil
+		case .Leaf(let y):
+			return (x == y) ? self : nil
+		case let .Node(left, y, right):
+			if x < y {
+				return left.search(x)
+			} else if y < x {
+				return right.search(x)
+			} else {
+				return self
+			}
+		}
+	}
+}
 
-As you can see, most of these functions have the same structure.
-
-Try it out in a playground:
-
-```swift
 tree.search(10)
 tree.search(1)
 tree.search(11)   // nil
