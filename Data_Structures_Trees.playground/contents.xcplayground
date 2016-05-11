@@ -4,6 +4,7 @@
         <page name='Tree'/>
         <page name='Binary Tree'/>
         <page name='Binary Search Tree (BST)'/>
+        <page name='Binary Search Tree (BST-enum)'/>
         <page name='AVL Tree'/>
         <page name='Segment Tree'/>
         <page name='Heap'/>

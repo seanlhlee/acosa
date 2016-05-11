@@ -765,12 +765,21 @@ You can check whether a tree is a valid binary search tree with the following me
 */
 extension BinarySearchTree {
 	public func isBST(minValue minValue: T, maxValue: T) -> Bool {
-		if value < minValue || value > maxValue { return false }
+		guard minValue <= value && maxValue >= value else { return false }
 		let leftBST = left?.isBST(minValue: minValue, maxValue: value) ?? true
 		let rightBST = right?.isBST(minValue: value, maxValue: maxValue) ?? true
 		return leftBST && rightBST
 	}
 }
+
+if let node1 = tree.search(1) {
+	tree.isBST(minValue: Int.min, maxValue: Int.max)  // true
+	node1.insert(100)                                 // EVIL!!!
+	tree.search(100)                                  // nil
+	tree.isBST(minValue: Int.min, maxValue: Int.max)  // false
+}
+
+
 /*:
 
 This verifies that the left branch does indeed contain values that are less than the current node's value, and that the right branch only contains values that are larger.
@@ -785,141 +794,6 @@ if let node1 = tree.search(1) {
 	tree.isBST(minValue: Int.min, maxValue: Int.max)  // false
 }
 ```
-
-## The code (solution 2)
-
-We've implemented the binary tree node as a class but you can also use an enum.
-
-The difference is reference semantics versus value semantics. Making a change to the class-based tree will update that same instance in memory. But the enum-based tree is immutable -- any insertions or deletions will give you an entirely new copy of the tree. Which one is best totally depends on what you want to use it for.
-	
-	Here's how you'd make a binary search tree using an enum:
-
-```swift
-public enum BinarySearchTree<T: Comparable> {
-	case Empty
-	case Leaf(T)
-	indirect case Node(BinarySearchTree, T, BinarySearchTree)
-}
-```
-
-The enum has three cases:
-
-- `Empty` to mark the end of a branch (the class-based version used `nil` references for this).
-- `Leaf` for a leaf node that has no children.
-- `Node` for a node that has one or two children. This is marked `indirect` so that it can hold `BinarySearchTree` values. Without `indirect` you can't make recursive enums.
-
-> **Note:** The nodes in this binary tree don't have a reference to their parent node. It's not a major impediment but it will make certain operations slightly more cumbersome to implement.
-
-As usual, we'll implement most functionality recursively. We'll treat each case of the enum slightly differently. For example, this is how you could calculate the number of nodes in the tree and the height of the tree:
-
-```swift
-public var count: Int {
-	switch self {
-	case .Empty: return 0
-	case .Leaf: return 1
-	case let .Node(left, _, right): return left.count + 1 + right.count
-	}
-}
-
-public var height: Int {
-	switch self {
-	case .Empty: return 0
-	case .Leaf: return 1
-	case let .Node(left, _, right): return 1 + max(left.height, right.height)
-	}
-}
-```
-
-Inserting new nodes looks like this:
-
-```swift
-public func insert(newValue: T) -> BinarySearchTree {
-	switch self {
-	case .Empty:
-		return .Leaf(newValue)
-		
-	case .Leaf(let value):
-		if newValue < value {
-			return .Node(.Leaf(newValue), value, .Empty)
-		} else {
-			return .Node(.Empty, value, .Leaf(newValue))
-		}
-		
-	case .Node(let left, let value, let right):
-		if newValue < value {
-			return .Node(left.insert(newValue), value, right)
-		} else {
-			return .Node(left, value, right.insert(newValue))
-		}
-	}
-}
-```
-
-Try it out in a playground:
-
-```swift
-var tree = BinarySearchTree.Leaf(7)
-tree = tree.insert(2)
-tree = tree.insert(5)
-tree = tree.insert(10)
-tree = tree.insert(9)
-tree = tree.insert(1)
-```
-
-Notice that each time you insert something, you get back a completely new tree object. That's why you need to assign the result back to the `tree` variable.
-
-Here is the all-important search function:
-
-```swift
-public func search(x: T) -> BinarySearchTree? {
-	switch self {
-	case .Empty:
-		return nil
-	case .Leaf(let y):
-		return (x == y) ? self : nil
-	case let .Node(left, y, right):
-		if x < y {
-			return left.search(x)
-		} else if y < x {
-			return right.search(x)
-		} else {
-			return self
-		}
-	}
-}
-```
-
-As you can see, most of these functions have the same structure.
-
-Try it out in a playground:
-
-```swift
-tree.search(10)
-tree.search(1)
-tree.search(11)   // nil
-```
-
-To print the tree for debug purposes you can use this method:
-
-```swift
-extension BinarySearchTree: CustomDebugStringConvertible {
-	public var debugDescription: String {
-		switch self {
-		case .Empty: return "."
-		case .Leaf(let value): return "\(value)"
-		case .Node(let left, let value, let right):
-			return "(\(left.debugDescription) <- \(value) -> \(right.debugDescription))"
-		}
-	}
-}
-```
-
-When you do `print(tree)` it will look something like this:
-
-((1 <- 2 -> 5) <- 7 -> (9 <- 10 -> .))
-
-The root node is in the middle; a dot means there is no child at that position.
-
 ## When the tree becomes unbalanced...
 
 A binary search tree is *balanced* when its left and right subtrees contain roughly the same number of nodes. In that case, the height of the tree is *log(n)*, where *n* is the number of nodes. That's the ideal situation.
@@ -929,6 +803,7 @@ However, if one branch is significantly longer than the other, searching becomes
 One way to make the binary search tree balanced is to insert the nodes in a totally random order. On average that should balance out the tree quite nicely. But it doesn't guarantee success, nor is it always practical.
 
 The other solution is to use a *self-balancing* binary tree. This type of data structure adjusts the tree to keep it balanced after you insert or delete nodes. See [AVL tree](../AVL Tree) and [red-black tree](../Red-Black Tree) for examples.
+
 
 ## See also
 
