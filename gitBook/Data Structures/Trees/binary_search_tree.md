@@ -552,15 +552,22 @@ tree.height()  // 2
 You can also calculate the *depth* of a node, which is the distance to the root. Here is the code:
 
 ```swift
-  public func depth() -> Int {
-    var node = self
-    var edges = 0
-    while case let parent? = node.parent {
-      node = parent
-      edges += 1
-    }
-    return edges
-  }
+extension BinarySearchTree {
+	public func depth(value: T) -> Int? {
+		return search(value)?._depth()
+	}
+	private func _depth() -> Int {
+		var node = self
+		var edges = 0
+		while case let parent? = node.parent {
+			node = parent
+			edges += 1
+		}
+		return edges
+	}
+}
+tree.depth(1)
+tree.depth(12)
 ```
 
 It steps upwards through the tree, following the `parent` pointers until we reach the root node (whose `parent` is nil). This takes **O(h)** time. Example:
