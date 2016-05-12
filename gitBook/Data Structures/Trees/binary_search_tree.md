@@ -405,13 +405,10 @@ Making changes to the tree involves changing a bunch of `parent` and `left` and 
 We also need a function that returns the leftmost descendent of a node:
 
 ```swift
-  public func minimum() -> BinarySearchTree {
-    var node = self
-    while case let next? = node.left {
-      node = next
-    }
-    return node
-  }
+	public func minimum() -> BinarySearchTree {
+		guard let next = left else { return self }
+		return next.minimum()
+	}
 ```
 
 To see how this works, take the following tree:
@@ -424,11 +421,8 @@ We won't need it for deleting, but for completeness' sake, here is the opposite 
 
 ```swift
   public func maximum() -> BinarySearchTree {
-    var node = self
-    while case let next? = node.right {
-      node = next
-    }
-    return node
+	guard let next = right else { return self }
+	return next.minimum()
   }
 ```
 
@@ -557,13 +551,11 @@ extension BinarySearchTree {
 		return search(value)?._depth()
 	}
 	private func _depth() -> Int {
-		var node = self
-		var edges = 0
-		while case let parent? = node.parent {
-			node = parent
-			edges += 1
+		var countParentUpWard = parent != nil ? 1 : 0
+		if let parent = parent {
+			countParentUpWard += parent._depth()
 		}
-		return edges
+		return countParentUpWard
 	}
 }
 tree.depth(1)
