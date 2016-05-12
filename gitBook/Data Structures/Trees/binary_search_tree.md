@@ -422,7 +422,7 @@ We won't need it for deleting, but for completeness' sake, here is the opposite 
 ```swift
   public func maximum() -> BinarySearchTree {
 	guard let next = right else { return self }
-	return next.minimum()
+	return next.maximum()
   }
 ```
 
@@ -578,18 +578,17 @@ Note that you can't find the number that comes before `7` by just looking at its
 The `predecessor()` function returns the node whose value precedes the current value in sorted order:
 
 ```swift
-  public func predecessor() -> BinarySearchTree<T>? {
-    if let left = left {
-      return left.maximum()
-    } else {
-      var node = self
-      while case let parent? = node.parent {
-        if parent.value < value { return parent }
-        node = parent
-      }
-      return nil
-    }
-  }
+extension BinarySearchTree {
+	public func predecessor() -> BinarySearchTree<T>? {
+		guard !hasLeftChild else { return left!.maximum() }
+		var node = self
+		while case let parent? = node.parent {
+			guard parent.value >= value else { return parent }
+			node = parent
+		}
+		return nil
+	}
+}
 ```
 
 It's easy if we have a left subtree. In that case, the immediate predecessor is the maximum value in that subtree. You can verify in the above picture that `5` is indeed the maximum value in `7`'s left branch.
@@ -599,18 +598,17 @@ However, if there is no left subtree then we have to look at our parent nodes un
 The code for `successor()` works the exact same way but mirrored:
 
 ```swift
-  public func successor() -> BinarySearchTree<T>? {
-    if let right = right {
-      return right.minimum()
-    } else {
-      var node = self
-      while case let parent? = node.parent {
-        if parent.value > value { return parent }
-        node = parent
-      }
-      return nil
-    }
-  }
+extension BinarySearchTree {
+	public func successor() -> BinarySearchTree<T>? {
+		guard !hasRightChild else { return right!.minimum() }
+		var node = self
+		while case let parent? = node.parent {
+			if parent.value > value { return parent }
+			node = parent
+		}
+		return nil
+	}
+}
 ```
 
 Both these methods run in **O(h)** time.
