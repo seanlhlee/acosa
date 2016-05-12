@@ -467,6 +467,46 @@ extension AVLTree: CustomStringConvertible {
 }
 
 
+var tree = AVLTree<Int, Int>()
+tree.size
+tree.insert(8)
+tree.size
+tree.insert(4)
+tree.size
+tree.insert(12)
+tree.insert(2)
+tree.insert(6)
+tree.insert(10)
+tree.insert(14)
+tree.insert(1)
+tree.insert(3)
+tree.insert(5)
+tree.insert(7)
+tree.insert(9)
+tree.insert(11)
+tree.insert(13)
+tree.insert(15)
+tree.display(tree.root!)
+
+tree[3] = 33
+//print(tree.debugDescription)
+tree.search(6)
+tree[6] = 29
+tree[6]
+tree.size
+tree.delete(3)
+tree.delete(9)
+tree.size
+tree.display(tree.root!)
+tree.delete(8)
+tree.display(tree.root!)
+tree.insert(3)
+tree.insert(9)
+tree.insert(8)
+tree.display(tree.root!)
+tree.delete(16)
+tree.display(tree.root!)
+tree.size
 
 
 

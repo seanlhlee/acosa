@@ -150,6 +150,11 @@ public class BinarySearchTree<T: Comparable>: Equatable {
 	public var count: Int {
 		return (left?.count ?? 0) + 1 + (right?.count ?? 0)
 	}
+	
+	private func getRoot() -> BinarySearchTree {
+		guard !isRoot else { return self }
+		return parent!.getRoot()
+	}
 }
 
 public func ==<T>(lhs: BinarySearchTree<T>, rhs: BinarySearchTree<T>) -> Bool {
@@ -299,6 +304,11 @@ Here is the implementation of `search()`:
 */
 extension BinarySearchTree {
 	public func search(value: T) -> BinarySearchTree? {
+		
+		guard value != self.value else { return self }
+		return value < self.value ? left?.search(value) : right?.search(value)
+	}
+	private func _search(value: T) -> BinarySearchTree? {
 		guard value != self.value else { return self }
 		return value < self.value ? left?.search(value) : right?.search(value)
 	}
@@ -475,18 +485,12 @@ We also need a function that returns the leftmost descendent of a node:
 */
 extension BinarySearchTree {
 	public func minimum() -> BinarySearchTree {
-		var node = self
-		while case let next? = node.left {
-			node = next
-		}
-		return node
+		guard let next = left else { return self }
+		return next.minimum()
 	}
 	public func maximum() -> BinarySearchTree {
-		var node = self
-		while case let next? = node.right {
-			node = next
-		}
-		return node
+		guard let next = right else { return self }
+		return next.maximum()
 	}
 }
 /*:
@@ -682,13 +686,8 @@ extension BinarySearchTree {
 		return search(value)?._depth()
 	}
 	private func _depth() -> Int {
-		var node = self
-		var edges = 0
-		while case let parent? = node.parent {
-			node = parent
-			edges += 1
-		}
-		return edges
+		guard let parent = parent else { return 0 }
+		return parent._depth() + 1
 	}
 }
 tree.depth(1)
@@ -716,31 +715,42 @@ The `predecessor()` function returns the node whose value precedes the current v
 */
 extension BinarySearchTree {
 	public func predecessor() -> BinarySearchTree<T>? {
-		if let left = left {
-			return left.maximum()
-		} else {
-			var node = self
-			while case let parent? = node.parent {
-				if parent.value < value { return parent }
-				node = parent
-			}
-			return nil
+		guard !hasLeftChild else { return left!.maximum() }
+		var node = self
+		while case let parent? = node.parent {
+			guard parent.value >= value else { return parent }
+			node = parent
 		}
+		return nil
 	}
 	public func successor() -> BinarySearchTree<T>? {
-		if let right = right {
-			return right.minimum()
-		} else {
-			var node = self
-			while case let parent? = node.parent {
-				if parent.value > value { return parent }
-				node = parent
-			}
-			return nil
+		guard !hasRightChild else { return right!.minimum() }
+		var node = self
+		while case let parent? = node.parent {
+			if parent.value > value { return parent }
+			node = parent
 		}
+		return nil
 	}
 }
-tree.predecessor()
+tree.insert(8)
+tree.insert(9)
+tree.insert(20)
+tree.insert(15)
+tree.insert(12)
+tree.insert(18)
+tree.insert(13)
+tree.insert(11)
+tree.insert(17)
+tree.insert(14)
+tree.insert(19)
+tree.insert(16)
+tree.insert(21)
+print(tree)
+tree.search(16)?.predecessor()
+let node21 = tree.search(21)!
+let node16 = tree.search(16)!
+node16 == node21
 /*:
 
 It's easy if we have a left subtree. In that case, the immediate predecessor is the maximum value in that subtree. You can verify in the above picture that `5` is indeed the maximum value in `7`'s left branch.
@@ -836,7 +846,7 @@ aTree.insert(15)
 aTree.search(8)?.isRoot
 print(aTree) //(((1) <- 2 -> (3)) <- 4 -> ((5) <- 6 -> (7))) <- 8 -> (((9) <- 10 -> (11)) <- 12 -> ((13) <- 14 -> (15)))
 aTree._remove()
-print(aTree)
+print(aTree) //(((1) <- 2 -> (3)) <- 4 -> ((5) <- 6 -> (7))) <- 9 -> ((10 -> (11)) <- 12 -> ((13) <- 14 -> (15)))
 aTree.height()
 aTree.depth(1)
 aTree.depth(12)
