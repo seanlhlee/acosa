@@ -551,11 +551,8 @@ extension BinarySearchTree {
 		return search(value)?._depth()
 	}
 	private func _depth() -> Int {
-		var countParentUpWard = parent != nil ? 1 : 0
-		if let parent = parent {
-			countParentUpWard += parent._depth()
-		}
-		return countParentUpWard
+		guard let parent = parent else { return 0 }
+		return parent._depth() + 1
 	}
 }
 tree.depth(1)
