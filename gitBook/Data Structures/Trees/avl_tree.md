@@ -39,6 +39,8 @@ But the following are trees that are unbalanced, because the height of the left 
 The difference between the heights of the left and right subtrees is called the *balance factor*. It is calculated as follows:
 
 	balance factor = abs(height(left subtree) - height(right subtree))
+    /// balance factor
+    
 
 If after an insertion or deletion the balance factor becomes greater than 1, then we need to re-balance this part of the AVL tree. And that is done with rotations.
 
