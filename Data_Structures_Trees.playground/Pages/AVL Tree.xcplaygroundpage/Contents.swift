@@ -69,450 +69,164 @@ The interesting bits are in the following methods:
 */
 import Foundation
 
-public class TreeNode<Key: Comparable, Payload> {
-	public typealias Node = TreeNode<Key, Payload>
-	
-	public var payload: Payload?
-	
-	private var key: Key
-	internal var leftChild: Node?
-	internal var rightChild: Node?
-	private var height: Int
-	weak private var parent: Node?
-	
-	public init(key: Key, payload: Payload?, leftChild: Node?, rightChild: Node?, parent: Node?, height: Int) {
-		self.key = key
-		self.payload = payload
-		self.leftChild = leftChild
-		self.rightChild = rightChild
-		self.parent = parent
-		self.height = height
-		
-		self.leftChild?.parent = self
-		self.rightChild?.parent = self
-	}
-	
-	public convenience init(key: Key, payload: Payload?) {
-		self.init(key: key, payload: payload, leftChild: nil, rightChild: nil, parent: nil, height: 1)
-	}
-	
-	public convenience init(key: Key) {
-		self.init(key: key, payload: nil)
-	}
-	
-	public var isRoot: Bool {
-		return parent == nil
-	}
-	
-	public var isLeaf: Bool {
-		return rightChild == nil && leftChild == nil
-	}
-	
-	public var isLeftChild: Bool {
-		return parent?.leftChild === self
-	}
-	
-	public var isRightChild: Bool {
-		return parent?.rightChild === self
-	}
-	
-	public var hasLeftChild: Bool {
-		return leftChild != nil
-	}
-	
-	public var hasRightChild: Bool {
-		return rightChild != nil
-	}
-	
-	public var hasAnyChild: Bool {
-		return leftChild != nil || rightChild != nil
-	}
-	
-	public var hasBothChildren: Bool {
-		return leftChild != nil && rightChild != nil
-	}
-}
-
-// MARK: - The AVL tree
+// MARK: - The AVL tree: a self balance Binary Search Tree type
+/// A self balance Binary Search Tree type
 
 public class AVLTree<Key: Comparable, Payload> {
+	
 	public typealias Node = TreeNode<Key, Payload>
 	
 	private(set) public var root: Node?
-	private(set) public var size = 0
-	
+	private	var count: Int { return root != nil ? root!.count : 0 }
+	private(set) public var size = 0 {
+		didSet {
+			//			display()
+			//			guard let root = root else { return }
+			guard !isBalanced else { return }
+			balance()
+			display()
+		}
+	}
+	/// check a tree is a balanced tree, return `true` if the heights of the two
+	/// child subtrees of any node differ by at most one.
+	private var isBalanced: Bool {
+		guard let root = root else { return true }
+		let array = root.nodeTrasform { (node: Node) -> Bool in
+			return node.isBalanced
+		}
+		return array.reduce(true){ $0 && $1 }
+	}
+	/// init a blank AVLTree (no tree node at all)
 	public init() { }
-}
-
-// MARK: - Searching
-
-extension TreeNode {
-	public func minimum() -> TreeNode? {
-		if let leftChild = self.leftChild {
-			return leftChild.minimum()
-		}
-		return self
+	private init(subBranch: Node) {
+		self.root = subBranch
 	}
 	
-	public func maximum() -> TreeNode? {
-		if let rightChild = self.rightChild {
-			return rightChild.maximum()
+	// MARK: - Searching
+	/// subscription function: get payloay by subscript[key]
+	public subscript(key: Key) -> Payload? {
+		get {
+			return search(key)?.payload
 		}
-		return self
-	}
-}
-
-extension AVLTree {
-	subscript(key: Key) -> Payload? {
-		get { return search(key) }
-		set { insert(key, newValue) }
-	}
-	
-	public func search(input: Key) -> Payload? {
-		if let result = search(input, root) {
-			return result.payload
-		} else {
-			return nil
-		}
-	}
-	
-	private func search(key: Key, _ node: Node?) -> Node? {
-		if let node = node {
-			if key == node.key {
-				return node
-			} else if key < node.key {
-				return search(key, node.leftChild)
+		/// need to consider the possibility of data being modified
+		set {
+			if let node = search(key) {
+				node.payload = newValue
 			} else {
-				return search(key, node.rightChild)
+				insert(key, newValue)
 			}
 		}
-		return nil
+	}
+	/// search and get payloay for key. return payload of node which key is `key`
+	public func searchFor(key: Key) -> Payload? {
+		return search(key)?.payload
+	}
+	/// search a node contains key, return a node in the tree whose key is `key`
+	public func search(key: Key, showNotFound: Bool = true) -> Node? {
+		if root?.search(key) == nil && showNotFound {
+			print("key: \(key) not found!")
+		}
+		return root?.search(key)
+	}
+	/// return if a node in the tree whose key is `key`, return `true` if yes
+	public func contains(key: Key) -> Bool {
+		return search(key) != nil
+	}
+}
+
+// MARK: - Debugging
+
+extension AVLTree: CustomStringConvertible, CustomDebugStringConvertible {
+	/// CustomStringConvertible
+	public var description: String {
+		guard let root = root else { return "[]" }
+		return root.description
+	}
+	/// CustomDebugStringConvertible
+	public var debugDescription: String {
+		guard let root = root else { return "[]" }
+		return root.debugDescription
+	}
+	
+	// MARK: - Displaying tree
+	// display a node structure
+	public func display(node: Node) {
+		node.display()
+	}
+	// display a tree structure
+	public func display() {
+		guard let root = root else { return }
+		root.display()
 	}
 }
 
 // MARK: - Inserting new items
 
 extension AVLTree {
+	/// insert a node to the tree, and keep a AVLTree
 	public func insert(key: Key, _ payload: Payload? = nil) {
+		// if a node in the tree and its key is `key' skip the inseart
+		guard search(key, showNotFound: false) == nil else { return }
 		if let root = root {
-			insert(key, payload, root)
+			root.insert(key, payload: payload)
 		} else {
-			root = Node(key: key, payload: payload)
+			self.root = Node(key: key, payload: payload)
 		}
 		size += 1
-	}
-	
-	private func insert(input: Key, _ payload: Payload?, _ node: Node) {
-		if input < node.key {
-			if let child = node.leftChild {
-				insert(input, payload, child)
-			} else {
-				let child = Node(key: input, payload: payload, leftChild: nil, rightChild: nil, parent: node, height: 1)
-				node.leftChild = child
-				balance(child)
-			}
-		} else {
-			if let child = node.rightChild {
-				insert(input, payload, child)
-			} else {
-				let child = Node(key: input, payload: payload, leftChild: nil, rightChild: nil, parent: node, height: 1)
-				node.rightChild = child
-				balance(child)
-			}
-		}
-	}
-}
-
-// MARK: - Balancing tree
-
-extension AVLTree {
-	private func updateHeightUpwards(node: Node?) {
-		if let node = node {
-			let lHeight = node.leftChild?.height ?? 0
-			let rHeight = node.rightChild?.height ?? 0
-			node.height = max(lHeight, rHeight) + 1
-			updateHeightUpwards(node.parent)
-		}
-	}
-	
-	private func lrDifference(node: Node?) -> Int {
-		let lHeight = node?.leftChild?.height ?? 0
-		let rHeight = node?.rightChild?.height ?? 0
-		return lHeight - rHeight
-	}
-	
-	private func balance(node: Node?) {
-		guard let node = node else {
-			return
-		}
-		
-		updateHeightUpwards(node.leftChild)
-		updateHeightUpwards(node.rightChild)
-		
-		var nodes = [Node?](count: 3, repeatedValue: nil)
-		var subtrees = [Node?](count: 4, repeatedValue: nil)
-		let nodeParent = node.parent
-		
-		let lrFactor = lrDifference(node)
-		if lrFactor > 1 {
-			// left-left or left-right
-			if lrDifference(node.leftChild) > 0 {
-				// left-left
-				nodes[0] = node
-				nodes[2] = node.leftChild
-				nodes[1] = nodes[2]?.leftChild
-				
-				subtrees[0] = nodes[1]?.leftChild
-				subtrees[1] = nodes[1]?.rightChild
-				subtrees[2] = nodes[2]?.rightChild
-				subtrees[3] = nodes[0]?.rightChild
-			} else {
-				// left-right
-				nodes[0] = node
-				nodes[1] = node.leftChild
-				nodes[2] = nodes[1]?.rightChild
-				
-				subtrees[0] = nodes[1]?.leftChild
-				subtrees[1] = nodes[2]?.leftChild
-				subtrees[2] = nodes[2]?.rightChild
-				subtrees[3] = nodes[0]?.rightChild
-			}
-		} else if lrFactor < -1 {
-			// right-left or right-right
-			if lrDifference(node.rightChild) < 0 {
-				// right-right
-				nodes[1] = node
-				nodes[2] = node.rightChild
-				nodes[0] = nodes[2]?.rightChild
-				
-				subtrees[0] = nodes[1]?.leftChild
-				subtrees[1] = nodes[2]?.leftChild
-				subtrees[2] = nodes[0]?.leftChild
-				subtrees[3] = nodes[0]?.rightChild
-			} else {
-				// right-left
-				nodes[1] = node
-				nodes[0] = node.rightChild
-				nodes[2] = nodes[0]?.leftChild
-				
-				subtrees[0] = nodes[1]?.leftChild
-				subtrees[1] = nodes[2]?.leftChild
-				subtrees[2] = nodes[2]?.rightChild
-				subtrees[3] = nodes[0]?.rightChild
-			}
-		} else {
-			// Don't need to balance 'node', go for parent
-			balance(node.parent)
-			return
-		}
-		
-		// nodes[2] is always the head
-		
-		if node.isRoot {
-			root = nodes[2]
-			root?.parent = nil
-		} else if node.isLeftChild {
-			nodeParent?.leftChild = nodes[2]
-			nodes[2]?.parent = nodeParent
-		} else if node.isRightChild {
-			nodeParent?.rightChild = nodes[2]
-			nodes[2]?.parent = nodeParent
-		}
-		
-		nodes[2]?.leftChild = nodes[1]
-		nodes[1]?.parent = nodes[2]
-		nodes[2]?.rightChild = nodes[0]
-		nodes[0]?.parent = nodes[2]
-		
-		nodes[1]?.leftChild = subtrees[0]
-		subtrees[0]?.parent = nodes[1]
-		nodes[1]?.rightChild = subtrees[1]
-		subtrees[1]?.parent = nodes[1]
-		
-		nodes[0]?.leftChild = subtrees[2]
-		subtrees[2]?.parent = nodes[0]
-		nodes[0]?.rightChild = subtrees[3]
-		subtrees[3]?.parent = nodes[0]
-		
-		updateHeightUpwards(nodes[1])    // Update height from left
-		updateHeightUpwards(nodes[0])    // Update height from right
-		
-		balance(nodes[2]?.parent)
-	}
-}
-
-// MARK: - Displaying tree
-
-extension AVLTree {
-	private func display(node: Node?, level: Int) {
-		if let node = node {
-			display(node.rightChild, level: level + 1)
-			print("")
-			if node.isRoot {
-				print("Root -> ", terminator: "")
-			}
-			for _ in 0..<level {
-				print("        ", terminator:  "")
-			}
-			print("(\(node.key):\(node.height))", terminator: "")
-			display(node.leftChild, level: level + 1)
-		}
-	}
-	
-	public func display(node: Node) {
-		display(node, level: 0)
-		print("")
 	}
 }
 
 // MARK: - Delete node
 
 extension AVLTree {
-	public func delete(key: Key) {
-		if size == 1 {
-			root = nil
-			size -= 1
-		} else if let node = search(key, root) {
-			delete(node)
-			size -= 1
+	/// delete a node its key is `key` from the tree, and keep a AVLTree
+	public func delete(key: Key) -> Node? {
+		guard let node = search(key) else { return nil }
+		guard size != 1 else {
+			self.root = nil
+			return nil
+		}
+		let removed = node.remove(key)
+		size -= 1				// remove node in advance of changing size
+		return removed
+	}
+}
+
+extension AVLTree {
+	private func balance() {
+		guard let root = root else { return }
+		guard let unBalancedNode = root.getUnbalancedNode().last else { return }
+		if unBalancedNode == root {
+			self.root = _balance(root)
+		} else {
+			let nodes = unBalancedNode.makeSubBranch()
+			let mainTail = nodes.main
+			let branch = _balance(nodes.branch)
+			if branch.key < mainTail.key {
+				mainTail.left = branch
+			} else {
+				mainTail.right = branch
+			}
 		}
 	}
 	
-	private func delete(node: Node) {
-		if node.isLeaf {
-			// Just remove and balance up
-			if let parent = node.parent {
-				guard node.isLeftChild || node.isRightChild else {
-					// just in case
-					fatalError("Error: tree is invalid.")
-				}
-				
-				if node.isLeftChild {
-					parent.leftChild = nil
-				} else if node.isRightChild {
-					parent.rightChild = nil
-				}
-				
-				balance(parent)
-			} else {
-				// at root
-				root = nil
-			}
-		} else {
-			// Handle stem cases
-			if let replacement = node.leftChild?.maximum() where replacement !== node {
-				node.key = replacement.key
-				node.payload = replacement.payload
-				delete(replacement)
-			} else if let replacement = node.rightChild?.minimum() where replacement !== node {
-				node.key = replacement.key
-				node.payload = replacement.payload
-				delete(replacement)
-			}
+	private func _balance(branch: Node) -> Node {
+		let pivot = branch.balanceFactor > 1 ? (branch.left!, true) : (branch.right!, false)
+		let child = pivot.0.balanceFactor > 0 ? (pivot.0.left!,true) : (pivot.0.right!, false)
+		switch (pivot.1, child.1) {
+		case (true, true):
+			return pivot.0._turn_right()!
+		case (false, false):
+			return pivot.0._turn_left()!
+		case (true, false):
+			branch.left = child.0._turn_left()
+			return _balance(branch)
+		case (false, true):
+			branch.right = child.0._turn_right()
+			return _balance(branch)
 		}
 	}
 }
-
-
-// MARK: - Debugging
-
-extension TreeNode: CustomDebugStringConvertible {
-	public var debugDescription: String {
-		var s = "key: \(key), payload: \(payload), height: \(height)"
-		if let parent = parent {
-			s += ", parent: \(parent.key)"
-		}
-		if let left = leftChild {
-			s += ", left = [" + left.debugDescription + "]"
-		}
-		if let right = rightChild {
-			s += ", right = [" + right.debugDescription + "]"
-		}
-		return s
-	}
-}
-
-extension AVLTree: CustomDebugStringConvertible {
-	public var debugDescription: String {
-		if let root = root {
-			return root.debugDescription
-		} else {
-			return "[]"
-		}
-	}
-}
-
-extension TreeNode: CustomStringConvertible {
-	public var description: String {
-		var s = ""
-		if let left = leftChild {
-			s += "(\(left.description)) <- "
-		}
-		s += "\(key)"
-		if let right = rightChild {
-			s += " -> (\(right.description))"
-		}
-		return s
-	}
-}
-
-extension AVLTree: CustomStringConvertible {
-	public var description: String {
-		if let root = root {
-			return root.description
-		} else {
-			return "[]"
-		}
-	}
-}
-
-
-var tree = AVLTree<Int, Int>()
-tree.size
-tree.insert(8)
-tree.size
-tree.insert(4)
-tree.size
-tree.insert(12)
-tree.insert(2)
-tree.insert(6)
-tree.insert(10)
-tree.insert(14)
-tree.insert(1)
-tree.insert(3)
-tree.insert(5)
-tree.insert(7)
-tree.insert(9)
-tree.insert(11)
-tree.insert(13)
-tree.insert(15)
-tree.display(tree.root!)
-
-tree[3] = 33
-//print(tree.debugDescription)
-tree.search(6)
-tree[6] = 29
-tree[6]
-tree.size
-tree.delete(3)
-tree.delete(9)
-tree.size
-tree.display(tree.root!)
-tree.delete(8)
-tree.display(tree.root!)
-tree.insert(3)
-tree.insert(9)
-tree.insert(8)
-tree.display(tree.root!)
-tree.delete(16)
-tree.display(tree.root!)
-tree.size
-
-
-
-
-
-
 
 /*:
 ## See also
@@ -521,7 +235,66 @@ tree.size
 
 AVL tree was the first self-balancing binary tree. These days, the [red-black tree](../Red-Black Tree/) seems to be more popular.
 
+# 測試：
+*/
+var tree = AVLTree<Int, Int>()
 
+tree.insert(7)
+tree.insert(12)
+tree.insert(3)
+tree.insert(5)
+tree.insert(2)
+tree.insert(6)
+tree.insert(1)
+tree.insert(13)
+tree.insert(8)
+tree.insert(10)
+tree.insert(9)
+tree.insert(15)
+tree.insert(11)
+tree.insert(14)
+tree.insert(4)
+
+tree.delete(14)
+tree.delete(13)
+tree.delete(12)
+
+tree.root?.isBST(minValue: 0, maxValue: 20)
+
+tree.delete(4)
+tree.delete(3)
+tree.delete(5)
+tree.delete(10)
+tree.delete(11)
+tree.delete(8)
+tree.delete(15)
+tree.delete(9)
+tree.delete(6)
+tree.delete(1)
+tree.delete(2)
+tree.display()
+tree.delete(7)
+tree.display()
+tree.insert(1)
+tree.insert(2)
+tree.insert(3)
+tree.insert(4)
+tree.insert(5)
+tree.insert(6)
+tree.insert(7)
+tree.insert(8)
+tree.insert(9)
+tree.insert(10)
+tree.insert(11)
+tree.insert(12)
+tree.insert(13)
+tree.insert(14)
+tree.insert(15)
+tree.delete(14)
+tree.delete(13)
+tree.delete(12)
+
+/*:
 ***
 [Previous](@previous) | [Next](@next)
 */
