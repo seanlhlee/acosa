@@ -151,9 +151,8 @@ public class BinarySearchTree<T: Comparable>: Equatable {
 		return (left?.count ?? 0) + 1 + (right?.count ?? 0)
 	}
 	
-	private func getRoot() -> BinarySearchTree {
-		guard !isRoot else { return self }
-		return parent!.getRoot()
+	public var root: BinarySearchTree {
+		return isRoot ? self : parent!.root
 	}
 }
 
@@ -265,23 +264,60 @@ The first value in the array becomes the root of the tree.
 
 ### Debug output
 
-When working with somewhat complicated data structures such as this, it's useful to have human-readable debug output.
+When working with somewhat complicated data structures such as this, it's useful to have human-readable debug output. Moreover, we can creat a custom function `display()` to display the tree (or node) structure for better understanding.
 
 */
-extension BinarySearchTree: CustomStringConvertible {
+extension BinarySearchTree: CustomStringConvertible, CustomDebugStringConvertible {
 	public var description: String {
 		let leftStr = left != nil ? "(\(left!.description)) <- " : ""
 		let rightStr = right != nil ? " -> (\(right!.description))" : ""
 		return leftStr + "\(value)" + rightStr
 	}
+	
+	public var debugDescription: String {
+		let meStr = "value: \(value)"
+		let parentStr = parent != nil ? ", parent: \(parent!.value)" : ""
+		let leftStr = left != nil ? ", left = [\(left!.debugDescription)]" : ""
+		let rightStr = right != nil ? ", right = [\(right!.debugDescription)]" : ""
+		return meStr + parentStr + leftStr + rightStr
+	}
+	
+	public func display() {
+		self._display(0)
+	}
+	
+	private func _display(level: Int) {
+		level == 0 ? __display_underline() : __display_underline(false)
+		
+		if let right = right {
+			right._display(level + 1)
+		}
+		var levelStr = "\t\t"
+		for _ in 0..<level {
+			levelStr += "\t\t"
+		}
+		let preStr = isRoot ? "Root ->\t" : levelStr
+		print(preStr + "(\(value))")
+		if let left = left {
+			left._display(level + 1)
+		}
+		
+		level == 0 ? __display_underline() : __display_underline(false)
+	}
+	
+	private func __display_underline(v: Bool = true) {
+		v ? print("______________________________________________") : print(terminator: "")
+	}
 }
 
-treeX.insert(4)
-treeX.insert(4)
-treeX.insert(4)
 tree.left?.right?.value
 print(treeX)
+print(treeX.debugDescription)
+treeX.display()
 
+//treeX.insert(4)
+//treeX.insert(4)
+//treeX.insert(4)
 
 /*:
 
@@ -304,24 +340,39 @@ Here is the implementation of `search()`:
 */
 extension BinarySearchTree {
 	public func search(value: T) -> BinarySearchTree? {
-		
-		guard value != self.value else { return self }
-		return value < self.value ? left?.search(value) : right?.search(value)
+		return root._search(value)
 	}
 	private func _search(value: T) -> BinarySearchTree? {
 		guard value != self.value else { return self }
-		return value < self.value ? left?.search(value) : right?.search(value)
+		return value < self.value ? left?._search(value) : right?._search(value)
 	}
 	public func contains(value: T) -> Bool {
 		return search(value) != nil
 	}
 }
 
+treeX.display()
 treeX.search(7)
 treeX.search(6)
 treeX.contains(7)
 treeX.contains(6)
 
+/*:
+For more convenient, we can creat a subscript method to make search a valu in a tree is easier.
+*/
+extension BinarySearchTree {
+	public subscript(value: T) -> BinarySearchTree? {
+		get {
+			if search(value) == nil {
+				print("value: \(value) not found!")
+			}
+			return search(value)
+		}
+	}
+}
+
+treeX[7]
+treeX[6]
 /*:
 
 I hope the logic is clear: this starts at the current node (usually the root) and compares the values. If the search value is less than the node's value, we continue searching in the left branch; if the search value is greater, we dive into the right branch.

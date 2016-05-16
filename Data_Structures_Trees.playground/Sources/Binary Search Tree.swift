@@ -14,17 +14,13 @@ public class TreeNode<Key: Comparable, Payload>:Equatable, CustomStringConvertib
 	public var left: Node? { didSet { left?.parent = self } }
 	/// if right has been set, set the parent of `right` as well.
 	public var right: Node? { didSet { right?.parent = self } }
-	
-	public var height: Int {
+	/// return maximum height of node's sub-branches
+	private var height: Int {
 		return isLeaf ? 0 : 1 + max(left?.height ?? 0, right?.height ?? 0)
 	}
-	
-	public func depth(key: Key) -> Int? {
-		return search(key)?._depth
-	}
-	
-	private var _depth: Int {
-		return parent != nil ? parent!._depth + 1 : 0
+	/// return how far to reach tree root. `root.depth = 0`
+	private var depth: Int {
+		return parent != nil ? parent!.depth + 1 : 0
 	}
 	
 	public init(key: Key, payload: Payload?, parent: Node?, left: Node?, right: Node?) {
@@ -46,35 +42,35 @@ public class TreeNode<Key: Comparable, Payload>:Equatable, CustomStringConvertib
 		self.init(key: key, payload: nil)
 	}
 	
-	public var isRoot: Bool {
+	private var isRoot: Bool {
 		return parent == nil
 	}
 	
-	public var isLeaf: Bool {
+	private var isLeaf: Bool {
 		return right == nil && left == nil
 	}
 	
-	public var isLeftChild: Bool {
+	private var isLeftChild: Bool {
 		return parent?.left === self
 	}
 	
-	public var isRightChild: Bool {
+	private var isRightChild: Bool {
 		return parent?.right === self
 	}
 	
-	public var hasLeftChild: Bool {
+	private var hasLeftChild: Bool {
 		return left != nil
 	}
 	
-	public var hasRightChild: Bool {
+	private var hasRightChild: Bool {
 		return right != nil
 	}
 	
-	public var hasAnyChild: Bool {
+	private var hasAnyChild: Bool {
 		return hasLeftChild || hasRightChild
 	}
 	
-	public var hasBothChildren: Bool {
+	private var hasBothChildren: Bool {
 		return hasLeftChild && hasRightChild
 	}
 	
@@ -97,14 +93,14 @@ public class TreeNode<Key: Comparable, Payload>:Equatable, CustomStringConvertib
 		return (left?.height ?? -1) - (right?.height ?? -1)
 	}
 	
-	public var root: Node {
+	private var root: Node {
 		return isRoot ? self : parent!.root
 	}
 	
-	public func minimum() -> Node {
+	private func minimum() -> Node {
 		return hasLeftChild ? left!.minimum() : self
 	}
-	public func maximum() -> Node {
+	private func maximum() -> Node {
 		return hasRightChild ? right!.maximum() : self
 	}
 	
@@ -124,7 +120,7 @@ public class TreeNode<Key: Comparable, Payload>:Equatable, CustomStringConvertib
 	}
 	
 	// MARK: - Displaying tree
-	
+	/// public displaying structure of a tree or it's branch.
 	public func display() {
 		self._display(0)
 	}
@@ -153,7 +149,9 @@ public class TreeNode<Key: Comparable, Payload>:Equatable, CustomStringConvertib
 	}
 	
 	// MARK: - Insert, Remove Items & Search
-	/// insert
+	/// insert a node to a tree.
+	/// defalt: insert a node by providing `key` value without assigning corresponding payload.
+	/// `insert(key, payload)`, insert a node with providing both `key` and corresponding `payload` values.
 	public func insert(key: Key, payload: Payload? = nil) {
 		if key < self.key {
 			if let left = left {
@@ -170,22 +168,47 @@ public class TreeNode<Key: Comparable, Payload>:Equatable, CustomStringConvertib
 		}
 	}
 	
-	/// remove
+	/// remove a node from tree.
 	public func remove(key: Key) -> Node? {
 		return search(key)?._remove()
 	}
+	
 	private func _remove() -> Node? {
-		let replacement = right?.minimum() != nil ? right?.minimum() : left?.maximum()
-		if isLeftChild {
-			parent?.left = _breakRelation(replacement)
-		} else if isRightChild {
-			parent?.right = _breakRelation(replacement)
-		} else {
-			self.key = (replacement?.key)!
-			_breakRelation(replacement)
+		// Root? true ==> remove by replace values of predecessor() or successor()
+		// case: self is root
+		guard let parent = parent else {
+			if let replacement = hasRightChild ? right?.minimum() : left?.maximum() {
+				self.key = replacement.key
+				self.payload = replacement.payload
+				replacement._remove()
+				return replacement
+			} else {
+				return nil		// remove fail: root is the only remaining element
+			}
 		}
-		replacement?.left = left
-		replacement?.right = right
+		// case: self is not root
+		// set replacement base on numbers of chiidren
+		// prepare replancement for connect to main tree
+		var replacement: Node? = nil		// no child, remove directly
+		if hasBothChildren {				// both children case
+			replacement = right!.minimum()	// set replacement => successor()
+			replacement!._remove()			// remove replacement -> indepandent node
+			replacement!.left = left		// connect left to replancement
+			if right !== replacement {		// connect right to replancement if right is not successor()
+				replacement!.right = right
+			}
+		} else if let left = left {			// with one child
+			replacement = left
+		} else if let right = right {
+			replacement = right
+		}
+		// connect replacement to parent and delete self from tree
+		if isLeftChild {
+			parent.left = replacement
+		} else {
+			parent.right = replacement
+		}
+		_breakRelation(self)
 		return replacement
 	}
 	
@@ -289,8 +312,12 @@ public class TreeNode<Key: Comparable, Payload>:Equatable, CustomStringConvertib
 		return mapToArray(formula).reduce(initial, combine: combine)
 	}
 	
-	public func toArray() -> [Key] {
+	public var keys: [Key] {
 		return mapToArray{ $0 }
+	}
+	
+	public var payloads: [Payload?] {
+		return nodeTrasform{ $0.payload }
 	}
 }
 
