@@ -3,7 +3,7 @@
 ***
 # Heap
 
-A heap is a [binary tree](../Binary Tree/) that lives inside an array, so it doesn't use parent/child pointers. The tree is partially sorted according to something called the "heap property" that determines the order of the nodes in the tree.
+A heap is a binary tree that lives inside an array, so it doesn't use parent/child pointers. The tree is partially sorted according to something called the "heap property" that determines the order of the nodes in the tree.
 
 Common uses for heap:
 	
@@ -20,11 +20,11 @@ In a max-heap, parent nodes must always have a greater value than each of their 
 
 An example:
 
-![A max-heap](/gitBook/pics/Heap1.png)
+![A max-heap](Heap1.png)
 
 This is a max-heap because every parent node is greater than its children. `(10)` is greater than `(7)` and `(2)`. `(7)` is greater than `(5)` and `(1)`.
 
-As a result of this heap property, a max-heap always stores its largest item at the root of the tree. For a min-heap, the root is always the smallest item in the tree. That is very useful because heaps are often used as a [priority queue](../Priority Queue/) where you want to quickly access the "most important" element.
+As a result of this heap property, a max-heap always stores its largest item at the root of the tree. For a min-heap, the root is always the smallest item in the tree. That is very useful because heaps are often used as a **priority queue** where you want to quickly access the "most important" element.
 
 > **Note:** You can't really say anything else about the sort order of the heap. For example, in a max-heap the maximum element is always at index 0 but the minimum element isn’t necessarily the last one -- the only guarantee you have is that it is one of the leaf nodes, but not which one.
 
@@ -32,11 +32,11 @@ As a result of this heap property, a max-heap always stores its largest item at 
 
 A heap isn't intended to be a replacement for a binary search tree. But there are many similarities between the two and also some differences. Here are some of the bigger differences:
 
-**Order of the nodes.** In a [binary search tree (BST)](../Binary Search Tree/), the left child must always be smaller than its parent and the right child must be greater. This is not true for a heap. In max-heap both children must be smaller; in a min-heap they both must be greater.
+**Order of the nodes.** In a *binary search tree (BST)*, the left child must always be smaller than its parent and the right child must be greater. This is not true for a heap. In max-heap both children must be smaller; in a min-heap they both must be greater.
 
 **Memory.** Traditional trees take up more memory than just the data they store. You need to allocate additional storage for the node objects and pointers to the left/right child nodes. A heap only uses a plain array for storage and uses no pointers.
 
-**Balancing.** A binary search tree must be "balanced" so that most operations have **O(log n)** performance. You can either insert and delete your data in a random order or use something like an [AVL tree](../AVL Tree/) or [red-black tree](../Red-Black Tree/). But with heaps we don't actually need the entire tree to be sorted. We just want the heap property to be fulfilled, and so balancing isn't an issue. Because of the way the heap is structured, heaps can guarantee **O(log n)** performance.
+**Balancing.** A binary search tree must be "balanced" so that most operations have **O(log n)** performance. You can either insert and delete your data in a random order or use something like an **AVL tree** or **red-black tree**. But with heaps we don't actually need the entire tree to be sorted. We just want the heap property to be fulfilled, and so balancing isn't an issue. Because of the way the heap is structured, heaps can guarantee **O(log n)** performance.
 
 **Searching.** Searching a binary tree is really fast -- that's its whole purpose. In a heap, searching is slow. The purpose of a heap is to always put the largest (or smallest) node at the front, and to allow relatively fast inserts and deletes. Searching isn't a top priority.
 
@@ -62,13 +62,13 @@ Note that `right(i)` is simply `left(i) + 1`. The left and right nodes are alway
 
 Let's use these formulas on the example. Fill in the array index and we should get the positions of the parent and child nodes in the array:
 
-| Node | Array index (`i`) | Parent index | Left child | Right child |
-|------|-------------|--------------|------------|-------------|
-| 10 | 0 | -1 | 1 | 2 |
-| 7 | 1 | 0 | 3 | 4 |
-| 2 | 2 | 0 | 5 | 6 |
-| 5 | 3 | 1 | 7 | 8 |
-| 1 | 4 | 1 | 9 | 10 |
+	| Node | Array index (`i`) | Parent index | Left child | Right child |
+	|------|-------------------|--------------|------------|-------------|
+	| 10   |			0	   |	-1		  |		1	   |	2		 |
+	|  7   |			1	   |	 0		  |		3	   |	4		 |
+	|  2   |			2	   |	 0		  |		5	   |	6		 |
+	|  5   |			3	   |	 1		  |		7	   |	8		 |
+	|  1   |			4	   |	 1		  |		9	   |	10		 |
 
 Verify for yourself that these array indices indeed correspond to the picture of the tree.
 
@@ -86,21 +86,21 @@ As you can see, these equations let us find the parent or child index for any no
 
 It's important to understand this relationship between array index and position in the tree. Here's a slightly larger heap, this tree has 15 nodes divided over four levels:
 
-![Large heap](/gitBook/pics/LargeHeap.png)
+![Large heap](LargeHeap.png)
 
 The numbers in this picture aren't the values of the nodes but the array indices that store the nodes! Those array indices correspond to the different levels of the tree like this:
 
-![The heap array](/gitBook/pics/Array.png)
+![The heap array](Array.png)
 
 For the formulas to work, parent nodes must always appear before child nodes in the array. You can see that in the above picture.
 
 Note that this scheme has limitations. You can do the following with a regular binary tree but not with a heap:
 
-![Impossible with a heap](/gitBook/pics/RegularTree.png)
+![Impossible with a heap](RegularTree.png)
 
 You can’t start a new level unless the current lowest level is completely full. So heaps always have this kind of shape:
 
-![The shape of a heap](/gitBook/pics/HeapShape.png)
+![The shape of a heap](HeapShape.png)
 
 > **Note:** Technically speaking you *could* emulate a regular binary tree with a heap, but it would waste a lot of space and you’d need some way to mark array indices as being empty.
 
@@ -110,7 +110,7 @@ Pop quiz! Let's say we have the array:
 
 Is this a valid heap? The answer is yes! A sorted array from low-to-high is a valid min-heap. We can draw this heap as follows:
 
-![A sorted array is a valid heap](/gitBook/pics/SortedArray.png)
+![A sorted array is a valid heap](SortedArray.png)
 
 The heap property holds for each node because a parent is always smaller than its children. (Verify for yourself that an array sorted from high-to-low is always a valid max-heap.)
 
@@ -124,7 +124,7 @@ The *height* of a tree is defined as the number of steps it takes to go from the
 
 This heap has height 3 and therefore has 4 levels:
 
-![Large heap](/gitBook/pics/LargeHeap.png)
+![Large heap](LargeHeap.png)
 
 A heap with *n* nodes has height *h = floor(log_2(n))*. This is because we always fill up the lowest level completely before we add a new level. The example has 15 nodes, so the height is `floor(log_2(15)) = floor(3.91) = 3`.
 
@@ -174,7 +174,7 @@ The heap also has a `peek()` function that returns the maximum (max-heap) or min
 
 Let's go through an example insertion to see in more detail how this works. We'll insert the value `16` into this heap:
 
-![The heap before insertion](/gitBook/pics/Heap1.png)
+![The heap before insertion](Heap1.png)
 
 The array for this heap is `[ 10, 7, 2, 5, 1 ]`.
 
@@ -184,7 +184,7 @@ The first step when inserting a new item is to append it to the end of the array
 
 This corresponds to the following tree:
 
-![The heap before insertion](/gitBook/pics/Insert1.png)
+![The heap before insertion](Insert1.png)
 
 The `(16)` was added to the first available space on the last row.
 
@@ -192,13 +192,13 @@ Unfortunately, the heap property is no longer satisfied because `(2)` is above `
 
 To restore the heap property, we're going to swap `(16)` and `(2)`.
 
-![The heap before insertion](/gitBook/pics/Insert2.png)
+![The heap before insertion](Insert2.png)
 
 We're not done yet because `(10)` is also smaller than `(16)`. We keep swapping our inserted value with its parent, until the parent is larger or we reach the top of the tree. This is called **shift-up** or **sifting** and is done after every insertion. It makes a number that is too large or too small "float up" the tree.
 
 Finally, we get:
 
-![The heap before insertion](/gitBook/pics/Insert3.png)
+![The heap before insertion](Insert3.png)
 
 And now every parent is greater than its children again.
 
@@ -208,23 +208,23 @@ The time required for shifting up is proportional to the height of the tree so i
 
 Let's remove `(10)` from this tree:
 
-![The heap before removal](/gitBook/pics/Heap1.png)
+![The heap before removal](Heap1.png)
 
 What happens to the empty spot at the top?
 
-![The root is gone](/gitBook/pics/Remove1.png)
+![The root is gone](Remove1.png)
 
 When inserting, we put the new value at the end of the array. Here, we'll do the opposite: we're going to take the last object we have, stick it up on top of the tree, and restore the heap property.
 
-![The last node goes to the root](/gitBook/pics/Remove2.png)
+![The last node goes to the root](Remove2.png)
 
 Let's look at how to **shift-down** `(1)`. To maintain the heap property for this max-heap, we want to the highest number of top. We have two candidates for swapping places with: `(7)` and `(2)`. We choose the highest number between these three nodes to be on top. That is `(7)`, so swapping `(1)` and `(7)` gives us the following tree.
 
-![The last node goes to the root](/gitBook/pics/Remove3.png)
+![The last node goes to the root](Remove3.png)
 
 Keep shifting down until the node doesn't have any children or it is larger than both its children. For our heap we only need one more swap to restore the heap property:
 
-![The last node goes to the root](/gitBook/pics/Remove4.png)
+![The last node goes to the root](Remove4.png)
 
 The time required for shifting all the way down is proportional to the height of the tree so it takes **O(log n)** time.
 
@@ -238,7 +238,7 @@ The vast majority of the time you'll be removing the object at the root of the h
 
 Let's take the example tree again and remove `(7)`:
 
-![The heap before removal](/gitBook/pics/Heap1.png)
+![The heap before removal](Heap1.png)
 
 As a reminder, the array is:
 
@@ -252,7 +252,7 @@ The last element is the one that we'll return; we'll call `removeLast()` to remo
 
 However, shifting down is not the only situation we need to handle -- it may also happen that the new element must be shifted up. Consider what happens if you remove `(5)` from the following heap:
 
-![We need to shift up](/gitBook/pics/Remove5.png)
+![We need to shift up](Remove5.png)
 
 Now `(5)` gets swapped with `(8)`. Because `(8)` is larger than its parent, we need to call `shiftUp()`.
 
@@ -295,7 +295,7 @@ In a [binary search tree](../Binary Search Tree/) you can depend on the order of
 
 Let's take our example heap again:
 
-![The heap](/gitBook/pics/Heap1.png)
+![The heap](Heap1.png)
 
 If we want to search for the index of node `(1)`, we could just step through the array `[ 10, 7, 2, 5, 1 ]` with a linear search.
 
