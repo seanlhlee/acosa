@@ -47,12 +47,13 @@ A segment tree is just a [binary tree](../Binary Tree/) where each node is an in
 
 ```swift
 public class SegmentTree<T> {
-  private var value: T
-  private var function: (T, T) -> T
-  private var leftBound: Int
-  private var rightBound: Int
-  private var leftChild: SegmentTree<T>?
-  private var rightChild: SegmentTree<T>?
+	public typealias Node = SegmentTree<T>
+	private var value: T
+	private var function: (T, T) -> T
+	private var leftBound: Int
+	private var rightBound: Int
+	private var left: Node?
+	private var right: Node?
 }
 ```
 
@@ -73,23 +74,27 @@ The `leftBound` and `rightBound` of each node are marked in red.
 Here's how we create a node of the segment tree:
 
 ```swift
-public init(array: [T], leftBound: Int, rightBound: Int, function: (T, T) -> T) {
-    self.leftBound = leftBound
-    self.rightBound = rightBound
-    self.function = function
+	public init(array: [T], leftBound: Int, rightBound: Int, function: (T, T) -> T) {
+		self.leftBound = leftBound
+		self.rightBound = rightBound
+		self.function = function
+		// 1
+		guard leftBound != rightBound else { value = array[leftBound]; return }
+		// 2
+		let middle = (leftBound + rightBound) / 2
+		// 3
+		self.left = SegmentTree<T>(array: array, leftBound: leftBound, rightBound: middle, function: function)
+		self.right = SegmentTree<T>(array: array, leftBound: middle + 1, rightBound: rightBound, function: function)
+		// 4
+		self.value = function(left!.value, right!.value)
+	}
+```
+Because the values of leftBound and rightBound should be always within the range `0..<array.count`. It is worthy to creat a tree without defining start and end index. Here is the convenience initializer:
 
-    if leftBound == rightBound {                    // 1
-      value = array[leftBound]
-    } else {
-      let middle = (leftBound + rightBound) / 2     // 2
-
-      // 3
-      leftChild = SegmentTree<T>(array: array, leftBound: leftBound, rightBound: middle, function: function)
-      rightChild = SegmentTree<T>(array: array, leftBound: middle+1, rightBound: rightBound, function: function)
-
-      value = function(leftChild!.value, rightChild!.value)  // 4
-    }
-  }
+```swift
+	public convenience init(array: [T], function: (T, T) -> T) {
+		self.init(array: array, leftBound: 0, rightBound: array.count - 1, function: function)
+	}
 ```
 
 Notice that this is a recursive method. You give it an array such as `[1, 2, 3, 4]` and it builds up the entire tree, from the root node to all the child nodes.
@@ -111,30 +116,30 @@ We go through all this trouble so we can efficiently query the tree.
 Here's the code:
 
 ```swift
-  public func queryWithLeftBound(leftBound: Int, rightBound: Int) -> T {
-    // 1
-    if self.leftBound == leftBound && self.rightBound == rightBound {
-      return self.value
-    }
+extension SegmentTree {
+	public func queryWithLeftBound(leftBound: Int, rightBound: Int) -> T {
+		// 1
+		guard self.leftBound != leftBound || self.rightBound != rightBound else { return self.value }
+		guard let left = left else { fatalError("left should not be nil") }
+		guard let right = right else { fatalError("right should not be nil") }
+		// 2
+		if left.rightBound < leftBound {
+			return right.queryWithLeftBound(leftBound, rightBound: rightBound)
+		// 3
+		} else if right.leftBound > rightBound {
+			return left.queryWithLeftBound(leftBound, rightBound: rightBound)
+		// 4
+		} else {
+			let leftResult = left.queryWithLeftBound(leftBound, rightBound: left.rightBound)
+			let rightResult = right.queryWithLeftBound(right.leftBound, rightBound: rightBound)
+			return function(leftResult, rightResult)
+		}
+	}
     
-    guard let leftChild = leftChild else { fatalError("leftChild should not be nil") }
-    guard let rightChild = rightChild else { fatalError("rightChild should not be nil") }
-    
-    // 2
-    if leftChild.rightBound < leftBound {
-      return rightChild.queryWithLeftBound(leftBound, rightBound: rightBound)
-      
-    // 3
-    } else if rightChild.leftBound > rightBound {
-      return leftChild.queryWithLeftBound(leftBound, rightBound: rightBound)
-      
-    // 4
-    } else {
-      let leftResult = leftChild.queryWithLeftBound(leftBound, rightBound: leftChild.rightBound)
-      let rightResult = rightChild.queryWithLeftBound(rightChild.leftBound, rightBound: rightBound)
-      return function(leftResult, rightResult)
-    }
-  }
+	public func queryWithRange(range: Range<Int>) -> T {
+		return queryWithLeftBound(range.startIndex, rightBound: range.endIndex - 1)
+	}
+}
 ```
 
 Again, this is a recursive method. It checks four different possibilities.
@@ -166,6 +171,13 @@ sumSegmentTree.queryWithLeftBound(0, rightBound: 3)  // 1 + 2 + 3 + 4 = 10
 sumSegmentTree.queryWithLeftBound(1, rightBound: 2)  // 2 + 3 = 5
 sumSegmentTree.queryWithLeftBound(0, rightBound: 0)  // just 1
 sumSegmentTree.queryWithLeftBound(3, rightBound: 3)  // just 4
+//sumSegmentTree.queryWithLeftBound(3, rightBound: 2)  // fatal error
+
+sumSegmentTree.queryWithRange(0...3)
+sumSegmentTree.queryWithRange(1...2)
+sumSegmentTree.queryWithRange(0...0)
+sumSegmentTree.queryWithRange(3...3)
+//sumSegmentTree.queryWithRange(3...2) // fatal error
 ```
 
 Querying the tree takes **O(log n)** time.
