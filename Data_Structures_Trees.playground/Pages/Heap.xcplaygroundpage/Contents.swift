@@ -7,8 +7,8 @@ A heap is a binary tree that lives inside an array, so it doesn't use parent/chi
 
 Common uses for heap:
 	
-	- For building [priority queues](../Priority Queue/).
-- The heap is the data structure supporting [heap sort](../Heap Sort/).
+- For building **priority queues**.
+- The heap is the data structure supporting **heap sort**.
 - Heaps are fast for when you often need to compute the minimum (or maximum) element of a collection.
 - Impressing your non-programmer friends.
 
@@ -114,7 +114,7 @@ Is this a valid heap? The answer is yes! A sorted array from low-to-high is a va
 
 The heap property holds for each node because a parent is always smaller than its children. (Verify for yourself that an array sorted from high-to-low is always a valid max-heap.)
 
-> **Note:** But not every min-heap is necessarily a sorted array! It only works one way... To turn a heap back into a sorted array, you need to use [heap sort](../Heap Sort/).
+> **Note:** But not every min-heap is necessarily a sorted array! It only works one way... To turn a heap back into a sorted array, you need to use **heap sort**.
 
 ## More math!
 
@@ -164,7 +164,7 @@ All of the above take time **O(log n)** because shifting up or down is the most 
 
 - `buildHeap(array)`: Converts an (unsorted) array into a heap by repeatedly calling `insert()`. If you’re smart about this, it can be done in **O(n)** time.
 
-- [Heap sort](../Heap Sort/). Since the heap is really an array, we can use its unique properties to sort the array from low to high. Time: **O(n lg n).**
+- **Heap sort**. Since the heap is really an array, we can use its unique properties to sort the array from low to high. Time: **O(n lg n).**
 
 The heap also has a `peek()` function that returns the maximum (max-heap) or minimum (min-heap) element, without removing it from the heap. Time: **O(1)**.
 
@@ -291,7 +291,7 @@ Here, `elements` is the heap's own array. We walk backwards through this array, 
 
 Heaps aren't made for fast searches, but if you want to remove an arbitrary element using `removeAtIndex()` or change the value of an element with `replace()`, then you need to obtain the index of that element somehow. Searching is one way to do this but it's kind of slow.
 
-In a [binary search tree](../Binary Search Tree/) you can depend on the order of the nodes to guarantee a fast search. A heap orders its nodes differently and so a binary search won't work. You'll potentially have to look at every node in the tree.
+In a [binary search tree](Binary%20Search%20Tree%20(BST)) you can depend on the order of the nodes to guarantee a fast search. A heap orders its nodes differently and so a binary search won't work. You'll potentially have to look at every node in the tree.
 
 Let's take our example heap again:
 
@@ -305,12 +305,159 @@ But even though the heap property wasn't conceived with searching in mind, we ca
 
 Despite this small optimization, searching is still an **O(n)** operation.
 
-> **Note:** There is away to turn lookups into a **O(1)** operation by keeping an additional dictionary that maps node values to indices. This may be worth doing if you often need to call `replace()` to change the "priority" of objects in a [priority queue](../Priority Queue/) that's built on a heap.
+> **Note:** There is away to turn lookups into a **O(1)** operation by keeping an additional dictionary that maps node values to indices. This may be worth doing if you often need to call `replace()` to change the "priority" of objects in a **priority queue** that's built on a heap.
 
 ## The code
 
 See [Heap.swift](Heap.swift) for the implementation of these concepts in Swift. Most of the code is quite straightforward. The only tricky bits are in `shiftUp()` and `shiftDown()`.
+*/
+import Foundation
 
+public struct Heap<T> {
+	
+	var elements = [T]()
+	private var isOrderedBefore: (T, T) -> Bool
+ 
+	public init(sort: (T, T) -> Bool) {
+		self.isOrderedBefore = sort
+	}
+	
+	public init(array: [T], sort: (T, T) -> Bool) {
+		self.isOrderedBefore = sort
+		buildHeap(array)
+	}
+	
+	private mutating func buildHeap(array: [T]) {
+		elements = array
+		for i in (elements.count/2 - 1).stride(through: 0, by: -1) {
+			shiftDown(index: i, heapSize: elements.count)
+		}
+	}
+	
+	public var isEmpty: Bool {
+		return elements.isEmpty
+	}
+	
+	public var count: Int {
+		return elements.count
+	}
+	
+	@inline(__always) func indexOfParent(i: Int) -> Int {
+		return (i - 1) / 2
+	}
+	
+	@inline(__always) func indexOfLeftChild(i: Int) -> Int {
+		return 2 * i + 1
+	}
+	
+	@inline(__always) func indexOfRightChild(i: Int) -> Int {
+		return 2 * i + 2
+	}
+	
+	public func peek() -> T? {
+		return elements.first
+	}
+	
+	public mutating func insert(value: T) {
+		elements.append(value)
+		shiftUp(index: elements.count - 1)
+	}
+	
+	public mutating func insert<S : SequenceType where S.Generator.Element == T>(sequence: S) {
+		for value in sequence {
+			insert(value)
+		}
+	}
+	
+	public mutating func replace(index i: Int, value: T) {
+		assert(isOrderedBefore(value, elements[i]))
+		elements[i] = value
+		shiftUp(index: i)
+	}
+	
+	public mutating func remove() -> T? {
+		if elements.isEmpty {
+			return nil
+		} else if elements.count == 1 {
+			return elements.removeLast()
+		} else {
+			// Use the last node to replace the first one, then fix the heap by
+			// shifting this new first node into its proper position.
+			let value = elements[0]
+			elements[0] = elements.removeLast()
+			shiftDown()
+			return value
+		}
+	}
+	
+	public mutating func removeAtIndex(i: Int) -> T? {
+		let size = elements.count - 1
+		if i != size {
+			swap(&elements[i], &elements[size])
+			shiftDown(index: i, heapSize: size)
+			shiftUp(index: i)
+		}
+		return elements.removeLast()
+	}
+	
+	mutating func shiftUp(index index: Int) {
+		var childIndex = index
+		let child = elements[childIndex]
+		var parentIndex = indexOfParent(childIndex)
+		
+		while childIndex > 0 && isOrderedBefore(child, elements[parentIndex]) {
+			elements[childIndex] = elements[parentIndex]
+			childIndex = parentIndex
+			parentIndex = indexOfParent(childIndex)
+		}
+		
+		elements[childIndex] = child
+	}
+	
+	mutating func shiftDown() {
+		shiftDown(index: 0, heapSize: elements.count)
+	}
+	
+	mutating func shiftDown(index index: Int, heapSize: Int) {
+		var parentIndex = index
+		
+		while true {
+			let leftChildIndex = indexOfLeftChild(parentIndex)
+			let rightChildIndex = leftChildIndex + 1
+			
+			var first = parentIndex
+			if leftChildIndex < heapSize && isOrderedBefore(elements[leftChildIndex], elements[first]) {
+				first = leftChildIndex
+			}
+			if rightChildIndex < heapSize && isOrderedBefore(elements[rightChildIndex], elements[first]) {
+				first = rightChildIndex
+			}
+			if first == parentIndex { return }
+			
+			swap(&elements[parentIndex], &elements[first])
+			parentIndex = first
+		}
+	}
+}
+
+// MARK: - Searching
+
+extension Heap where T: Equatable {
+	public func indexOf(element: T) -> Int? {
+		return indexOf(element, 0)
+	}
+	
+	private func indexOf(element: T, _ i: Int) -> Int? {
+		if i >= count { return nil }
+		if isOrderedBefore(element, elements[i]) { return nil }
+		if element == elements[i] { return i }
+		if let j = indexOf(element, indexOfLeftChild(i)) { return j }
+		if let j = indexOf(element, indexOfRightChild(i)) { return j }
+		return nil
+	}
+}
+
+/*:
 You've seen that there are two types of heaps: a max-heap and a min-heap. The only difference between them is in how they order their nodes: largest value first or smallest value first.
 
 Rather than create two different versions, `MaxHeap` and `MinHeap`, there is just one `Heap` object and it takes an `isOrderedBefore` closure. This closure contains the logic that determines the order of two values. You've probably seen this before because it's also how Swift's `sort()` works.
@@ -333,7 +480,30 @@ I just wanted to point this out, because where most heap implementations use the
 
 [Heap on Wikipedia](https://en.wikipedia.org/wiki/Heap_%28data_structure%29)
 
+# 測試：
+*/
+extension Heap: CustomStringConvertible {
+	public var description: String {
+		return elements.description
+	}
+}
 
+var maxHeap = Heap(array: [1,9,6,5,2,0,3], sort: >)
+maxHeap.elements // [9, 5, 6, 1, 2, 0, 3]
+maxHeap.insert(4) //[9, 5, 6, 4, 2, 0, 3, 1]
+maxHeap.peek()
+maxHeap
+maxHeap.insert([7,8])
+maxHeap.replace(index: 3, value: 10)
+//maxHeap.replace(index: 3, value: 5)  /// In a max-heap, the new element should be larger than the old one; in a min-heap it should be smaller.
+maxHeap.remove()
+maxHeap
+
+maxHeap.removeAtIndex(3)
+maxHeap
+
+
+/*:
 ***
 [Previous](@previous) | [Next](@next)
 */
