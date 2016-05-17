@@ -213,14 +213,14 @@ extension AVLTree {
 		let child = pivot.0.balanceFactor > 0 ? (pivot.0.left!,true) : (pivot.0.right!, false)
 		switch (pivot.1, child.1) {
 		case (true, true):
-			return pivot.0._turn_right()!
+			return pivot.0.turn_right()!
 		case (false, false):
-			return pivot.0._turn_left()!
+			return pivot.0.turn_left()!
 		case (true, false):
-			branch.left = child.0._turn_left()
+			branch.left = child.0.turn_left()
 			return _balance(branch)
 		case (false, true):
-			branch.right = child.0._turn_right()
+			branch.right = child.0.turn_right()
 			return _balance(branch)
 		}
 	}

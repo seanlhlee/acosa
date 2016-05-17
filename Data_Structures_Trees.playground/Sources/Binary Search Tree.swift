@@ -2,7 +2,7 @@ import Foundation
 
 // MARK: - TreeNode: Binary Search Tree
 /// A Binary Search Tree type.
-public class TreeNode<Key: Comparable, Payload>:Equatable, CustomStringConvertible, CustomDebugStringConvertible {
+public class TreeNode<Key: Comparable, Payload>:Equatable {
 	
 	public typealias Node = TreeNode<Key, Payload>
 	
@@ -10,17 +10,29 @@ public class TreeNode<Key: Comparable, Payload>:Equatable, CustomStringConvertib
 	public var payload: Payload?
 	
 	weak public var parent: Node?
-	/// if left has been set, set the parent of `left` as well.
-	public var left: Node? { didSet { left?.parent = self } }
-	/// if right has been set, set the parent of `right` as well.
-	public var right: Node? { didSet { right?.parent = self } }
-	/// return maximum height of node's sub-branches
-	private var height: Int {
-		return isLeaf ? 0 : 1 + max(left?.height ?? 0, right?.height ?? 0)
+	/// if left subtree has been set, set the parent of `left` as well.
+	/// if left subtree will be removed, remove parent connection of `left` in advance.
+	public var left: Node? {
+		didSet {
+			left?.parent = self
+		}
+		willSet {
+			if newValue == nil {
+				left?.parent = nil
+			}
+		}
 	}
-	/// return how far to reach tree root. `root.depth = 0`
-	private var depth: Int {
-		return parent != nil ? parent!.depth + 1 : 0
+	/// if right subtree has been set, set the parent of `right` as well.
+	/// if right subtree will be removed, remove parent connection of `right` in advance.
+	public var right: Node? {
+		didSet {
+			right?.parent = self
+		}
+		willSet {
+			if newValue == nil {
+				right?.parent = nil
+			}
+		}
 	}
 	
 	public init(key: Key, payload: Payload?, parent: Node?, left: Node?, right: Node?) {
@@ -33,13 +45,38 @@ public class TreeNode<Key: Comparable, Payload>:Equatable, CustomStringConvertib
 		self.left?.parent = self
 		self.right?.parent = self
 	}
-	
+}
+
+// Mark: - Equatable
+
+public func ==<Key: Comparable, Payload>(lhs: TreeNode<Key, Payload>, rhs: TreeNode<Key, Payload>) -> Bool {
+	guard lhs.key == rhs.key else { return false }
+	guard lhs.count == rhs.count else { return false }
+	return lhs.left == rhs.left && lhs.right == rhs.right
+}
+
+// MARK: - convenience initializers
+
+extension TreeNode {
 	public convenience init(key: Key, payload: Payload?) {
 		self.init(key: key, payload: payload, parent: nil, left: nil, right: nil)
 	}
 	
 	public convenience init(key: Key) {
 		self.init(key: key, payload: nil)
+	}
+}
+
+// MARK: - private computed variables
+
+private extension TreeNode {
+	/// return maximum height of node's sub-branches
+	private var height: Int {
+		return isLeaf ? 0 : 1 + max(left?.height ?? 0, right?.height ?? 0)
+	}
+	/// return how far to reach tree root. `root.depth = 0`
+	private var depth: Int {
+		return parent != nil ? parent!.depth + 1 : 0
 	}
 	
 	private var isRoot: Bool {
@@ -74,105 +111,20 @@ public class TreeNode<Key: Comparable, Payload>:Equatable, CustomStringConvertib
 		return hasLeftChild && hasRightChild
 	}
 	
-	public var count: Int {
-		return (left?.count ?? 0) + 1 + (right?.count ?? 0)
-	}
-	
-	public func isBST(minValue minValue: Key, maxValue: Key) -> Bool {
-		guard minValue <= key && maxValue >= key else { return false }
-		let leftBST = left?.isBST(minValue: minValue, maxValue: key) ?? true
-		let rightBST = right?.isBST(minValue: key, maxValue: maxValue) ?? true
-		return leftBST && rightBST
-	}
-	
-	public var isBalanced: Bool {
-		return abs(balanceFactor) < 2
-	}
-	
-	public var balanceFactor: Int {
-		return (left?.height ?? -1) - (right?.height ?? -1)
-	}
-	
 	private var root: Node {
 		return isRoot ? self : parent!.root
 	}
-	
-	private func minimum() -> Node {
-		return hasLeftChild ? left!.minimum() : self
+}
+
+// Mark: - internal helping methods
+
+private extension TreeNode {
+	/// helping method of searck(key)
+	private func _search(key: Key) -> Node? {
+		guard key != self.key else { return self }
+		return key < self.key ? left?._search(key) : right?._search(key)
 	}
-	private func maximum() -> Node {
-		return hasRightChild ? right!.maximum() : self
-	}
-	
-	// MARK: - Debugging
-	public var debugDescription: String {
-		let meStr = "key: \(key), payload: \(payload), height: \(height)"
-		let parentStr = parent != nil ? ", parent: \(parent!.key)" : ""
-		let leftStr = left != nil ? ", left = [\(left!.debugDescription)]" : ""
-		let rightStr = right != nil ? ", right = [\(right!.debugDescription)]" : ""
-		return meStr + parentStr + leftStr + rightStr
-	}
-	
-	public var description: String {
-		let leftStr = left != nil ? "(\(left!.description)) <- " : ""
-		let rightStr = right != nil ? " -> (\(right!.description))" : ""
-		return leftStr + "\(key)" + rightStr
-	}
-	
-	// MARK: - Displaying tree
-	/// public displaying structure of a tree or it's branch.
-	public func display() {
-		self._display(0)
-	}
-	
-	private func _display(level: Int) {
-		level == 0 ? __display_underline() : __display_underline(false)
-		
-		if let right = right {
-			right._display(level + 1)
-		}
-		var levelStr = "\t\t"
-		for _ in 0..<level {
-			levelStr += "\t\t"
-		}
-		let preStr = isRoot ? "Root ->\t" : levelStr
-		print(preStr + "(\(key))")
-		if let left = left {
-			left._display(level + 1)
-		}
-		
-		level == 0 ? __display_underline() : __display_underline(false)
-	}
-	
-	private func __display_underline(v: Bool = true) {
-		v ? print("______________________________________________") : print(terminator: "")
-	}
-	
-	// MARK: - Insert, Remove Items & Search
-	/// insert a node to a tree.
-	/// defalt: insert a node by providing `key` value without assigning corresponding payload.
-	/// `insert(key, payload)`, insert a node with providing both `key` and corresponding `payload` values.
-	public func insert(key: Key, payload: Payload? = nil) {
-		if key < self.key {
-			if let left = left {
-				left.insert(key, payload: payload)
-			} else {
-				left = TreeNode(key: key, payload: payload)
-			}
-		} else {
-			if let right = right {
-				right.insert(key, payload: payload)
-			} else {
-				right = TreeNode(key: key, payload: payload)
-			}
-		}
-	}
-	
-	/// remove a node from tree.
-	public func remove(key: Key) -> Node? {
-		return search(key)?._remove()
-	}
-	
+	/// helping method of remove(key)
 	private func _remove() -> Node? {
 		// Root? true ==> remove by replace values of predecessor() or successor()
 		// case: self is root
@@ -211,8 +163,87 @@ public class TreeNode<Key: Comparable, Payload>:Equatable, CustomStringConvertib
 		_breakRelation(self)
 		return replacement
 	}
+	/// break connection to parent but still keep subtrees
+	private func _breakRelation(node: Node?) -> Node? {
+		guard let node = node else { return nil }
+		if node.isLeftChild {
+			node.parent?.left = nil
+		} else if node.isRightChild {
+			node.parent?.right = nil
+		}
+		node.parent = nil
+		return node
+	}
+}
+
+// MARK: - public computed variables
+
+extension TreeNode {
 	
-	// MARK: - Searching
+	public var count: Int {
+		return (left?.count ?? 0) + 1 + (right?.count ?? 0)
+	}
+	
+	public var keys: [Key] {
+		return mapToArray{ $0 }
+	}
+	
+	public var payloads: [Payload?] {
+		return nodeTrasform{ $0.payload }
+	}
+	
+	public var isBalanced: Bool {
+		return abs(balanceFactor) < 2
+	}
+	
+	public var balanceFactor: Int {
+		return (left?.height ?? -1) - (right?.height ?? -1)
+	}
+	
+	public func isBST(minValue minValue: Key, maxValue: Key) -> Bool {
+		guard minValue <= key && maxValue >= key else { return false }
+		let leftBST = left?.isBST(minValue: minValue, maxValue: key) ?? true
+		let rightBST = right?.isBST(minValue: key, maxValue: maxValue) ?? true
+		return leftBST && rightBST
+	}
+}
+
+// MARK: - Tree operatios: Insert, Remove & Search
+
+extension TreeNode {
+	/// insert a node to a tree.
+	/// defalt: insert a node by providing `key` value without assigning corresponding payload.
+	/// `insert(key, payload)`, insert a node with providing both `key` and corresponding `payload` values.
+	public func insert(key: Key, payload: Payload? = nil) {
+		if key < self.key {
+			if let left = left {
+				left.insert(key, payload: payload)
+			} else {
+				left = TreeNode(key: key, payload: payload)
+			}
+		} else {
+			if let right = right {
+				right.insert(key, payload: payload)
+			} else {
+				right = TreeNode(key: key, payload: payload)
+			}
+		}
+	}
+	
+	/// remove a node from tree.
+	public func remove(key: Key) -> Node? {
+		return search(key)?._remove()
+	}
+	
+	/// return a node it's key value is `key` or nil if no such node.
+	public func search(key: Key) -> Node? {
+		return root._search(key)
+	}
+	
+	public func contains(key: Key) -> Bool {
+		return search(key) != nil
+	}
+	
 	public subscript(key: Key) -> Payload? {
 		get {
 			if search(key) == nil {
@@ -228,60 +259,24 @@ public class TreeNode<Key: Comparable, Payload>:Equatable, CustomStringConvertib
 			}
 		}
 	}
-	
-	public func search(key: Key) -> Node? {
-		return root._search(key)
+	/// return an array contenting unbalances nodes in height increasing order
+	public func getUnbalancedNode() -> [TreeNode] {
+		let node = !self.isBalanced ? [self] : []
+		let leftArr = left != nil ? left!.getUnbalancedNode() : []
+		let rightArr = right != nil ? right!.getUnbalancedNode() : []
+		return node + leftArr + rightArr
 	}
-	
-	private func _search(key: Key) -> Node? {
-		guard key != self.key else { return self }
-		return key < self.key ? left?._search(key) : right?._search(key)
+	/// return a tuple contains subtree `branch` and it's parent node 'main'
+	public func makeSubBranch() -> (main:Node, branch: Node) {
+		guard let parent = parent else { fatalError("root can't make sub") }
+		return (parent, _breakRelation(self)!)
 	}
+}
+
+// Mark: - Tree operatios: Memberwise operations
+
+extension TreeNode {
 	
-	public func contains(key: Key) -> Bool {
-		return search(key) != nil
-	}
-	
-	// MARK: - predecessor() & successor()
-	public func predecessor() -> Node? {
-		guard !hasLeftChild else { return left!.maximum() }
-		var node = self
-		while case let parent? = node.parent {
-			guard parent.key >= key else { return parent }
-			node = parent
-		}
-		return nil
-	}
-	public func successor() -> Node? {
-		guard !hasRightChild else { return right!.minimum() }
-		var node = self
-		while case let parent? = node.parent {
-			if parent.key > key { return parent }
-			node = parent
-		}
-		return nil
-	}
-	
-	// MARK: - traverse
-	public func traverseInOrder(@noescape process: Key -> Void) {
-		left?.traverseInOrder(process)
-		process(key)
-		right?.traverseInOrder(process)
-	}
-	
-	public func traversePreOrder(@noescape process: Key -> Void) {
-		process(key)
-		left?.traversePreOrder(process)
-		right?.traversePreOrder(process)
-	}
-	
-	public func traversePostOrder(@noescape process: Key -> Void) {
-		left?.traversePostOrder(process)
-		right?.traversePostOrder(process)
-		process(key)
-	}
-	
-	// Mark: - map
 	public func map(@noescape formula: Key -> Key) -> Node {
 		let me = TreeNode(key: formula(key) )
 		me.left = left != nil ? left!.map(formula) : nil
@@ -311,41 +306,21 @@ public class TreeNode<Key: Comparable, Payload>:Equatable, CustomStringConvertib
 	public func reduce<T: Comparable>(initial: T, @noescape formula: Key -> T, @noescape combine: (T, Array<T>.Generator.Element) -> T) -> T {
 		return mapToArray(formula).reduce(initial, combine: combine)
 	}
-	
-	public var keys: [Key] {
-		return mapToArray{ $0 }
-	}
-	
-	public var payloads: [Payload?] {
-		return nodeTrasform{ $0.payload }
-	}
 }
 
-// Mark: - Equatable
-public func ==<Key: Comparable, Payload>(lhs: TreeNode<Key, Payload>, rhs: TreeNode<Key, Payload>) -> Bool {
-	guard lhs.key == rhs.key else { return false }
-	guard lhs.count == rhs.count else { return false }
-	return lhs.left == rhs.left && lhs.right == rhs.right
-}
+// Mark: - Subtree operations: min, max & turning
 
 extension TreeNode {
-	public func makeSubBranch() -> (main:Node, branch: Node) {
-		guard let parent = parent else { fatalError("root can't make sub") }
-		return (parent, _breakRelation(self)!)
+	/// return minimun key value node of the tree
+	public func minimum() -> Node {
+		return hasLeftChild ? left!.minimum() : self
 	}
-	
-	/// break connection to parent but still keep subtrees
-	private func _breakRelation(node: Node?) -> Node? {
-		guard let node = node else { return nil }
-		if node.isLeftChild {
-			node.parent?.left = nil
-		} else if node.isRightChild {
-			node.parent?.right = nil
-		}
-		node.parent = nil
-		return node
+	/// return maximum key value node of the tree
+	public func maximum() -> Node {
+		return hasRightChild ? right!.maximum() : self
 	}
-	public func _turn_right() -> Node? {
+	/// turn the subtree to right
+	public func turn_right() -> Node? {
 		guard let parent = parent else { return nil }
 		// 1. break pivot's right breanch
 		let sub_x = _breakRelation(right)
@@ -357,8 +332,8 @@ extension TreeNode {
 		sub_y.right = parent
 		return sub_y
 	}
-	
-	public func _turn_left() -> Node? {
+	/// turn the sub tree to left
+	public func turn_left() -> Node? {
 		guard let parent = parent else { return nil }
 		// 1. break pivot's left breanch
 		let sub_x = _breakRelation(left)
@@ -370,11 +345,108 @@ extension TreeNode {
 		sub_y.left = parent
 		return sub_y
 	}
-	public func getUnbalancedNode() -> [TreeNode] {
-		let node = !self.isBalanced ? [self] : []
-		let leftArr = left != nil ? left!.getUnbalancedNode() : []
-		let rightArr = right != nil ? right!.getUnbalancedNode() : []
-		return node + leftArr + rightArr
+}
+
+
+
+// MARK: - predecessor() & successor()
+
+extension TreeNode {
+	/// Returns the previous consecutive value before `self`.
+	///
+	/// - Requires: The previous value is representable.
+	public func predecessor() -> Node? {
+		guard !hasLeftChild else { return left!.maximum() }
+		var node = self
+		while case let parent? = node.parent {
+			guard parent.key >= key else { return parent }
+			node = parent
+		}
+		return nil
+	}
+	/// Returns the next consecutive value after `self`.
+	///
+	/// - Requires: The next value is representable.
+	public func successor() -> Node? {
+		guard !hasRightChild else { return right!.minimum() }
+		var node = self
+		while case let parent? = node.parent {
+			if parent.key > key { return parent }
+			node = parent
+		}
+		return nil
 	}
 }
 
+// MARK: - Debugging, CustomStringConvertible, CustomDebugStringConvertible
+
+extension TreeNode: CustomStringConvertible, CustomDebugStringConvertible {
+	
+	public var description: String {
+		let leftStr = left != nil ? "(\(left!.description)) <- " : ""
+		let rightStr = right != nil ? " -> (\(right!.description))" : ""
+		return leftStr + "\(key)" + rightStr
+	}
+	
+	public var debugDescription: String {
+		let meStr = "key: \(key), payload: \(payload), height: \(height)"
+		let parentStr = parent != nil ? ", parent: \(parent!.key)" : ""
+		let leftStr = left != nil ? ", left = [\(left!.debugDescription)]" : ""
+		let rightStr = right != nil ? ", right = [\(right!.debugDescription)]" : ""
+		return meStr + parentStr + leftStr + rightStr
+	}
+}
+
+// MARK: - Debugging, Display()
+
+extension TreeNode {
+	/// public displaying structure of a tree or it's branch.
+	public func display() {
+		self._display(0)
+	}
+	
+	private func _display(level: Int) {
+		level == 0 ? __display_underline() : __display_underline(false)
+		
+		if let right = right {
+			right._display(level + 1)
+		}
+		var levelStr = "\t\t"
+		for _ in 0..<level {
+			levelStr += "\t\t"
+		}
+		let preStr = isRoot ? "Root ->\t" : levelStr
+		print(preStr + "(\(key))")
+		if let left = left {
+			left._display(level + 1)
+		}
+		
+		level == 0 ? __display_underline() : __display_underline(false)
+	}
+	
+	private func __display_underline(v: Bool = true) {
+		v ? print("______________________________________________") : print(terminator: "")
+	}
+}
+
+// MARK: - traverse
+
+extension TreeNode {
+	public func traverseInOrder(@noescape process: Key -> Void) {
+		left?.traverseInOrder(process)
+		process(key)
+		right?.traverseInOrder(process)
+	}
+	
+	public func traversePreOrder(@noescape process: Key -> Void) {
+		process(key)
+		left?.traversePreOrder(process)
+		right?.traversePreOrder(process)
+	}
+	
+	public func traversePostOrder(@noescape process: Key -> Void) {
+		left?.traversePostOrder(process)
+		right?.traversePostOrder(process)
+		process(key)
+	}
+}

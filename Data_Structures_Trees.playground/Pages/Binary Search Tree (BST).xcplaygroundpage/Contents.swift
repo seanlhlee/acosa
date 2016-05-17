@@ -624,29 +624,46 @@ extension BinarySearchTree {
 	}
 	
 	private func _remove() -> BinarySearchTree? {
-		func breakRelation(node: BinarySearchTree?) -> BinarySearchTree? {
-			guard let node = node else { return nil }
-			if node.isLeftChild {
-				node.parent?.left = nil
-			} else if node.isRightChild {
-				node.parent?.right = nil
-			}
-			node.parent = nil
-			return node
-		}
-		let replacement = right?.minimum()
-		if isLeftChild {
-			parent?.left = breakRelation(replacement)
 
-		} else if isRightChild {
-			parent?.right = breakRelation(replacement)
-		} else {
-			self.value = (replacement?.value)!
-			breakRelation(replacement)
+		guard let parent = parent else {
+			if let replacement = hasRightChild ? right?.minimum() : left?.maximum() {
+				self.value = replacement.value
+				return replacement
+			} else {
+				return nil
+			}
 		}
-		replacement?.left = left
-		replacement?.right = right
+		var replacement: BinarySearchTree? = nil
+		if hasBothChildren {
+			replacement = right!.minimum()
+			replacement!._remove()
+			replacement!.left = left
+			if right !== replacement {
+				replacement!.right = right
+			}
+		} else if let left = left {
+			replacement = left
+		} else if let right = right {
+			replacement = right
+		}
+		if isLeftChild {
+			parent.left = replacement
+		} else {
+			parent.right = replacement
+		}
+		_breakRelation(self)
 		return replacement
+	}
+	
+	private func _breakRelation(node: BinarySearchTree?) -> BinarySearchTree? {
+		guard let node = node else { return nil }
+		if node.isLeftChild {
+			node.parent?.left = nil
+		} else if node.isRightChild {
+			node.parent?.right = nil
+		}
+		node.parent = nil
+		return node
 	}
 }
 
@@ -708,14 +725,13 @@ Recall that the height of a node is the distance to its lowest leaf. We can calc
 
 */
 extension BinarySearchTree {
-	public func height() -> Int {
-		guard !isLeaf else { return 0 }
-		return 1 + max(left?.height() ?? 0, right?.height() ?? 0)
+	private var height: Int {
+		return isLeaf ? 0 : 1 + max(left?.height ?? 0, right?.height ?? 0)
 	}
 }
 tree.remove(4)
 tree.remove(4)
-tree.height()
+tree.height
 print(tree)
 
 /*:
@@ -733,16 +749,12 @@ tree.height()  // 2
 You can also calculate the *depth* of a node, which is the distance to the root. Here is the code:
 */
 extension BinarySearchTree {
-	public func depth(value: T) -> Int? {
-		return search(value)?._depth()
-	}
-	private func _depth() -> Int {
-		guard let parent = parent else { return 0 }
-		return parent._depth() + 1
+	private var depth: Int {
+		return parent != nil ? parent!.depth + 1 : 0
 	}
 }
-tree.depth(1)
-tree.depth(12)
+tree.search(1)?.depth
+tree.search(12)?.depth
 /*:
 
 It steps upwards through the tree, following the `parent` pointers until we reach the root node (whose `parent` is nil). This takes **O(h)** time. Example:
@@ -898,9 +910,9 @@ aTree.search(8)?.isRoot
 print(aTree) //(((1) <- 2 -> (3)) <- 4 -> ((5) <- 6 -> (7))) <- 8 -> (((9) <- 10 -> (11)) <- 12 -> ((13) <- 14 -> (15)))
 aTree._remove()
 print(aTree) //(((1) <- 2 -> (3)) <- 4 -> ((5) <- 6 -> (7))) <- 9 -> ((10 -> (11)) <- 12 -> ((13) <- 14 -> (15)))
-aTree.height()
-aTree.depth(1)
-aTree.depth(12)
+aTree.height
+aTree.search(1)?.depth
+aTree.search(12)?.depth
 aTree.search(5)?.isRoot
 aTree.search(9)?.isRoot
 aTree.search(8)?.isRoot
