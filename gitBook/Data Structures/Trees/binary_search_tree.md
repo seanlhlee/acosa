@@ -91,6 +91,8 @@ So much for the theory. Let's see how we can implement a binary search tree in S
 
 Here's a first stab at a `BinarySearchTree` class:
 
+> **Note:** We add obsever to left & righ properties for setting a node's parent while it have been others child.
+
 ```swift
 public class BinarySearchTree<T: Comparable>: Equatable {
 	private(set) public var value: T
@@ -437,33 +439,51 @@ extension BinarySearchTree {
 	}
 	
 	private func _remove() -> BinarySearchTree? {
-		func breakRelation(node: BinarySearchTree?) -> BinarySearchTree? {
-			guard let node = node else { return nil }
-			if node.isLeftChild {
-				node.parent?.left = nil
-			} else if node.isRightChild {
-				node.parent?.right = nil
+
+		guard let parent = parent else {
+			if let replacement = hasRightChild ? right?.minimum() : left?.maximum() {
+				self.value = replacement.value
+				return replacement
+			} else {
+				return nil
 			}
-			node.parent = nil
-			return node
 		}
-		let replacement = right?.minimum()
+		var replacement: BinarySearchTree? = nil
+		if hasBothChildren {
+			replacement = right!.minimum()
+			replacement!._remove()
+			replacement!.left = left
+			if right !== replacement {
+				replacement!.right = right
+			}
+		} else if let left = left {
+			replacement = left
+		} else if let right = right {
+			replacement = right
+		}
 		if isLeftChild {
-			parent?.left = breakRelation(replacement)
-		} else if isRightChild {
-			parent?.right = breakRelation(replacement)
+			parent.left = replacement
 		} else {
-			self.value = (replacement?.value)!
-			breakRelation(replacement)
+			parent.right = replacement
 		}
-        replacement?.left = left
-		replacement?.right = right
+		_breakRelation(self)
 		return replacement
+	}
+	
+	private func _breakRelation(node: BinarySearchTree?) -> BinarySearchTree? {
+		guard let node = node else { return nil }
+		if node.isLeftChild {
+			node.parent?.left = nil
+		} else if node.isRightChild {
+			node.parent?.right = nil
+		}
+		node.parent = nil
+		return node
 	}
 }
 ```
 
-It doesn't look so scary after all. ;-) There are four situations to handle:
+It doesn't look so scary after all. ;-) There are four situations to handle for a none-root node:
 
 1. This node has two children. 
 2. This node only has a left child. The left child replaces the node.
