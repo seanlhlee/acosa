@@ -207,6 +207,56 @@ As usual, this works with recursion. If the node is a leaf, we just change its v
 
 Replacing an item takes **O(log n)** time.
 
+## Debuging
+```swift
+extension SegmentTree: CustomStringConvertible, CustomDebugStringConvertible {
+	// MARK: - Debugging, CustomStringConvertible, CustomDebugStringConvertible
+	
+	public var description: String {
+		let leftStr = left != nil ? "(\(left!.description)) <- " : ""
+		let rightStr = right != nil ? " -> (\(right!.description))" : ""
+		return leftStr + "\(value)" + rightStr
+	}
+	
+	public var debugDescription: String {
+		let meStr = "value: \(value)"
+		let leftStr = left != nil ? ", left = [\(left!.debugDescription)]" : ""
+		let rightStr = right != nil ? ", right = [\(right!.debugDescription)]" : ""
+		return meStr + leftStr + rightStr
+	}
+	
+	// MARK: - Debugging, Display()
+	
+	/// public displaying structure of a tree or it's branch.
+	public func display() {
+		self._display(0)
+	}
+	
+	private func _display(level: Int) {
+		level == 0 ? __display_underline() : __display_underline(false)
+		
+		if let right = right {
+			right._display(level + 1)
+		}
+		var levelStr = "\t\t"
+		for _ in 0..<level {
+			levelStr += "\t\t"
+		}
+		let preStr = /*isRoot ? "Root ->\t" :*/ levelStr
+		print(preStr + "(\(value))")
+		if let left = left {
+			left._display(level + 1)
+		}
+		
+		level == 0 ? __display_underline() : __display_underline(false)
+	}
+	
+	private func __display_underline(v: Bool = true) {
+		v ? print("______________________________________________") : print(terminator: "")
+	}
+}
+```
+
 See the playground for more examples of how to use the segment tree.
 
 ## See also
