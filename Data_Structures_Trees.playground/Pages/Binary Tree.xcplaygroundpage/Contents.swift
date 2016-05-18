@@ -129,6 +129,28 @@ Something you often need to do with trees is traverse them, i.e. look at all the
 2. *Pre-order*: first look at a node, then at its left and right children.
 3. *Post-order*: first look at the left and right children and process the node itself last.
 
+二元樹的遍歷順序，理論上總共四種──但是事實上還是只有 DFS 與 BFS 兩種，只不過更動了節點的輸出順序。
+
+![Traversal](BinaryTree4.png)
+
+注意樹根的位置，就能輕鬆解讀這四種序。
+
+	Preorder Traversal 前序遍歷
+	理論上的遍歷順序是：根、左子樹、右子樹。根排在前面。
+	即是Depth-first Search。
+
+	Inorder Traversal 中序遍歷
+	理論上的遍歷順序是：左子樹、根、右子樹。根排在中間。
+	實際上是採用Depth-first Search，只不過更動了節點的輸出順序。
+
+	Postorder Traversal 後序遍歷
+	理論上的遍歷順序是：左子樹、右子樹、根。根排在後面。
+	實際上是採用Depth-first Search，只不過更動了節點的輸出順序。
+
+	Level-order Traversal 層序遍歷
+	即是Breath-first Search。
+
+
 Here is how you'd implement that:
 
 */
