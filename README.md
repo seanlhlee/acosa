@@ -108,6 +108,7 @@
 - Splay Tree *參展數*
 - Threaded Binary Tree *線索二元樹*
 - [Segment Tree](gitBook/Data Structures/Trees/segment_tree.md) *線段樹*
+- Bottom-up Segment Tree *由下至上線段樹*
 - kd-Tree *k-d樹*
 - [Heap](gitBook/Data Structures/Trees/heap.md) *堆積*
 - Fibonacci Heap *斐波那契堆*
