@@ -208,6 +208,57 @@ As usual, this works with recursion. If the node is a leaf, we just change its v
 
 Replacing an item takes **O(log n)** time.
 
+## Debugging
+
+*/
+
+extension SegmentTree: CustomStringConvertible, CustomDebugStringConvertible {
+	// MARK: - Debugging, CustomStringConvertible, CustomDebugStringConvertible
+	
+	public var description: String {
+		let leftStr = left != nil ? "(\(left!.description)) <- " : ""
+		let rightStr = right != nil ? " -> (\(right!.description))" : ""
+		return leftStr + "\(value)" + rightStr
+	}
+	
+	public var debugDescription: String {
+		let meStr = "value: \(value)"
+		let leftStr = left != nil ? ", left = [\(left!.debugDescription)]" : ""
+		let rightStr = right != nil ? ", right = [\(right!.debugDescription)]" : ""
+		return meStr + leftStr + rightStr
+	}
+	
+	// MARK: - Debugging, Display()
+	
+	/// public displaying structure of a tree or it's branch.
+	public func display() {
+		self._display(0)
+	}
+	
+	private func _display(level: Int) {
+		level == 0 ? __display_underline() : __display_underline(false)
+		
+		if let right = right {
+			right._display(level + 1)
+		}
+		var levelStr = "\t\t"
+		for _ in 0..<level {
+			levelStr += "\t\t"
+		}
+		let preStr = /*isRoot ? "Root ->\t" :*/ levelStr
+		print(preStr + "(\(value))")
+		if let left = left {
+			left._display(level + 1)
+		}
+		
+		level == 0 ? __display_underline() : __display_underline(false)
+	}
+	
+	private func __display_underline(v: Bool = true) {
+		v ? print("______________________________________________") : print(terminator: "")
+	}
+}
+/*:
 See the playground for more examples of how to use the segment tree.
 
 ## See also
@@ -216,14 +267,16 @@ See the playground for more examples of how to use the segment tree.
 
 # 測試：
 */
-print(sumSegmentTree.queryWithLeftBound(0, rightBound: 3)) // 1 + 2 + 3 + 4 = 10
-print(sumSegmentTree.queryWithLeftBound(1, rightBound: 2)) // 2 + 3 = 5
-print(sumSegmentTree.queryWithLeftBound(0, rightBound: 0)) // 1 = 1
+sumSegmentTree.display()
+
+sumSegmentTree.queryWithLeftBound(0, rightBound: 3) // 1 + 2 + 3 + 4 = 10
+sumSegmentTree.queryWithLeftBound(1, rightBound: 2) // 2 + 3 = 5
+sumSegmentTree.queryWithLeftBound(0, rightBound: 0) // 1 = 1
 
 sumSegmentTree.replaceItemAtIndex(0, withItem: 2) //our array now is [2, 2, 3, 4]
 
-print(sumSegmentTree.queryWithLeftBound(0, rightBound: 0)) // 2 = 2
-print(sumSegmentTree.queryWithLeftBound(0, rightBound: 1)) // 2 + 2 = 4
+sumSegmentTree.queryWithLeftBound(0, rightBound: 0) // 2 = 2
+sumSegmentTree.queryWithLeftBound(0, rightBound: 1) // 2 + 2 = 4
 
 
 //you can use any associative function (i.e (a+b)+c == a+(b+c)) as function for segment tree
@@ -244,14 +297,16 @@ let gcdArray = [2, 4, 6, 3, 5]
 
 let gcdSegmentTree = SegmentTree(array: gcdArray, function: gcd)
 
-print(gcdSegmentTree.queryWithLeftBound(0, rightBound: 1)) // gcd(2, 4) = 2
-print(gcdSegmentTree.queryWithLeftBound(2, rightBound: 3)) // gcd(6, 3) = 3
-print(gcdSegmentTree.queryWithLeftBound(1, rightBound: 3)) // gcd(4, 6, 3) = 1
-print(gcdSegmentTree.queryWithLeftBound(0, rightBound: 4)) // gcd(2, 4, 6, 3, 5) = 1
+gcdSegmentTree.display()
+
+gcdSegmentTree.queryWithLeftBound(0, rightBound: 1) // gcd(2, 4) = 2
+gcdSegmentTree.queryWithLeftBound(2, rightBound: 3) // gcd(6, 3) = 3
+gcdSegmentTree.queryWithLeftBound(1, rightBound: 3) // gcd(4, 6, 3) = 1
+gcdSegmentTree.queryWithLeftBound(0, rightBound: 4) // gcd(2, 4, 6, 3, 5) = 1
 
 gcdSegmentTree.replaceItemAtIndex(3, withItem: 10) //gcdArray now is [2, 4, 6, 10, 5]
 
-print(gcdSegmentTree.queryWithLeftBound(3, rightBound: 4)) // gcd(10, 5) = 5
+gcdSegmentTree.queryWithLeftBound(3, rightBound: 4) // gcd(10, 5) = 5
 
 
 //example of segment tree which finds minimum on given range
@@ -259,12 +314,14 @@ let minArray = [2, 4, 1, 5, 3]
 
 let minSegmentTree = SegmentTree(array: minArray, function: min)
 
-print(minSegmentTree.queryWithLeftBound(0, rightBound: 4)) // min(2, 4, 1, 5, 3) = 1
-print(minSegmentTree.queryWithLeftBound(0, rightBound: 1)) // min(2, 4) = 2
+minSegmentTree.display()
+
+minSegmentTree.queryWithLeftBound(0, rightBound: 4) // min(2, 4, 1, 5, 3) = 1
+minSegmentTree.queryWithLeftBound(0, rightBound: 1) // min(2, 4) = 2
 
 minSegmentTree.replaceItemAtIndex(2, withItem: 10) // minArray now is [2, 4, 10, 5, 3]
 
-print(minSegmentTree.queryWithLeftBound(0, rightBound: 4)) // min(2, 4, 10, 5, 3) = 2
+minSegmentTree.queryWithLeftBound(0, rightBound: 4) // min(2, 4, 10, 5, 3) = 2
 
 
 //type of elements in array can be any type which has some associative function
@@ -272,10 +329,10 @@ let stringArray = ["a", "b", "c", "A", "B", "C"]
 
 let stringSegmentTree = SegmentTree(array: stringArray, function: +)
 
-print(stringSegmentTree.queryWithLeftBound(0, rightBound: 1)) // "a"+"b" = "ab"
-print(stringSegmentTree.queryWithLeftBound(2, rightBound: 3)) // "c"+"A" = "cA"
-print(stringSegmentTree.queryWithLeftBound(1, rightBound: 3)) // "b"+"c"+"A" = "bcA"
-print(stringSegmentTree.queryWithLeftBound(0, rightBound: 5)) // "a"+"b"+"c"+"A"+"B"+"C" = "abcABC"
+stringSegmentTree.queryWithLeftBound(0, rightBound: 1) // "a"+"b" = "ab"
+stringSegmentTree.queryWithLeftBound(2, rightBound: 3) // "c"+"A" = "cA"
+stringSegmentTree.queryWithLeftBound(1, rightBound: 3) // "b"+"c"+"A" = "bcA"
+stringSegmentTree.queryWithLeftBound(0, rightBound: 5) // "a"+"b"+"c"+"A"+"B"+"C" = "abcABC"
 
 stringSegmentTree.replaceItemAtIndex(0, withItem: "I")
 stringSegmentTree.replaceItemAtIndex(1, withItem: " like")
@@ -284,7 +341,11 @@ stringSegmentTree.replaceItemAtIndex(3, withItem: " and")
 stringSegmentTree.replaceItemAtIndex(4, withItem: " swift")
 stringSegmentTree.replaceItemAtIndex(5, withItem: "!")
 
-print(stringSegmentTree.queryWithLeftBound(0, rightBound: 5))
+stringSegmentTree.queryWithLeftBound(0, rightBound: 5)
+
+stringSegmentTree.display()
+
+
 /*:
 ***
 [Previous](@previous) | [Next](@next)

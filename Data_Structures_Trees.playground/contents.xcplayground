@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<playground version='6.0' target-platform='ios' display-mode='rendered'>
+<playground version='6.0' target-platform='ios' display-mode='raw'>
     <pages>
         <page name='Tree'/>
         <page name='Binary Tree'/>
@@ -7,6 +7,7 @@
         <page name='Binary Search Tree (BST-enum)'/>
         <page name='AVL Tree'/>
         <page name='Segment Tree'/>
+        <page name='Bottom-up Segment Tree'/>
         <page name='Heap'/>
         <page name='B-Tree'/>
     </pages>
