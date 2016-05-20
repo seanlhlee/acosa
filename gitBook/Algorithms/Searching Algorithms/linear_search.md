@@ -38,4 +38,3 @@ linearSearch(array, 2) 	// This will return 1
 
 [Linear search on Wikipedia](https://en.wikipedia.org/wiki/Linear_search)
 
-*Written by [Patrick Balestra](http://www.github.com/BalestraPatrick)*
