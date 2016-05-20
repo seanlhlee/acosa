@@ -52,7 +52,7 @@ then the tree structure looks like:
 
 There are two trees in this forest, each of which corresponds to one set of elements. (Note: due to the limitations of ASCII art the trees are shown here as binary trees but that is not necessarily the case.)
 
-We give each subset a unique number to identify it. That number is the index of  the root node of that subset's tree. In the example, node `1` is the root of the first tree and `6` is the root of the second tree.
+We give each subset a unique number to identify it. That number is the index of the root node of that subset's tree. In the example, node `1` is the root of the first tree and `6` is the root of the second tree.
 
 So in this example we have two subsets, the first with the label `1` and the second with the label `6`. The **Find** operation actually returns the set's label, not its contents.
 
