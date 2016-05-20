@@ -1,33 +1,28 @@
 /*:
 [Previous](@previous) | [Next](@next)
 ***
-# Union-Find
+# 聯合搜尋法（Union-Find）
 
-Union-Find is a data structure that can keep track of a set of elements partitioned into a number of disjoint (non-overlapping) subsets. It is also known as disjoint-set data structure.
+聯合搜尋法是一種將集合中分成互不交集的子集合的一種資料結構，也稱為並查集（disjoint-set data structure）。舉例來說，聯合搜尋法資料結構可以對下列集合保持追蹤以下互不交集的集合:
 
-What do we mean by this? For example, the Union-Find data structure could be keeping track of the following sets:
+	[ a, b, f, k ]
+	[ e ]
+	[ g, d, c ]
+	[ i, j ]
 
-[ a, b, f, k ]
-[ e ]
-[ g, d, c ]
-[ i, j ]
+聯合搜尋法主要有三種操作：
 
-These sets are disjoint because they have no members in common.
+1. **Find(A)**： 找到哪一個集合中含有元素**A**。例如`find(d)`將會回傳是`[ g, d, c ]`子集合。
 
-Union-Find supports three basic operations:
+2. **Union(A, B)**：合併包含**A**與**B**的子集合成為新集合。例如`union(d, j)`會將`[ g, d, c ]`與`[ i, j ]`合併成`[ g, d, c, i, j ]`。
 
-1. **Find(A)**: Determine which subset an element **A** is in. For example, `find(d)` would return the subset `[ g, d, c ]`.
+3. **AddSet(A)**：增加一個僅函**A**元素之子集合。例如，`addSet(h)`會增加`[ h ]`子集合。
 
-2. **Union(A, B)**: Join two subsets that contain **A** and **B** into a single subset. For example, `union(d, j)` would combine `[ g, d, c ]` and `[ i, j ]` into the larger set `[ g, d, c, i, j ]`.
+這種資料結構最常被應用於追蹤「圖」（graph）中無向的相互連結的元素。也可用于實作Kruskal演算法的有效版本用以找到一個圖形的最小生成樹（the minimum spanning tree）。
 
-3. **AddSet(A)**: Add a new subset containing just that element **A**. For example, `addSet(h)` would add a new set `[ h ]`.
+## 實作
 
-The most common application of this data structure is keeping track of the connected components of an undirected [graph](../Graph/). It is also used for implementing an efficient version of Kruskal's algorithm to find the minimum spanning tree of a graph.
-
-## Implementation
-
-Union-Find can be implemented in many ways but we'll look at the most efficient.
-
+聯合搜尋法可以已多種方式實作，此處我們介紹最有效率的一種。
 */
 import Foundation
 
@@ -37,36 +32,26 @@ public struct UnionFind<T: Hashable> {
 	private var size = [Int]()
 }
 /*:
+此處的聯合搜尋法的資料結構事實上是由許多樹的子集合組成的森林。要做到前述功能，需要一個追蹤每個節點的父節點的陣列`parent`，不需紀錄子集點，`parent[i]`為索引值`i`節點的父節點。
 
-Our Union-Find data structure is actually a forest where each subset is represented by a [tree](../Tree/).
+例如：`parent`陣列如下
 
-For our purposes we only need to keep track of the parent of each tree node, not the node's children. To do this we use the array `parent` so that `parent[i]` is the index of node `i`'s parent.
+	parent [ 1, 1, 1, 0, 2, 0, 6, 6, 6 ]
+		i     0  1  2  3  4  5  6  7  8
 
-Example: If `parent` looks like this,
+則對應了如下兩個樹結構：
 
-parent [ 1, 1, 1, 0, 2, 0, 6, 6, 6 ]
-i   0  1  2  3  4  5  6  7  8
+		1               6
+	  /   \           / \
+	 0     2         7   8
+	/ \   /
+	3  5 4
 
-then the tree structure looks like:
+此處有兩棵樹，每棵代表了一個數字集合。給定每一個子集合一個獨特的數字來代表，此數字也代表子集合樹的跟節點索引值。如範例中`1`為第一個樹的跟節點，`6`為第二棵樹的根節點。我們以`1`來標註第一子集合，以`6`來標註第二子集合。**Find**的操作結果實際上是回傳子集合的標註而非內容。注意到一個根節點在`parent[]`中會指向自己的索引值，`parent[1] = 1`、`parent[6] = 6`這也是我們可以辨別根節點的方式。
 
-1              6
-/   \           / \
-0       2        7   8
-/ \     /
-3   5   4
+## 增加子集合
 
-There are two trees in this forest, each of which corresponds to one set of elements. (Note: due to the limitations of ASCII art the trees are shown here as binary trees but that is not necessarily the case.)
-
-We give each subset a unique number to identify it. That number is the index of  the root node of that subset's tree. In the example, node `1` is the root of the first tree and `6` is the root of the second tree.
-
-So in this example we have two subsets, the first with the label `1` and the second with the label `6`. The **Find** operation actually returns the set's label, not its contents.
-
-Note that the `parent[]` of a root node points to itself. So `parent[1] = 1` and `parent[6] = 6`. That's how we can tell something is a root node.
-
-## Add set
-
-Let's look at the implementation of these basic operations, starting with adding a new set.
-
+接著，介紹幾個基本操作的實作。首先由增加新的子集合開始：
 */
 extension UnionFind {
 	public mutating func addSetWith(element: T) {
@@ -76,18 +61,17 @@ extension UnionFind {
 	}
 }
 /*:
+當增加一個新元素，實際上是增加一個只包含此元素的子集合。
 
-When you add a new element, this actually adds a new subset containing just that element.
+1. 定義此新元素的索引值於`index`字典中，這樣之後能很快的查找到該元素。
 
-1. We save the index of the new element in the `index` dictionary. That lets us look up the element quickly later on.
+2. 之後將父節點的索引值紀錄到`parent`陣列中。此處`parent[i]`指向自己，因為此新增的樹子集合僅有單一元素。
 
-2. Then we add that index to the `parent` array to build a new tree for this  set. Here, `parent[i]` is pointing to itself because the tree that represents the new set contains only one node, which of course is the root of that tree.
+3. `size[i]`代表根節點索引值為`i`的樹中的節點數。對新建的樹，該值為1，之後會在其他的操作中使用到`size`陣列。
 
-3. `size[i]` is the count of nodes in the tree whose root is at index `i`. For the new set this is 1 because it only contains the one element. We'll be using the `size` array in the Union operation.
+## 尋找（Find）
 
-## Find
-
-Often we want to determine whether we already have a set that contains a given element. That's what the **Find** operation does. In our `UnionFind` data structure it is called `setOf()`:
+我們經常需要查找是否某一個集合包含尋找的元素。此**Find**操作在聯合查找中為`setOf()`函式:
 
 */
 extension UnionFind {
@@ -101,7 +85,7 @@ extension UnionFind {
 }
 /*:
 
-This looks up the element's index in the `index` dictionary and then uses a helper method to find the set that this element belongs to:
+此函式於`index`字典中查找元素的索引值，在使用以下的輔助函式回傳所屬的子集合:
 
 */
 extension UnionFind {
@@ -116,29 +100,29 @@ extension UnionFind {
 }
 /*:
 
-Because we're dealing with a tree structure, this is a recursive method.
+因為我們正在處理的是一個樹狀結構，是一個遞迴的方法
 
-Recall that each set is represented by a tree and that the index of the root node serves as the number that identifies the set. We're going to find the root node of the tree that the element we're searching for belongs to, and return its index.
+之前提及，每個集合由一個樹代表，其根節點的索引值作為代表子集合的標籤。可以發現，尋找操作即在尋找元素所屬樹的根節點，並返回其索引。
 
-1. First, we check if the given index represents a root node (i.e. a node whose `parent` points back to the node itself). If so, we're done.
+1. 首先，我們確認輸入的索引值是否代表一根節點，若是即回傳該值。
 
-2. Otherwise we recursively call this method on the parent of the current node. And then we do a **very important thing**: we overwrite the parent of the current node with the index of root node, in effect reconnecting the node directly to the root of the tree. The next time we call this method, it will execute faster because the path to the root of the tree is now much shorter. Without that optimization, this method's complexity is **O(n)** but now in combination with the size optimization (covered in the Union section) it is almost **O(1)**.
+2. 若非，則我們遞迴地找到跟節點索引值。我們做了**非常重要**的動作： 覆寫了當前節點父節點索引值為跟節點的索引值。這樣下次查找時就會非常快。在未更新為根節點索引值前，時間複雜度為**O(n)**，最佳化後可達**O(1)**效率。
 
-3. We return the index of the root node as the result.
+3. 回傳根節點索引值
 
-Here's illustration of what I mean. Let's say the tree looks like this:
+以下圖示說明:
 
 ![BeforeFind](BeforeFind.png)
 
-We call `setOf(4)`. To find the root node we have to first go to node `2` and then to node `7`. (The indexes of the elements are marked in red.)
+呼叫`setOf(4)`，會先得到索引值`2`接著為`7`。（圖中索引值標示為紅色）
 
-During the call to `setOf(4)`, the tree is reorganized to look like this:
+在呼叫`setOf(4)`之後樹結構成為：
 
 ![AfterFind](AfterFind.png)
 
-Now if we need to call `setOf(4)` again, we no longer have to go through node `2` to get to the root. So as you use the Union-Find data structure, it optimizes itself. Pretty cool!
+之後，我們在呼叫`setOf(4)`就不用再經過節點`2`來知道根節點。當使用聯合搜尋法，會自動最佳化，還不錯。
 
-There is also a helper method to check that two elements are in the same set:
+以下為另一個輔助函式，用來檢查兩元素是否在同一個子集合中：
 
 */
 extension UnionFind {
@@ -152,11 +136,11 @@ extension UnionFind {
 }
 /*:
 
-Since this calls `setOf()` it also optimizes the tree.
+此函式亦呼叫`setOf()`函式，同時也會優化樹結構。
 
-## Union
+## 聯合（Union）
 
-The final operation is **Union**, which combines two sets into one larger set.
+現在介紹**Union**，此操作合併兩子集合成為一個較大的子集合。
 
 */
 extension UnionFind {
@@ -174,37 +158,41 @@ extension UnionFind {
 		}
 	}
 }
+
+extension UnionFind: CustomStringConvertible {
+	public var description: String {
+		return parent.description
+	}
+}
 /*:
 
-Here is how it works:
+說明如下：
 
-1. We find the sets that each element belongs to. Remember that this gives us two integers: the indices of the root nodes in the `parent` array.
+1. 查找每個元素所屬的子集合，回傳值為兩索引值，分別代表根節點的索引值。
 
-2. Check that the sets are not equal because if they are it makes no sense to union them.
+2. 確認是否為不同的兩個子集合。
 
-3. This is where the size optimization comes in. We want to keep the trees as shallow as possible so we always attach the smaller tree to the root of the larger tree. To determine which is the smaller tree we compare trees by their sizes.
+3. 將較小的樹與較大的樹合併，事先判斷哪個子集合較小。
 
-4. Here we attach the smaller tree to the root of the larger tree.
+4. 都過修改根節點，將較小的樹合併到較大的樹。
 
-5. Update the size of larger tree because it just had a bunch of nodes added to it.
+5. 修改大樹的大小。
 
-An illustration may help to better understand this. Let's say we have these two sets, each with its own tree:
+下列圖示有助於理解，假設兩子集合有各自所屬的樹結構：
 
 ![BeforeUnion](BeforeUnion.png)
 
-Now we call `unionSetsContaining(4, and: 3)`. The smaller tree is attached to the larger one:
+呼叫`unionSetsContaining(4, and: 3)`後，較小的樹與較大的樹合併：
 
 ![AfterUnion](AfterUnion.png)
 
-Note that, because we call `setOf()` at the start of the method, the larger tree was also optimized in the process -- node `3` now hangs directly off the root.
+因為在執行時，也呼叫了`setOf()`，較大的樹同時也最佳化了結構 -- 節點`3`直接銜接於根節點上。
 
-Union with optimizations also takes almost **O(1)** time.
+時間複雜度為**O(1)**。
 
-## See also
+## 參考資料
 
-See the playground for more examples of how to use this handy data structure.
-
-[Union-Find at Wikipedia](https://en.wikipedia.org/wiki/Disjoint-set_data_structure)
+[維基百科: Union-Find](https://en.wikipedia.org/wiki/Disjoint-set_data_structure)
 */
 var dsu = UnionFind<Int>()
 
@@ -212,6 +200,8 @@ for i in 1...10 {
 	dsu.addSetWith(i)
 }
 // now our dsu contains 10 independent sets
+dsu
+
 
 // let's divide our numbers into two sets by divisibility by 2
 for i in 3...10 {
@@ -255,6 +245,7 @@ for word in words {
 		dsuForStrings.unionSetsContaining("b", and: word)
 	}
 }
+dsuForStrings
 
 print(dsuForStrings.inSameSet("a", and: "all"))
 print(dsuForStrings.inSameSet("all", and: "awesome"))
