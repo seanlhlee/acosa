@@ -128,13 +128,13 @@ Recall that each set is represented by a tree and that the index of the root nod
 
 Here's illustration of what I mean. Let's say the tree looks like this:
 
-![BeforeFind](/gitBook/pics/BeforeFind.png)
+![BeforeFind](BeforeFind.png)
 
 We call `setOf(4)`. To find the root node we have to first go to node `2` and then to node `7`. (The indexes of the elements are marked in red.)
 
 During the call to `setOf(4)`, the tree is reorganized to look like this:
 
-![AfterFind](/gitBook/pics/AfterFind.png)
+![AfterFind](AfterFind.png)
 
 Now if we need to call `setOf(4)` again, we no longer have to go through node `2` to get to the root. So as you use the Union-Find data structure, it optimizes itself. Pretty cool!
 
@@ -190,11 +190,11 @@ Here is how it works:
 
 An illustration may help to better understand this. Let's say we have these two sets, each with its own tree:
 
-![BeforeUnion](/gitBook/pics/BeforeUnion.png)
+![BeforeUnion](BeforeUnion.png)
 
 Now we call `unionSetsContaining(4, and: 3)`. The smaller tree is attached to the larger one:
 
-![AfterUnion](/gitBook/pics/AfterUnion.png)
+![AfterUnion](AfterUnion.png)
 
 Note that, because we call `setOf()` at the start of the method, the larger tree was also optimized in the process -- node `3` now hangs directly off the root.
 
@@ -205,9 +205,68 @@ Union with optimizations also takes almost **O(1)** time.
 See the playground for more examples of how to use this handy data structure.
 
 [Union-Find at Wikipedia](https://en.wikipedia.org/wiki/Disjoint-set_data_structure)
+*/
+var dsu = UnionFind<Int>()
+
+for i in 1...10 {
+	dsu.addSetWith(i)
+}
+// now our dsu contains 10 independent sets
+
+// let's divide our numbers into two sets by divisibility by 2
+for i in 3...10 {
+	if i % 2 == 0 {
+		dsu.unionSetsContaining(2, and: i)
+	} else {
+		dsu.unionSetsContaining(1, and: i)
+	}
+}
+
+// check our division
+print(dsu.inSameSet(2, and: 4))
+print(dsu.inSameSet(4, and: 6))
+print(dsu.inSameSet(6, and: 8))
+print(dsu.inSameSet(8, and: 10))
+
+
+print(dsu.inSameSet(1, and: 3))
+print(dsu.inSameSet(3, and: 5))
+print(dsu.inSameSet(5, and: 7))
+print(dsu.inSameSet(7, and: 9))
+
+
+print(dsu.inSameSet(7, and: 4))
+print(dsu.inSameSet(3, and: 6))
 
 
 
+var dsuForStrings = UnionFind<String>()
+let words = ["all", "border", "boy", "afternoon", "amazing", "awesome", "best"]
+
+dsuForStrings.addSetWith("a")
+dsuForStrings.addSetWith("b")
+
+// In that example we divide strings by its first letter
+for word in words {
+	dsuForStrings.addSetWith(word)
+	if word.hasPrefix("a") {
+		dsuForStrings.unionSetsContaining("a", and: word)
+	} else if word.hasPrefix("b") {
+		dsuForStrings.unionSetsContaining("b", and: word)
+	}
+}
+
+print(dsuForStrings.inSameSet("a", and: "all"))
+print(dsuForStrings.inSameSet("all", and: "awesome"))
+print(dsuForStrings.inSameSet("amazing", and: "afternoon"))
+
+print(dsuForStrings.inSameSet("b", and: "boy"))
+print(dsuForStrings.inSameSet("best", and: "boy"))
+print(dsuForStrings.inSameSet("border", and: "best"))
+
+print(dsuForStrings.inSameSet("amazing", and: "boy"))
+print(dsuForStrings.inSameSet("all", and: "border"))
+/*:
 ***
 [Previous](@previous) | [Next](@next)
 */

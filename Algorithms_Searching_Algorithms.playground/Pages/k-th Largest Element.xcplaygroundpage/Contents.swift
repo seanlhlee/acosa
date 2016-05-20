@@ -1,7 +1,7 @@
 /*:
 [Previous](@previous) | [Next](@next)
 ***
-# k-th Largest Element Problem
+# 查找第k大的值（k-th Largest Element Problem）
 
 You're given an integer array `a`. Write an algorithm that finds the *k*-th largest element in the array.
 
