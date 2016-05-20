@@ -34,7 +34,7 @@ linearSearch(array, 2) 	// This will return 1
 
 最佳情況**O(1)**，平均來說是陣列大小的一半。
 
-## See also
+## 參考資料
 
 [Linear search on Wikipedia](https://en.wikipedia.org/wiki/Linear_search)
 
