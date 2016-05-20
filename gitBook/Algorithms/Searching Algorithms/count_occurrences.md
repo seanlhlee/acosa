@@ -1,4 +1,4 @@
-# Count Occurrences
+# 計數法（Count Occurrences）
 
 Goal: Count how often a certain value appears in an array.
 
