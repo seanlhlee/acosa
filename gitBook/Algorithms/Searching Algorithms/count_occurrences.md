@@ -1,10 +1,10 @@
 # 計數法（Count Occurrences）
 
-Goal: Count how often a certain value appears in an array.
+目標： 計算陣列中某元素重複的次數
 
-The obvious way to do this is with a [linear search](../Linear Search/) from the beginning of the array until the end, keeping count of how often you come across the value. That is an **O(n)** algorithm.
+顯然可以利用線性尋法（[linear search](../Linear Search/)）來完成計數，為時間複雜度**O(n)**的演算法。
 
-However, if the array is sorted you can do it much faster, in **O(log n)** time, by using a modification of [binary search](../Binary Search/).
+若經過排序的陣列，使用However, if the array is sorted you can do it much faster, in **O(log n)** time, by using a modification of [binary search](../Binary Search/).
 
 Let's say we have the following array:
 
