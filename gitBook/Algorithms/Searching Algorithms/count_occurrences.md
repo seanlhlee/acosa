@@ -61,6 +61,30 @@ countOccurrencesOfKey(3, inArray: a)  // returns 4
 
 > **注意:** 需要先對來源陣列進行排序！
 
+程式碼重複的部分可改良如下：
+```swift
+func countOccurrencesOfKey(key: Int, inArray a: [Int]) -> Int {
+	func boundary(left left: Bool) -> Int {
+		var low = 0
+		var high = a.count
+		while low < high {
+			let midIndex = low + (high - low)/2
+			let condition: Bool = left ? a[midIndex] < key : !(a[midIndex] > key)
+			if condition {
+				low = midIndex + 1
+			} else {
+				high = midIndex
+			}
+		}
+		return low
+	}
+	return boundary(left: false) - boundary(left: true)
+}
+let a = [ 0, 1, 1, 3, 3, 3, 3, 6, 8, 10, 11, 11 ]
+
+countOccurrencesOfKey(3, inArray: a)  // returns 4
+```
+
 範例陣列：
 
 	[ 0, 1, 1, 3, 3, 3, 3, 6, 8, 10, 11, 11 ]
