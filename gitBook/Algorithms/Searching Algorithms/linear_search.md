@@ -1,16 +1,12 @@
 # 線性搜尋法（Linear Search）
 
-Goal: Find a particular value in an array.
+目標: 在陣列中找到特定值
 
-We have an array of generic objects. With linear search, we iterate over all the objects in the array and compare each one to the object we're looking for. If the two objects are equal, we stop and return the current array index. If not, we continue to look for the next object as long as we have objects in the array.
+有一格儲存泛型（Generic）物件的陣列，線性搜尋法遍歷陣列元素與欲尋找物件比較，若比較為不相同繼續遍歷直到比較相等或以完整遍歷整個陣列。
 
-## An example
+## 範例
 
-Let's say we have an array of numbers `[5, 2, 4, 7]` and we want to check if the array contains the number `2`.
-
-We start by comparing the first number in the array, `5`, to the number we're looking for, `2`. They are obviously not the same, and so we continue to the next array element.
-
-We compare the number `2` from the array to our number `2` and notice they are equal. Now we can stop our iteration and return 1, which is the index of the number `2` in the array.
+假設有一陣列`[5, 2, 4, 7]`，要在其中找到`2`。首先我們先比較第一個元素`5`與目標`2`，結果不同，便繼續往下查找。直到遍歷至`2`與目標`2`比較相同，此時的索引值為`1`將會被回傳，代表找到目標在陣列中的位置。
 
 ## The code
 
