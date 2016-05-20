@@ -8,9 +8,9 @@
 
 假設有一陣列`[5, 2, 4, 7]`，要在其中找到`2`。首先我們先比較第一個元素`5`與目標`2`，結果不同，便繼續往下查找。直到遍歷至`2`與目標`2`比較相同，此時的索引值為`1`將會被回傳，代表找到目標在陣列中的位置。
 
-## The code
+## 程式碼實作
 
-Here is a simple implementation of linear search in Swift:
+以下為Swift語言的程式實作：
 
 ```swift
 func linearSearch<T: Equatable>(array: [T], _ object: T) -> Int? {
@@ -21,18 +21,18 @@ func linearSearch<T: Equatable>(array: [T], _ object: T) -> Int? {
 }
 ```
 
-Put this code in a playground and test it like so:
+在playground中可以測試:
 
 ```swift
 let array = [5, 2, 4, 7]
 linearSearch(array, 2) 	// This will return 1
 ```
 
-## Performance
+## 效能
 
-Linear search runs at **O(n)**. It compares the object we are looking for with each object in the array and so the time it takes is proportional to the array length. In the worst case, we need to look at all the elements in the array.
+線性效能的時間複雜度為**O(n)**，因為遍歷陣列元素，因此搜尋時間隨陣列的資料量增加而線性成長，最差情況需要所有元素都遍歷過。
 
-The best-case performance is **O(1)** but this case is rare because the object we're looking for has to be positioned at the start of the array to be immediately found. You might get lucky, but most of the time you won't. On average, linear search needs to look at half the objects in the array.
+最佳情況**O(1)**，平均來說是陣列大小的一半。
 
 ## See also
 
