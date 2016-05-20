@@ -103,8 +103,7 @@ countOccurrencesOfKey(3, inArray: a)  // returns 4
 
 由上例，左右各做了4個步驟，總共為8步驟，對於僅12個元素的陣列來說不是很快。但對更大的陣列此演算法就會顯現效率。對已排序容量為1,000,000的陣列，僅需要40個步驟即可完成計算任何特定目標在陣列中的個數。
 
-By the way, if the value you're looking for is not in the array, then `rightBoundary()` and `leftBoundary()` return the same value and so the difference between them is 0.
+此外，輔助函式會在當目標元素不存在時傳回相同值，此時`rightBoundary()`與`leftBoundary()`沒有差別，並最終回傳0。
 
-This is an example of how you can modify the basic binary search to solve other algorithmic problems as well. Of course, it does require that the array is sorted.
+此範例同時也說明了如何利用修改二元搜尋法來解決不同的問題，記得，來源陣列要是排序的。
 
-*Written for Swift Algorithm Club by Matthijs Hollemans*
