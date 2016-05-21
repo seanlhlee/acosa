@@ -1,120 +1,119 @@
-# Shell Sort
+# 希爾排序法（Shell Sort）
 
-Shell sort is based on [insertion sort](../Insertion%20Sort/) as a general way to improve its performance, by breaking the original list into smaller sublists which are then individually sorted using insertion sort.
+希爾排序法（Shell Sort）是基於[插入排序法](Insertion%20Sort)進行效能改良，藉由將原集合分成數個小集合再個別以插入排序法完成排序。
 
-[There is a nice video created at Sapientia University](https://www.youtube.com/watch?v=CmPA7zE8mx0) which shows the process as a Hungarian folk dance.
+一段不錯的希爾排序法[介紹影片](https://www.youtube.com/watch?v=CmPA7zE8mx0)
 
-## How it works
+## 運作機制
 
-Instead of comparing elements that are side-by-side and swapping them if they are out of order, the way insertion sort does it, the shell sort algorithm compares elements that are far apart.
+插入排序法是相鄰元素比較，失序時交換位置，而希爾排序法則是比較相隔一段距離的元素，失序時一樣交換位置。相隔的距離是*gap*，如果比較的元素是錯誤的順序，交換位置的距離是*gap*。想法是藉由元素間較長距離的換位來快速達到區域性的排序，使得在之後的步驟因為不用再換位而更快速。一旦一輪結束，交換距離*gap*變得更小再進行相同的步驟一輪，直到*gap*為1。此演算法運作起來就像插入排序法，在一輪一輪過程中椅部分排序而加快了後續的進行。
 
-The distance between elements is known as the *gap*. If the elements being compared are in the wrong order, they are swapped across the gap. This eliminates many in-between copies that are common with insertion sort.
+## 例子
 
-The idea is that by moving the elements over large gaps, the array becomes partially sorted quite quickly. This makes later passes faster because they don't have to swap so many items anymore.
+假設我們有一陣列`[64, 20, 50, 33, 72, 10, 23, -1, 4]`以希爾排序法排序，開始時，我們將元素數除以2：`n = floor(9/2) = 4`做為第一輪的`gap`大小，將陣列分成小陣列，每個小陣列元素間間隔為`gap`，再以`insertionSort()`的輔助函式進行子陣列的排序。
 
-Once a pass has been completed, the gap is made smaller and a new pass starts.  This repeats until the gap has size 1, at which point the algorithm functions just like  insertion sort. But since the data is already fairly well sorted by then, the final pass can be very quick.
+第一輪的示意如下:
 
-## An example
+	子陣列 0:  [ 64, xx, xx, xx, 72, xx, xx, xx, 4  ]
+	子陣列 1:  [ xx, 20, xx, xx, xx, 10, xx, xx, xx ]
+	子陣列 2:  [ xx, xx, 50, xx, xx, xx, 23, xx, xx ]
+	子陣列 3:  [ xx, xx, xx, 33, xx, xx, xx, -1, xx ]
 
-Suppose we want to sort the array `[64, 20, 50, 33, 72, 10, 23, -1, 4]` using shell sort.
+每個子陣列為原陣列間隔4的元素。不在子陣列的元素在示意中標示為`xx`，第一個子集合是`[ 64, 72, 4 ]`，第二個是`[ 20, 10 ]`，使用"gap"變數可以直接在原陣列中操作，而避新建許多新陣列。之後對每個子陣列呼叫輔助函式`insertionSort()`進行排序(此處的實作由後開始往前排序)。
 
-We start by dividing the length of the array by 2:
+對於子陣列0，`4`與`72`換位，之後`4`再與`64`換位：
 
-    n = floor(9/2) = 4
+	子陣列 0:  [ 4, xx, xx, xx, 64, xx, xx, xx, 72 ]
 
-This is the gap size.
+其他三個子陣列排序後：
 
-We create `n` sublists. In each sublist, the items are spaced apart by a gap of size `n`. In our example, we need to make four of these sublists. The sublists are sorted by the `insertionSort()` function.
+	子陣列 1:  [ xx, 10, xx, xx, xx, 20, xx, xx, xx ]
+	子陣列 2:  [ xx, xx, 23, xx, xx, xx, 50, xx, xx ]
+	子陣列 3:  [ xx, xx, xx, -1, xx, xx, xx, 33, xx ]
 
-That may not have made a whole lot of sense, so let's take a closer look at what happens.
-
-The first pass is as follows. We have `n = 4`, so we make four sublists:
-
-	sublist 0:  [ 64, xx, xx, xx, 72, xx, xx, xx, 4  ]
-	sublist 1:  [ xx, 20, xx, xx, xx, 10, xx, xx, xx ]
-	sublist 2:  [ xx, xx, 50, xx, xx, xx, 23, xx, xx ]
-	sublist 3:  [ xx, xx, xx, 33, xx, xx, xx, -1, xx ]
-
-As you can see, each sublist contains only every 4th item from the original array. The items that are not in a sublist are marked with `xx`. So the first sublist is `[ 64, 72, 4 ]` and the second is `[ 20, 10 ]`, and so on. The reason we use this "gap" is so that we don't have to actually make new arrays. Instead, we interleave them in the original array.
-
-We now call `insertionSort()` once on each sublist.
-
-This particular version of [insertion sort](../Insertion Sort/) sorts from the back to the front. Each item in the sublist is compared against the others. If they're in the wrong order, the value is swapped and travels all the way down until we reach the start of the sublist.
-
-So for sublist 0, we swap `4` with `72`, then swap `4` with `64`. After sorting, this sublist looks like:
-
-    sublist 0:  [ 4, xx, xx, xx, 64, xx, xx, xx, 72 ]
-
-The other three sublists after sorting:
-
-	sublist 1:  [ xx, 10, xx, xx, xx, 20, xx, xx, xx ]
-	sublist 2:  [ xx, xx, 23, xx, xx, xx, 50, xx, xx ]
-	sublist 3:  [ xx, xx, xx, -1, xx, xx, xx, 33, xx ]
-    
-The total array looks like this now:
+而整個陣列現在是：
 
 	[ 4, 10, 23, -1, 64, 20, 50, 33, 72 ]
 
-It's not entirely sorted yet but it's more sorted than before. This completes the first pass.
+然還還是沒有排序的，但與未排序前相較是有次序些了。第二輪我們在將gap值除以2：`n = floor(4/2) = 2`，這代表此次我們只有兩個子陣列：
 
-In the second pass, we divide the gap size by two:
+	子陣列 0:  [  4, xx, 23, xx, 64, xx, 50, xx, 72 ]
+	子陣列 1:  [ xx, 10, xx, -1, xx, 20, xx, 33, xx ]
 
-	n = floor(4/2) = 2
+針對每個子陣列再次以呼叫`insertionSort()`輔助函式排序：
 
-That means we now create only two sublists:
+	子陣列 0:  [  4, xx, 23, xx, 50, xx, 64, xx, 72 ]
+	子陣列 1:  [ xx, -1, xx, 10, xx, 20, xx, 33, xx ]
 
-	sublist 0:  [  4, xx, 23, xx, 64, xx, 50, xx, 72 ]
-	sublist 1:  [ xx, 10, xx, -1, xx, 20, xx, 33, xx ]
-
-Each sublist contains every 2nd item. Again, we call `insertionSort()` to sort these sublists. The result is:
-
-	sublist 0:  [  4, xx, 23, xx, 50, xx, 64, xx, 72 ]
-	sublist 1:  [ xx, -1, xx, 10, xx, 20, xx, 33, xx ]
-
-Note that in each list only two elements were out of place. So the insertion sort is really fast. That's because we already sorted the array a little in the first pass.
-
-The total array looks like this now:
+可以注意到每個子陣列只有兩個元素的位置是錯的，原因是第一輪時已些微的排序了一次。而整個列現在是：
 
 	[ 4, -1, 23, 10, 50, 20, 64, 33, 72 ]
 
-This completes the second pass. The gap size of the final pass is:
-
-	n = floor(2/2) = 1
-
-A gap size of 1 means we only have a single sublist, the array itself, and once again we call `insertionSort()` to sort it. The final sorted array is:
+最後，再將gap值除以2：`n = floor(2/2) = 1`，陣列已不再分割，同前呼叫`insertionSort()`輔助函式排序即完成：
 
 	[ -1, 4, 10, 20, 23, 33, 50, 64, 72 ]
 
-The performance of shell sort is **O(n^2)** in most cases or **O(n log n)** if you get lucky. This algorithm produces an unstable sort; it may change the relative order of elements with equal values.
-  
-## The gap sequence
+## 效能
 
-The "gap sequence" determines the initial size of the gap and how it is made smaller with each iteration. A good gap sequence is important for shell sort to perform well.
+希爾排序法的時間複雜度為**O(n^2)**，最佳時間複雜度為**O(n log n)**此法為不穩定排序，如果有值相同的元素，可能改變其順序。
 
-The gap sequence in this implementation is the one from Shell's original version: the initial value is half the array size and then it is divided by 2 each time. There are other ways to calculate the gap sequence.
+## 間隔值(gap)的次序
 
-## Just for fun...
+間隔值(gap)的次序決定了每一輪子集合的大小，也會影響此演算法的效率。在我們的實作中我們採跟原始的希爾排序法相同的方式，在每一輪中對`gap`除以2。當然，還有其他的方式，可以自行嘗試。
 
-This is an old Commodore 64 BASIC version of shell sort that Matthijs used a long time ago and ported to pretty much every programming language he ever used:
+## 實作
 
-	61200 REM S is the array to be sorted
-	61205 REM AS is the number of elements in S
-	61210 W1=AS
-	61220 IF W1<=0 THEN 61310
-	61230 W1=INT(W1/2): W2=AS-W1
-	61240 V=0
-	61250 FOR N1=0 TO W2-1
-	61260 W3=N1+W1
-	61270 IF S(N1)>S(W3) THEN SH=S(N1): S(N1)=S(W3): S(W3)=SH: V=1
-	61280 NEXT N1
-	61290 IF V>0 THEN 61240
-	61300 GOTO 61220
-	61310 RETURN
+以下為希爾排序法（Shell Sort）的Swift實作：
 
-## See also
+```swift
+public func shellSort<T>(array: [T], _ isOrderedBefore: (T, T) -> Bool) -> [T] {
+	func insertionSorted(inout list: [T], start: Int, gap: Int) {
+		for i in (start + gap).stride(to: list.count, by: gap) {
+			let currentValue = list[i]
+			var pos = i
+			while pos >= gap && isOrderedBefore(currentValue, list[pos - gap]) {
+				list[pos] = list[pos - gap]
+				pos -= gap
+			}
+			list[pos] = currentValue
+		}
+	}
+	var sortedArray = array
+	var subArrayCount = array.count / 2
+	while subArrayCount > 0 {
+		for pos in 0..<subArrayCount {
+			insertionSorted(&sortedArray, start: pos, gap: subArrayCount)
+		}
+		subArrayCount = subArrayCount / 2
+	}
+	return sortedArray
+}
 
-[Shellsort on Wikipedia](https://en.wikipedia.org/wiki/Shellsort)
 
-[Shell sort at Rosetta code](http://rosettacode.org/wiki/Sorting_algorithms/Shell_sort)
+public func shellSorted<T>(inout array: [T], _ isOrderedBefore: (T, T) -> Bool) {
+	func insertionSorted(inout list: [T], start: Int, gap: Int) {
+		for i in (start + gap).stride(to: list.count, by: gap) {
+			let currentValue = list[i]
+			var pos = i
+			while pos >= gap && isOrderedBefore(list[pos - gap], currentValue) {
+				list[pos] = list[pos - gap]
+				pos -= gap
+			}
+			list[pos] = currentValue
+		}
+	}
+	var subArrayCount = array.count / 2
+	while subArrayCount > 0 {
+		for pos in 0..<subArrayCount {
+			insertionSorted(&array, start: pos, gap: subArrayCount)
+		}
+		subArrayCount = subArrayCount / 2
+	}
+}
+```
 
-*Written for Swift Algorithm Club by [Mike Taghavi](https://github.com/mitghi) and Matthijs Hollemans*
+## 參考資料
+
+[維基百科：Shellsort](https://en.wikipedia.org/wiki/Shellsort)
+
+[Rosetta code: Shell sort](http://rosettacode.org/wiki/Sorting_algorithms/Shell_sort)
