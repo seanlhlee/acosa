@@ -21,7 +21,7 @@
 
 - note: 例子中的🐮索引值為6而非3，是因為Swift的字串使用了更多的記憶體來表示一個表情符號。`String.Index`的值並不重要，只是一個字串中指到正確字元位置的值。
 
-[*字串暴力搜尋法*]可以達到目標要求，但非常沒有效率。實際上要達到功能要求，可以跳過許多的字元，不需對來源字串進行地毯式搜索。這種算法稱為[Boyer-Moore](https://en.wikipedia.org/wiki/Boyer–Moore_string_search_algorithm)演算法，已經存在很長一段時間，被認為是所有的字符串搜索算法的基準。
+ [*字串暴力搜尋法*](Brute-Force%20String%20Search "")可以達到目標要求，但非常沒有效率。實際上要達到功能要求，可以跳過許多的字元，不需對來源字串進行地毯式搜索。這種算法稱為[*Boyer-Moore*](https://en.wikipedia.org/wiki/Boyer–Moore_string_search_algorithm "")演算法，已經存在很長一段時間，被認為是所有的字符串搜索算法的基準。
 
 以下為以Swift實作的程式碼：
 
@@ -79,7 +79,7 @@ extension String {
 		if let strIdx = indexOf(pattern) {
 			var i = 0
 			while i < characters.count {
-				if self.startIndex.advancedBy(i) == strIdx {ß
+				if self.startIndex.advancedBy(i) == strIdx {
 					return i
 				}
 				i += 1
