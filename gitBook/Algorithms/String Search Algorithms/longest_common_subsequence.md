@@ -1,192 +1,199 @@
-# Longest Common Subsequence
+# 最長共同子序列演算法（Longest Common Subsequence）
 
-The Longest Common Subsequence (LCS) of two strings is the longest sequence of characters that appear in the same order in both strings.
+最長共同子序列（Longest Common Subsequence (LCS)）是指兩個字串中最長的相同次序出現的字元所組成的序列。舉例來說，`"Hello World"`與`"Bonjour le monde"`兩字串的LCS為`"oorld"`。字串由左往右排列字元，可以發現`o`, `o`, `r`, `l`, `d`是以相同的次序出現在兩字串中。其他相同次序的組合還有`"ed"`與`"old"`，都比`"oorld"`來的短。
 
-For example the LCS of `"Hello World"` and `"Bonjour le monde"` is `"oorld"`. If you go through both strings from left-to-right, you'll find that the characters `o`, `o`, `r`, `l`, `d` appear in both strings in that order.
+> **注意：** 通常此問題很容易與最長共同子字串混淆（Longest Common Substring），最長共同子字串指的是兩字串中都有的最長的子字串，而共同子序列是字母出現的順序，這個順序若是連續的亦可組合成字串，然而LCS僅要求出現次序相同，不需要可以組合成字串。其中一種找到兩個字串的最常共同子序列的方法是採用動態規劃（dynamic programming）與回溯策略（backtracking strategy）。
 
-Other possible subsequences are `"ed"` and `"old"`, but these are all shorter than `"oorld"`. 
+## 以動態規劃（dynamic programming）求LCS的長度
 
-> **Note:** This should not be confused with the Longest Common Substring problem, where the characters must form a substring of both strings, i.e they have to be immediate neighbors. With a subsequence, it's OK if the characters are not right next to each other, but they must be in the same order.
+求解兩字串`a`與`b`的最長共同子序列，首先我們先找出這個共同順序的序列之長度。可以利用*動態規劃（dynamic programming）*技巧，意即計算出所有可能性，將其儲存到查詢表中。也可以說是把問題遞迴分割成許多更小的問題，把問題一一對應到表格，決定問題的計算順序。
 
-One way to find the LCS of two strings `a` and `b` is using dynamic programming and a backtracking strategy.
+> **注意：** 下述解說中`n`代表`a`字串的長度而`m`代表`b`字串的長度。
 
-## Finding the length of the LCS with dynamic programming
+為了找出所有可能的次序，使用一個輔助函式`lcsLength()`來建立一個大小為`(n+1)` × `(m+1)`的矩陣`matrix[x][y]`值為子字串`a[0...x-1]`與子字串`b[0...y-1]`之最長共同子序列(LCS)長度。
 
-First, we want to find the length of the longest common subsequence between strings `a` and `b`. We're not looking for the actual subsequence yet, only how long it is.
+假設兩字串`"ABCBX"`與`"ABDCAB"`，則`lcsLength()`傳回的矩陣如下:
 
-To determine the length of the LCS between all combinations of substrings of `a` and `b`, we can use a *dynamic programming* technique. Dynamic programming basically means that you compute all possibilities and store them inside a look-up table.
+	|   | Ø | A | B | D | C | A | B |
+	| Ø | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+	| A | 0 | 1 | 1 | 1 | 1 | 1 | 1 |
+	| B | 0 | 1 | 2 | 2 | 2 | 2 | 2 |
+	| C | 0 | 1 | 2 | 2 | 3 | 3 | 3 |
+	| B | 0 | 1 | 2 | 2 | 3 | 3 | 4 |
+	| X | 0 | 1 | 2 | 2 | 3 | 3 | 4 |
 
-> **Note:** During the following explanation, `n` is the length of string `a`, and `m` is the length of string `b`.
-
-To find the lengths of all possible subsequences, we use a helper function, `lcsLength()`. This creates a matrix of size `(n+1)` by `(m+1)`, where `matrix[x][y]` is the length of the LCS between the substrings `a[0...x-1]` and `b[0...y-1]`.
-
-Given strings `"ABCBX"` and `"ABDCAB"`, the output matrix of `lcsLength()` is the following:
-
-```
-|   | Ø | A | B | D | C | A | B |
-| Ø | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
-| A | 0 | 1 | 1 | 1 | 1 | 1 | 1 |  
-| B | 0 | 1 | 2 | 2 | 2 | 2 | 2 |
-| C | 0 | 1 | 2 | 2 | 3 | 3 | 3 |
-| B | 0 | 1 | 2 | 2 | 3 | 3 | 4 |
-| X | 0 | 1 | 2 | 2 | 3 | 3 | 4 |
-```
-
-In this example, if we look at `matrix[3][4]` we find the value `3`. This means the length of the LCS between `a[0...2]` and `b[0...3]`, or between `"ABC"` and `"ABDC"`, is 3. That is correct, because these two substrings have the subsequence `ABC` in common. (Note: the first row and column of the matrix are always filled with zeros.)
-
-Here is the source code for `lcsLength()`; this lives in an extension on `String`:
-
+此例中，`matrix[3][4]`值為`3`，這代表`a[0...2]`與`b[0...3]`或說`"ABC"`與`"ABDC"`的最長共同序列長度為3，因為兩個子字串共同序列有`ABC`。(注意： 矩陣的首行與首列總是0)。以下為`lcsLength()`函式實作的程式碼，我們將其做為`String`類別的拓展(extension)延伸功能：
 ```swift
-func lcsLength(other: String) -> [[Int]] {
-
-  var matrix = [[Int]](count: self.characters.count+1, 
-                       repeatedValue: [Int](count: other.characters.count+1, repeatedValue: 0))
-
-  for (i, selfChar) in self.characters.enumerate() {
-	for (j, otherChar) in other.characters.enumerate() {
-	  if otherChar == selfChar {
-		// Common char found, add 1 to highest lcs found so far.
-		matrix[i+1][j+1] = matrix[i][j] + 1
-	  } else {
-		// Not a match, propagates highest lcs length found so far.
-		matrix[i+1][j+1] = max(matrix[i][j+1], matrix[i+1][j])
-	  }
+    func lcsLength(other: String) -> [[Int]] {
+		
+		var matrix = [[Int]](count: self.characters.count+1,
+							 repeatedValue: [Int](count: other.characters.count+1, repeatedValue: 0))
+		
+		for (i, selfChar) in self.characters.enumerate() {
+			for (j, otherChar) in other.characters.enumerate() {
+				if otherChar == selfChar {
+					// Common char found, add 1 to highest lcs found so far.
+					matrix[i+1][j+1] = matrix[i][j] + 1
+				} else {
+					// Not a match, propagates highest lcs length found so far.
+					matrix[i+1][j+1] = max(matrix[i][j+1], matrix[i+1][j])
+				}
+			}
+		}
+		
+		return matrix
 	}
-  }
-
-  return matrix
-}
 ```
 
-First, this creates a new matrix -- really a 2-dimensional array -- and fills it with zeros. Then it loops through both strings, `self` and `other`, and compares their characters in order to fill in the matrix. If two characters match, we increment the length of the subsequence. However, if two characters are different, then we "propagate" the highest LCS length found so far.
+首先，建立一個新的二維矩陣，所有元素先設為0。Then it loops through both strings, 然後`self`與`other`兩字串用迴圈兩兩比對字元是否相同，若相同則在先前已知的長度上+1，若不同則是填入已知的長度。如下圖示：
 
-Let's say the following is the current situation:
+	|   | Ø | A | B | D | C | A | B |
+	| Ø | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+	| A | 0 | 1 | 1 | 1 | 1 | 1 | 1 |
+	| B | 0 | 1 | 2 | 2 | 2 | 2 | 2 |
+	| C | 0 | 1 | 2 | * |   |   |   |
+	| B | 0 |   |   |   |   |   |   |
+	| X | 0 |   |   |   |   |   |   |
 
-```
-|   | Ø | A | B | D | C | A | B |
-| Ø | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
-| A | 0 | 1 | 1 | 1 | 1 | 1 | 1 |  
-| B | 0 | 1 | 2 | 2 | 2 | 2 | 2 |
-| C | 0 | 1 | 2 | * |   |   |   |
-| B | 0 |   |   |   |   |   |   |
-| X | 0 |   |   |   |   |   |   |
-```
+圖中`*`標記為正在比對的位置，即`C`與`D`兩字元比對，兩字元是不同的，所以標記位置我們填入已知的最長長度`2`：
 
-The `*` marks the two characters we're currently comparing, `C` versus `D`. These characters are not the same, so we propagate the highest length we've seen so far, which is `2`:
+	|   | Ø | A | B | D | C | A | B |
+	| Ø | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+	| A | 0 | 1 | 1 | 1 | 1 | 1 | 1 |
+	| B | 0 | 1 | 2 | 2 | 2 | 2 | 2 |
+	| C | 0 | 1 | 2 | 2 | * |   |   |
+	| B | 0 |   |   |   |   |   |   |
+	| X | 0 |   |   |   |   |   |   |
 
-```
-|   | Ø | A | B | D | C | A | B |
-| Ø | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
-| A | 0 | 1 | 1 | 1 | 1 | 1 | 1 |  
-| B | 0 | 1 | 2 | 2 | 2 | 2 | 2 |
-| C | 0 | 1 | 2 | 2 | * |   |   |
-| B | 0 |   |   |   |   |   |   |
-| X | 0 |   |   |   |   |   |   |
-```
+接下的`C`與`C`是相同的，所以填入已知最長2再加1為`3`:
 
-Now we compare `C` with `C`. These are equal, and we increment the length to `3`:
 
-```
-|   | Ø | A | B | D | C | A | B |
-| Ø | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
-| A | 0 | 1 | 1 | 1 | 1 | 1 | 1 |  
-| B | 0 | 1 | 2 | 2 | 2 | 2 | 2 |
-| C | 0 | 1 | 2 | 2 | 3 | * |   |
-| B | 0 |   |   |   |   |   |   |
-| X | 0 |   |   |   |   |   |   |
-```
+	|   | Ø | A | B | D | C | A | B |
+	| Ø | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+	| A | 0 | 1 | 1 | 1 | 1 | 1 | 1 |
+	| B | 0 | 1 | 2 | 2 | 2 | 2 | 2 |
+	| C | 0 | 1 | 2 | 2 | 3 | * |   |
+	| B | 0 |   |   |   |   |   |   |
+	| X | 0 |   |   |   |   |   |   |
 
-And so on... this is how `lcsLength()` fills in the entire matrix.
 
-## Backtracking to find the actual subsequence
+持續到最後，`lcsLength()`就可以順利完成整個矩陣。
 
-So far we've calculated the length of every possible subsequence. The length of the longest subsequence is found in the bottom-left corner of matrix, at `matrix[n+1][m+1]`. In the above example it is 4, so the LCS consists of 4 characters.
+## 以回溯策略（Backtracking）求LCS的實際序列
 
-Having the length of every combination of substrings makes it possible to determine *which* characters are part of the LCS itself by using a backtracking strategy.
-
-Backtracking starts at `matrix[n+1][m+1]` and walks up and left (in this priority) looking for changes that do not indicate a simple propagation.
+至此，可能序列的長度，而最長的長度為4，也是`matrix[n+1][m+1]`的值。接下來可以回溯策略（Backtracking）來求取哪些字元是以相同的次序出現在兩字串中。
+由`matrix[n+1][m+1]`開始向上向左回溯來找出長度的變化位置。
 
 ```
 |   |  Ø|  A|  B|  D|  C|  A|  B|
 | Ø |  0|  0|  0|  0|  0|  0|  0|
-| A |  0|↖ 1|  1|  1|  1|  1|  1|  
+| A |  0|↖ 1|  1|  1|  1|  1|  1|
 | B |  0|  1|↖ 2|← 2|  2|  2|  2|
 | C |  0|  1|  2|  2|↖ 3|← 3|  3|
 | B |  0|  1|  2|  2|  3|  3|↖ 4|
 | X |  0|  1|  2|  2|  3|  3|↑ 4|
 ```
 
-Each `↖` move indicates a character (in row/column header) that is part of the LCS.
-
-If the number on the left and above are different than the number in the current cell, no propagation happened. In that case `matrix[i][j]` indicates a common char between the strings `a` and `b`, so the characters at `a[i - 1]` and `b[j - 1]` are part of the LCS that we're looking for.
-
-One thing to notice is, as it's running backwards, the LCS is built in reverse order. Before returning, the result is reversed to reflect the actual LCS.
-
-Here is the backtracking code:
-
+每個`↖`的移動符號代表LCS中的共同字元。如果在`matrix[i][j]`位置的上方與左方的數字不同，代表該位置是共同字元`a[i - 1]`與`b[j - 1]`，需要注意到逆向追溯使得到的結果會是次序顛倒的，在回傳前需要倒置次序。以下為回溯（backtrack）輔助函式的實作:
 ```swift
-func backtrack(matrix: [[Int]]) -> String {
-  var i = self.characters.count
-  var j = other.characters.count
-  
-  var charInSequence = self.endIndex
-  
-  var lcs = String()
-  
-  while i >= 1 && j >= 1 {
-	// Indicates propagation without change: no new char was added to lcs.
-	if matrix[i][j] == matrix[i][j - 1] {
-	  j -= 1
+    func backtrack(matrix: [[Int]]) -> String {
+		var i = self.characters.count
+		var j = other.characters.count
+		
+		var charInSequence = self.endIndex
+		
+		var lcs = String()
+		
+		while i >= 1 && j >= 1 {
+			// Indicates propagation without change: no new char was added to lcs.
+			if matrix[i][j] == matrix[i][j - 1] {
+				j -= 1
+			}
+			// Indicates propagation without change: no new char was added to lcs.
+			else if matrix[i][j] == matrix[i - 1][j] {
+				i -= 1
+				charInSequence = charInSequence.predecessor()
+			}
+			// Value on the left and above are different than current cell.
+			// This means 1 was added to lcs length.
+			else {
+				i -= 1
+				j -= 1
+				charInSequence = charInSequence.predecessor()
+				lcs.append(self[charInSequence])
+			}
+		}
+		
+		return String(lcs.characters.reverse())
 	}
-	// Indicates propagation without change: no new char was added to lcs.
-	else if matrix[i][j] == matrix[i - 1][j] {
-	  i -= 1
-	  charInSequence = charInSequence.predecessor()
-	}
-	// Value on the left and above are different than current cell.
-	// This means 1 was added to lcs length.
-	else {
-	  i -= 1
-	  j -= 1
-	  charInSequence = charInSequence.predecessor()
-	  lcs.append(self[charInSequence])
-	}
-  }
-  
-  return String(lcs.characters.reverse())
-}
-```  
+```
+此輔助函式由矩陣右下角`matrix[n+1][m+1]`追溯至左上角`matrix[1][1]` (top-right corner)，來找到都有出現在兩字串中的字元並將其加到暫存字串`lcs`中。`charInSequence`變數為`self`字串中字元的索引值，由尾端開始。每當`i`在迴圈遞減時，同時對`charInSequence`變數遞減。當找到相同字元的位置時，我們將字元`self[charInSequence]`增加至`lcs`字串中。回傳結果前以`reverse()`倒置字串順序。
 
-This backtracks from `matrix[n+1][m+1]` (bottom-right corner) to `matrix[1][1]` (top-right corner), looking for characters that are common to both strings. It adds those characters to a new string, `lcs`.
+## 將輔助函式整合
 
-The `charInSequence` variable is an index into the string given by `self`. Initially this points to the last character of the string. Each time we decrement `i`, we also move back `charInSequence`. When the two characters are found to be equal, we add the character at `self[charInSequence]` to the new `lcs` string. (We can't just write `self[i]` because `i` may not map to the current position inside the Swift string.)
-
-Due to backtracking, characters are added in reverse order, so at the end of the function we call `reverse()` to put the string in the right order. (Appending new characters to the end of the string and then reversing it once is faster than always inserting the characters at the front of the string.)
-
-## Putting it all together
-
-To find the LCS between two strings, we first call `lcsLength()` and then `backtrack()`:
+要得到兩個字串中最長的相同次序出現的字元所組成的序列，先呼叫`lcsLength()`再呼叫`backtrack()`：
 
 ```swift
 extension String {
-  public func longestCommonSubsequence(other: String) -> String {
-
-    func lcsLength(other: String) -> [[Int]] {
-      ...
-    }
-    
-    func backtrack(matrix: [[Int]]) -> String {
-      ...
-    }
-
-    return backtrack(lcsLength(other))
-  }
+	public func longestCommonSubsequence(other: String) -> String {
+		
+		func lcsLength(other: String) -> [[Int]] {
+			
+			var matrix = [[Int]](count: self.characters.count+1,
+			                     repeatedValue: [Int](count: other.characters.count+1, repeatedValue: 0))
+			
+			for (i, selfChar) in self.characters.enumerate() {
+				for (j, otherChar) in other.characters.enumerate() {
+					if otherChar == selfChar {
+						// Common char found, add 1 to highest lcs found so far.
+						matrix[i+1][j+1] = matrix[i][j] + 1
+					} else {
+						// Not a match, propagates highest lcs length found so far.
+						matrix[i+1][j+1] = max(matrix[i][j+1], matrix[i+1][j])
+					}
+				}
+			}
+			
+			return matrix
+		}
+		
+		func backtrack(matrix: [[Int]]) -> String {
+			var i = self.characters.count
+			var j = other.characters.count
+			
+			var charInSequence = self.endIndex
+			
+			var lcs = String()
+			
+			while i >= 1 && j >= 1 {
+				// Indicates propagation without change: no new char was added to lcs.
+				if matrix[i][j] == matrix[i][j - 1] {
+					j -= 1
+				}
+					// Indicates propagation without change: no new char was added to lcs.
+				else if matrix[i][j] == matrix[i - 1][j] {
+					i -= 1
+					charInSequence = charInSequence.predecessor()
+				}
+					// Value on the left and above are different than current cell.
+					// This means 1 was added to lcs length.
+				else {
+					i -= 1
+					j -= 1
+					charInSequence = charInSequence.predecessor()
+					lcs.append(self[charInSequence])
+				}
+			}
+			
+			return String(lcs.characters.reverse())
+		}
+		
+		return backtrack(lcsLength(other))
+	}
 }
 ```
 
-To keep everything tidy, the two helper functions are nested inside the main `longestCommonSubsequence()` function.
-
-Here's how you could try it out in a Playground:
+為了整齊起見，我們將兩個`longestCommonSubsequence()`函式之輔助函式寫為其當中的巢狀函式。以下是可在Playground中測試的程式碼：
 
 ```swift
 let a = "ABCBX"
@@ -198,5 +205,3 @@ a.longestCommonSubsequence(c)   // "" (no common subsequence)
 
 "Hello World".longestCommonSubsequence("Bonjour le monde")   // "oorld"
 ```
-
-*Written for Swift Algorithm Club by Pedro Vereza*
