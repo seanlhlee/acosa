@@ -1,200 +1,118 @@
-# Selection Sampling
+# 選擇排序法（Selection Sort）
 
-Goal: Select *k* items at random from a collection of *n* items.
+目標: 將一個陣列中的元素由高到低（或高至低）排序。
 
-Let's say you have a deck of 52 playing cards and you need to draw 10 cards at random. This algorithm lets you do that.
+將一個無序的陣列正確排序。選擇排序法（Selection Sort）將陣列分為兩部分，在陣列前端為排序過的部分，後面的是帶排序的部分。
 
-Here's a very fast version:
+	[ ...sorted numbers... | ...unsorted numbers... ]
+
+此點與[插入排序法](Insertion%20Sort)相似，不同在於如何將新的元素加入已排序的部分中。其運作方式如下：
+
+- 找到陣列中最小的元素，這可以藉由暫存一個最小值的變數並遍歷整個陣列的迴圈達成
+- 將此最小值與索引值0的位置交換
+- 找到索引值1到最後未排序部分的最小值
+- 與索引值為1的元素位置交換
+- 之後一直重複將未排序部分的最小值與該部分的最前方索引值進行位置交換
+- 持續到所有元素均排序
+
+這個演算法稱為選擇排序法（Selection Sort），因為每次均自未排序的部分選擇出最小值來。
+
+## 例子
+
+假設有一個未排序整數集合`[ 5, 8, 3, 4, 6 ]`，我們以`|`符號來代表分割已排序與未排序的部分。開始時已排序部分是空的：
+
+	[| 5, 8, 3, 4, 6 ]
+
+在集合中`|`之後找到最小值`3`，藉由與`5`位置交換將其放到已排序部分:
+
+	[ 3 | 8, 5, 4, 6 ]
+
+現在已排序部分`[ 3 ]`，待排序部分為`[ 8, 5, 4, 6 ]`，我們再由其中找到最小值`4`並與`8`的位置交換：
+
+	[ 3, 4 | 5, 8, 6 ]
+
+完成每個步驟，`|`符號均向右移一位。繼續找未排序部分最小值`5`，`5`已在對的位置上因此僅將`|`符號右移：
+
+	[ 3, 4, 5 | 8, 6 ]
+
+持續以上步驟直到完成。
+
+[ 3, 4, 5, 6, 8 |]
+
+正如你所看到的，選擇排序是*就地*排序，一切都在同一陣列中發生的；無需額外的暫存陣列（實際上我們以Swift實作是以複製相同的陣列完成）。您還可以實作為遇到*穩定*的排序，遇到相同的元素時不經交換。（請注意，下面給出的版本是不穩定的）
+
+## 實作程式碼：
+
+以下為以Swift實作的選擇排序法：
 
 ```swift
-func select<T>(from a: [T], count k: Int) -> [T] {
-  var a = a
-  for i in 0..<k {
-    let r = random(min: i, max: a.count - 1)
-    if i != r {
-      swap(&a[i], &a[r])
-    }
-  }
-  return Array(a[0..<k])
-}
-```
-
-As often happens with these [kinds of algorithms](../Shuffle/), it divides the array into two regions. The first region contains the selected items; the second region is all the remaining items.
-
-Here's an example. Let's say the array is:
-
-	[ "a", "b", "c", "d", "e", "f", "g" ]
+func selectionSort<T>(array: [T], _ isOrderedBefore: (T, T) -> Bool) -> [T] {
+	guard !array.isEmpty else { return array }  // 1
 	
-We want to select 3 items, so `k = 3`. In the loop, `i` is initially 0, so it points at `"a"`.
-
-	[ "a", "b", "c", "d", "e", "f", "g" ]
-	   i
-
-We calculate a random number between `i` and `a.count`, the size of the array. Let's say this is 4. Now we swap `"a"` with `"e"`, the element at index 4, and move `i` forward:
-
-	[ "e" | "b", "c", "d", "a", "f", "g" ]
-	         i
-
-The `|` bar shows the split between the two regions. `"e"` is the first element we've selected. Everything to the right of the bar we still need to look at.
-
-Again, we ask for a random number between `i` and `a.count`, but because `i` has shifted, the random number can never be less than 1. So we'll never again swap `"e"` with anything.
-
-Let's say the random number is 6 and we swap `"b"` with `"g"`:
-
-	[ "e" , "g" | "c", "d", "a", "f", "b" ]
-	               i
-
-One more random number to pick, let's say it is 4 again. We swap `"c"` with `"a"` to get the final selection on the left:
-
-	[ "e", "g", "a" | "d", "c", "f", "b" ]
-
-And that's it. Easy peasy. The performance of this function is **O(k)** because as soon as we've selected *k* elements, we're done.
-
-Here is an alternative algorithm, called "reservoir sampling":
-
-```swift
-func reservoirSample<T>(from a: [T], count k: Int) -> [T] {
-  precondition(a.count >= k)
-
-  var result = [T]()      // 1
-  for i in 0..<k {
-    result.append(a[i])
-  }
-
-  for i in k..<a.count {  // 2
-    let j = random(min: 0, max: i)
-    if j < k {
-      result[j] = a[i]
-    }
-  }
-  return result
-}
-```
-
-This works in two steps:
-
-1. Fill the `result` array with the first `k` elements from the original array. This is called the "reservoir".
-2. Randomly replace elements in the reservoir with elements from the remaining pool.
-
-The performance of this algorithm is **O(n)**, so it's a little bit slower than the first algorithm. However, its big advantage is that it can be used for arrays that are too large to fit in memory, even if you don't know what the size of the array is (in Swift this might be something like a lazy generator that reads the elements from a file).
-
-There is one downside to the previous two algorithms: they do not keep the elements in the original order. In the input array `"a"` came before `"e"` but now it's the other way around. If that is an issue for your app, you can't use this particular method.
-
-Here is an alternative approach that does keep the original order intact, but is a little more involved:
-
-```swift
-func select<T>(from a: [T], count requested: Int) -> [T] {
-  var examined = 0
-  var selected = 0
-  var b = [T]()
-  
-  while selected < requested {                          // 1
-    examined += 1
-    
-    let r = Double(arc4random()) / 0x100000000          // 2
-    
-    let leftToExamine = a.count - examined + 1          // 3
-    let leftToAdd = requested - selected
-
-    if Double(leftToExamine) * r < Double(leftToAdd) {  // 4
-      selected += 1
-      b.append(a[examined - 1])
-    }
-  }
-  return b
-}
-```
-
-This algorithm uses probability to decide whether to include a number in the selection or not. 
-
-1. The loop steps through the array from beginning to end. It keeps going until we've selected *k* items from our set of *n*. Here, *k* is called `requested` and *n* is `a.count`.
-
-2. Calculate a random number between 0 and 1. We want `0.0 <= r < 1.0`. The higher bound is exclusive; we never want it to be exactly 1. That's why we divide the result from `arc4random()` by `0x100000000` instead of the more usual `0xffffffff`.
-
-3. `leftToExamine` is how many items we still haven't looked at. `leftToAdd` is how many items we still need to select before we're done.
-
-4. This is where the magic happens. Basically, we're flipping a coin. If it was heads, we add the current array element to the selection; if it was tails, we skip it.
-
-Interestingly enough, even though we use probability, this approach always guarantees that we end up with exactly *k* items in the output array.
-
-Let's walk through the same example again. The input array is:
-
-	[ "a", "b", "c", "d", "e", "f", "g" ]
-
-The loop looks at each element in turn, so we start at `"a"`. We get a random number between 0 and 1, let's say it is 0.841. The formula at `// 4` multiplies the number of items left to examine with this random number. There are still 7 elements left to examine, so the result is: 
-
-	7 * 0.841 = 5.887
-
-We compare this to 3 because we wanted to select 3 items. Since 5.887 is greater than 3, we skip `"a"` and move on to `"b"`.
-
-Again, we get a random number, let's say 0.212. Now there are only 6 elements left to examine, so the formula gives:
-
-	6 * 0.212 = 1.272
-
-This *is* less than 3 and we add `"b"` to the selection. This is the first item we've selected, so two left to go.
-
-On to the next element, `"c"`. The random number is 0.264, giving the result:
-
-	5 * 0.264 = 1.32
-
-There are only 2 elements left to select, so this number must be less than 2. It is, and we also add `"c"` to the selection. The total selection is `[ "b", "c" ]`.
-
-Only one item left to select but there are still 4 candidates to look at. Suppose the next random number is 0.718. The formula now gives:
-
-	4 * 0.718 = 2.872
-
-For this element to be selected the number has to be less than 1, as there is only 1 element left to be picked. It isn't, so we skip `"d"`. Only three possibilities left -- will we make it before we run out of elements?
-
-The random number is 0.346. The formula gives:
-
-	3 * 0.346 = 1.038
+	var a = array                               // 2
 	
-Just a tiny bit too high. We skip `"e"`. Only two candidates left...
+	for i in 0..<a.count - 1 {                  // 3
+		var indexMin = i
+		for j in i + 1 ..< a.count {            // 4
+			if isOrderedBefore(a[j], a[indexMin]) {
+				indexMin = j
+			}
+		}
+		
+		if i != indexMin {                      // 5
+			swap(&a[i], &a[indexMin])
+		}
+	}
+	return a
+}
 
-Note that now literally we're dealing with a toin coss: if the random number is less than 0.5 we select `"f"` and we're done. If it's greater than 0.5, we go on to the final element. Let's say we get 0.583:
 
-	2 * 0.583 = 1.166
+var list = [ 10, -1, 3, 9, 2, 27, 8, 5, 1, 3, 0, 26 ]
+selectionSort(list, <)  // [-1, 0, 1, 2, 3, 3, 5, 8, 9, 10, 26, 27]
 
-We skip `"f"` and look at the very last element. Whatever random number we get here, it should always select `"g"` or we won't have selected enough elements and the algorithm doesn't work!
+func selectionSorted<T>(inout array: [T], _ isOrderedBefore: (T, T) -> Bool) {
+	guard !array.isEmpty else { return }
+	for i in 0..<array.count - 1 {
+		var indexMin = i
+		for j in i + 1 ..< array.count {
+			if isOrderedBefore(array[j], array[indexMin]) {
+				indexMin = j
+			}
+		}
+		if i != indexMin {
+			swap(&array[i], &array[indexMin])
+		}
+	}
+}
 
-Let's say our final random number is 0.999 (remember, it can never be 1.0 or higher). Actually, no matter what we choose here, the formula will always give a value less than 1:
+selectionSorted(&list, <)  // list= [-1, 0, 1, 2, 3, 3, 5, 8, 9, 10, 26, 27]
 
-	1 * 0.999 = 0.999
-
-And so the last element will always be chosen if we didn't have a big enough selection yet. The final selection is `[ "b", "c", "g" ]`. Notice that the elements are still in their original order, because we examined the array from left to right.
-
-Maybe you're not convinced yet... What if we always got 0.999 as the random value (the maximum possible), would that still select 3 items? Well, let's do the math:
-
-	7 * 0.999 = 6.993     is this less than 3? no
-	6 * 0.999 = 5.994     is this less than 3? no
-	5 * 0.999 = 4.995     is this less than 3? no
-	4 * 0.999 = 3.996     is this less than 3? no
-	3 * 0.999 = 2.997     is this less than 3? YES
-	2 * 0.999 = 1.998     is this less than 2? YES
-	1 * 0.999 = 0.999     is this less than 1? YES
-
-It always works! But does this mean that elements closer to the end of the array have a higher probability of being chosen than those in the beginning? Nope, all elements are equally likely to be selected. (Don't take my word for it: see the playground for a quick test that shows this in practice.)
-
-Here's an example of how to test this algorithm:
-
-```swift
-let input = [
-  "there", "once", "was", "a", "man", "from", "nantucket",
-  "who", "kept", "all", "of", "his", "cash", "in", "a", "bucket",
-  "his", "daughter", "named", "nan",
-  "ran", "off", "with", "a", "man",
-  "and", "as", "for", "the", "bucket", "nan", "took", "it",
-]
-
-let output = select(from: input, count: 10)
-print(output)
-print(output.count)
 ```
 
-The performance of this second algorithm is **O(n)** as it may require a pass through the entire input array.
+分步解說：
 
-> **Note:** If `k > n/2`, then it's more efficient to do it the other way around and choose `k` items to remove.
+1. 若陣列為空直接回傳
 
-Based on code from Algorithm Alley, Dr. Dobb's Magazine, October 1993.
+2. 複製來源陣列，排序之後回傳的是一個副本。
 
-*Written for Swift Algorithm Club by Matthijs Hollemans*
+3. 有兩個迴圈，外迴圈依序選擇陣列中的元素，如同說明中`|`符號右移。
+
+4. 內迴圈用來找到未排序部分的最小值。
+
+5. 將最小值與目前未排序的第一個位置交換，`if`確認`swap()`的必要性。
+
+總結: 對於陣列中的每個元素，會與未排序部分的最小值進行位置交換，並由左至右進行。
+
+- note: 外迴圈終止於`a.count - 2`，因為最後一個元素必然已經是在對的位置上。
+
+## 效能
+
+選擇排序法非常容易理解，但其效能不高，時間複雜度為**O(n^2)**比[插入排序法](Insertion%20Sort)差但比[氣泡排序法](Bubble%20Sort)好。效能最大的關鍵是在未排序部分找到最小值。
+
+*堆積排序法（Heap sort）* 使用相同的原理，但更快速地找到未排序資料中的最小值，其實時間複雜度為**O(n log n)**.
+
+## 參考資料
+
+[維基百科：Selection sort](https://en.wikipedia.org/wiki/Selection_sort)
+
+
