@@ -217,7 +217,7 @@ mergeSortBottomUp(array, <)   // [1, 1, 2, 2, 3, 4, 4, 5, 7, 8, 9, 9, 10]
 
 ## 參考資料
 
-[維基百科: Merge sort](https://en.wikipedia.org/wiki/Merge_sort)
+[維基百科：Merge sort](https://en.wikipedia.org/wiki/Merge_sort)
 ***
 # **測試**:
 */
