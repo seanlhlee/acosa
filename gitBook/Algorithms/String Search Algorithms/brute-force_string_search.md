@@ -43,7 +43,7 @@ animals.indexOf("🐮")  // 6
 ```
 此方法依序檢查字串中以每個字元起始，長度與目標相同的子字串是否相同，若有相符回傳當下的索引值，若無則繼續比對至迴圈結束，未找到回傳`nil`。
 
-字串暴力搜尋法（Brute-Force String Search）的運作是可行的，然而效率並不好。請參考[Boyer-Moore字串搜尋法](gitBook/Algorithms/String Search Algorithms/boyer-moore.md)為字串搜尋效率改善的一種演算法。
+字串暴力搜尋法（Brute-Force String Search）的運作是可行的，然而效率並不好。請參考[Boyer-Moore字串搜尋法](../gitBook/Algorithms/String Search Algorithms/boyer-moore.md)為字串搜尋效率改善的一種演算法。
 
 # 回傳字符數之字串暴力搜尋法（Brute-Force String Search）
 
