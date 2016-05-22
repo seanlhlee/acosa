@@ -1,5 +1,16 @@
 import Foundation
 
+public func random(min min: Int, max: Int) -> Int {
+	assert(min < max)
+	return min + Int(arc4random_uniform(UInt32(max - min + 1)))
+}
+
+public func swap<T>(inout a: [T], _ i: Int, _ j: Int) {
+	if i != j {
+		swap(&a[i], &a[j])
+	}
+}
+
 //performance check function
 public func timeElapsedInSecondsWhenRunningCode(operation:()->()) -> Double {
 	let startTime = CFAbsoluteTimeGetCurrent()
