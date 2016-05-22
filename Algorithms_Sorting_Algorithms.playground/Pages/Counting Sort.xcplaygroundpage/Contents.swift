@@ -1,85 +1,69 @@
 /*:
 [Previous](@previous) | [Next](@next)
 ***
-# Counting Sort
+# 計數排序法（Counting Sort）
 
-Counting sort is an algorithm for sorting a collection of objects according to keys that are small integers. It operates by counting the number of objects that have each distinct key values, and using arithmetic on those counts to determine the positions of each key value in the output sequence.
+計數排序法（Counting Sort）是一種排序鍵值(key)為簡單整數的物件集合排序法。其方式是以一陣列來記錄整數鍵值出現的次數，再由索引值排序各鍵值的排序。
 
-## Example
+## 例子
 
-To understand the algorithm let's walk through a small example.
+以下藉由簡單的例子來說明，假設一陣列如下：
 
-Consider the array: `[ 10, 9, 8, 7, 1, 2, 7, 3 ]`
+	[ 10, 9, 8, 7, 1, 2, 7, 3 ]
 
-### Step 1:
+### 步驟1：
 
-The first step is to count the total number of occurrences for each item in the array. The output for the first step would be a new array that looks as follows:
+首先針對每個整數的值出現在陣列中的次數進行計次，其輸出唯一如下之陣列：
 
-```
-Index 0 1 2 3 4 5 6 7 8 9 10
-Count 0 1 1 1 0 0 0 2 1 1 1
-```
+	Index 0 1 2 3 4 5 6 7 8 9 10
+	Count 0 1 1 1 0 0 0 2 1 1 1
 
-Here is the code to accomplish this:
+### 步驟2：
 
-```swift
-let maxElement = array.maxElement() ?? 0
+此步驟計算每個鍵值的位置，因為我們已經知道每個數字出現的次數，只要將每個索引值將之前的值求和即可。輸出如下：
 
-var countArray = [Int](count: Int(maxElement + 1), repeatedValue: 0)
-for element in array {
-countArray[element] += 1
+	Index 0 1 2 3 4 5 6 7 8 9 10
+	Count 0 1 2 3 3 3 3 5 6 7 8
+
+### 步驟3：
+
+此步驟將依照第二步得到的陣列，安排每個數字的位置，例如數字10的索引值為7。最後輸出為：
+
+	Index  0 1 2 3 4 5 6 7
+	Output 1 2 3 7 7 8 9 10
+
+以下為此部分的實作：
+*/
+
+func countingSort(array: [Int]) -> [Int] {
+	let maxElement = array.maxElement() ?? 0
+	var countArray = [Int](count: Int(maxElement + 1), repeatedValue: 0)
+	// 1 對鍵值計次
+	for element in array {
+		countArray[element] += 1
+	}
+	// 2 計算各鍵值在結果陣列之索引值
+	for index in 1 ..< countArray.count {
+		let sum = countArray[index] + countArray[index - 1]
+		countArray[index] = sum
+	}
+	// 3 依序將各數字填入輸出陣列中
+	var sortedArray = [Int](count: array.count, repeatedValue: 0)
+	for element in array {
+		countArray[element] -= 1
+		sortedArray[countArray[element]] = element
+	}
+	return sortedArray
 }
-```
 
-### Step 2:
+var array = [ 10, 9, 8, 7, 1, 2, 7, 3 ]
+countingSort(array)
 
-In this step the algorithm tries to determine the number of elements that are placed before each element. Since, you already know the total occurrences for each element you can use this information to your advantage. The way it works is to sum up the previous counts and store them at each index.
+/*:
 
-The count array would be as follows:
+## 效能
 
-```
-Index 0 1 2 3 4 5 6 7 8 9 10
-Count 0 1 2 3 3 3 3 5 6 7 8
-```
-
-The code for step 2 is:
-
-```swift
-for index in 1 ..< countArray.count {
-let sum = countArray[index] + countArray[index - 1]
-countArray[index] = sum
-}
-```
-
-### Step 3:
-
-This is the last step in the algorithm. Each element in the original array is placed at the position defined by the output of step 2. For example, the number 10 would be placed at an index of 7 in the output array. Also, as you place the elements you need to reduce the count by 1 as those many elements are reduced from the array.
-
-The final output would be:
-
-```
-Index  0 1 2 3 4 5 6 7
-Output 1 2 3 7 7 8 9 10
-```
-
-Here is the code for this final step:
-
-```swift
-var sortedArray = [Int](count: array.count, repeatedValue: 0)
-for element in array {
-countArray[element] -= 1
-sortedArray[countArray[element]] = element
-}
-return sortedArray
-```
-
-## Performance
-
-The algorithm uses simple loops to sort a collection. Hence, the time to run the entire algorithm is **O(n+k)** where **O(n)** represents the loops that are required to initialize the output arrays and **O(k)** is the loop required to create the count array.
-
-The algorithm uses arrays of length **n + 1** and **n**, so the total space required is **O(2n)**. Hence for collections where the keys are scattered in a dense area along the number line it can be space efficient.
-
-*Written for Swift Algorithm Club by Ali Hafizji*
+這個演算法使用簡單的迴圈來排序集合，其實時間複雜度為**O(n+k)**，其中**O(n)**與**O(k)**分別代表輸出結果陣列的迴圈與產生計次陣列的迴圈。
 
 ***
 [Previous](@previous) | [Next](@next)
