@@ -4,89 +4,85 @@
 
 # 拓撲排序法（Topological Sort）
 
-Topological sort is an algorithm that orders a directed graph such that for each directed edge *u→v*, vertex *u* comes before vertex *v*.
+拓撲排序（Topological sort）是一種有向圖（directed graph）的排序法，使得每個定向邊* U→V *，*頂點U *排序在* 頂點V*前的演算法。
 
-In other words, a topological sort places the vertices of a [directed acyclic graph](../Graph/) on a line so that all directed edges go from left to right.
+換言之，一個拓撲排序將有向無環圖（directed acyclic graph，DAG）的頂點排列於一線上，使所有指向邊均從左到右。
 
-Consider the graph in the following example:
+考慮以下示例中的圖（graph）：
 
 ![Example](Graph.png)
 
-This graph has two possible topological sorts:
+此圖排序後有兩種呈現方式：
 
 ![Example](TopologicalSort.png)
 
-The topological orderings are **S, V, W, T, X** and **S, W, V, T, X**. Notice how the arrows all go from left to right.
+其次序為**S, V, W, T, X**與**S, W, V, T, X**。所有的箭頭由左向右指。
 
-The following is not a valid topological sort for this graph, since **X** and **T** cannot happen before **V**:
+下例則非一個有效的拓樸排序圖，因為**頂點X**與**頂點T**不可在**頂點V**之前：
 
 ![Example](InvalidSort.png)
 
-## Where is this used?
+## 用在哪裡？
 
-Let's consider that you want to learn all the algorithms and data structures from the Swift Algorithm Club. This might seem daunting at first but we can use topological sort to get things organized.
+讓我們考慮一個問題：要從網路上學習所有的算法和數據結構，這似乎是一項艱鉅任務，但我們可以用拓撲排序來使學習有組織地進行。現在正在學習拓撲排序，我們以此為例子。你需要什麼先學，才能充分了解拓撲排序？拓撲排序使用到**深度優先搜尋（ＤＦＳ）**與**堆疊（Stack）**，但在此之前，需先了解什麼是**圖（Graph）**，同時了解**樹（Tree）**也會有幫助。反過來說，在學習拓撲排序前，先了解圖和樹將物件連結的想法再進入到深度優先搜尋法等等⋯⋯之後再學習會比較容易充分了解。
 
-Since you're learning about topological sort, let's take this topic as an example. What else do you need to learn first before you can fully understand topological sort? Well, topological sort uses [depth-first search](../Depth-First Search/) as well as a [stack](../Stack/). But before you can learn about the depth-first search algorithm, you need to know what a [graph](../Graph/) is, and it helps to know what a [tree](../Tree/) is. In turn, graphs and trees use the idea of linking objects together, so you may need to read up on that first. And so on...
-
-If we were to represent these objectives in the form of a graph it would look as follows:
+如果我們以圖（Graph）來表示，會是下面的形式：
 
 ![Example](Algorithms.png)
 
-If we consider each algorithm to be a vertex in the graph you can clearly see the dependencies between them. To learn something you might have to know something else first. This is exactly what topological sort is used for -- it will sort things out so that you know what to do first.
+假設每一個算法是在圖中的頂點（ vertex），可以清楚地看到它們之間的依賴關係。要學習的東西，你可能需要先學習一些其他的知識。這正是拓撲排序的用途—將需要進行的事情排序從而得到路徑的一項方法。
 
-## How does it work?
+## 運作原理
 
-**Step 1: Find all vertices that have in-degree of 0**
+**第1步：查找入度（In-degree）為0的所有頂點**
 
-The *in-degree* of a vertex is the number of edges pointing at that vertex. Vertices with no incoming edges have an in-degree of 0. These vertices are the starting points for the topological sort.
+一個頂點的*入度*是指向該頂點的邊數，沒有輸入的邊的頂點其入度為0。這些頂點可作為拓撲排序的起點。
 
-In the context of the previous example, these starting vertices represent algorithms and data structures that don't have any prerequisites; you don't need to learn anything else first, hence the sort starts with them.
+在前面的例子中，這些起始頂點表示學習這些算法和數據結構之前，不需要學習其他基礎，因此排序由他們開始。
 
-**Step 2: Traverse the graph with depth-first search**
+**第2步：以深度優先搜尋法遍歷整個圖**
 
-Depth-first search is an algorithm that starts traversing the graph from a certain vertex and explores as far as possible along each branch before backtracking. To find out more about depth-first search, please take a look at the [detailed explanation](../Depth-First%20Search/).
+深度優先搜尋是以某個頂點啟動，並盡可能探索到最遠的節點，再沿著每個分支回溯的遍歷圖形的演算法。要了解更多關於深度優先搜尋(DFS)，請先參閱深度優先搜尋(DFS)的章節。
 
-We perform a depth-first search on each vertex with in-degree 0. This tells us which vertices are connected to each of these starting vertices.
+我們對每個入度0頂點執行深度優先搜尋，這告訴我們哪些頂點連接到這些起始頂點。
 
-**Step 3: Remember all visited vertices**
+**第3步：記住所有訪問過的頂點**
 
-As we perform the depth-first search, we maintain a list of all the vertices that have been visited. This is to avoid visiting the same vertex twice.
+當我們進行深度優先搜尋，我們紀錄一個已訪問的列表，來避免重複訪問。
 
-**Step 4: Put it all together**
+**第四步：把它放在一起**
 
-The last step of the sort is to combine the results of the different depth-first searches and put the vertices in a sorted list.
+排序的最後一步是結合不同的深度優先搜尋的結果，並把頂點列在排序列表。
 
-## Example
+## 例子
 
-Consider the following graph:
+請看下圖：
 
 ![Graph Example](Example.png)
 
-**Step 1:** The vertices with 0 in-degree are: **3, 7, 5**. These are our starting vertices.
+**第1步：** 入度0的節點有：**3, 7, 5**，這些是我們的起點。
 
-**Step 2:** Perform depth-first search for each starting vertex, without remembering vertices that have already been visited:
+**第2步：** 每個起始節點進行深度優先搜尋（不紀錄是否訪問過）：
 
 	Vertex 3: 3, 10, 8, 9
 	Vertex 7: 7, 11, 2, 8, 9
 	Vertex 5: 5, 11, 2, 9, 10
 
-**Step 3:** Filter out the vertices already visited in each previous search:
+**第3步：** 將搜尋結果去除重複訪問的節點
 
 	Vertex 3: 3, 10, 8, 9
 	Vertex 7: 7, 11, 2
 	Vertex 5: 5
 
-**Step 4:** Combine the results of these three depth-first searches. The final sorted order is **5, 7, 11, 2, 3, 10, 8, 9**. (Important: we need to add the results of each subsequent search to the *front* of the sorted list.)
-
-The result of the topological sort looks like this:
+**第4步：** 結合這三個深度優先搜尋的結果。最後其次序是**5, 7, 11, 2, 3, 10, 8, 9**。（重要：必須將每一個搜尋結果加到前一個結果之前），其結果如下：
 
 ![Result of the sort](GraphResult.png)
 
-> **Note:** This is not the only possible topological sort for this graph. For example, other valid solutions are **3, 7, 5, 10, 8, 11, 9, 2** and **3, 7, 5, 8, 11, 2, 9, 10**. Any order where all the arrows are going from left to right will do.
+> **注意：** 這不是唯一一種拓樸排序的型態。例如，**3, 7, 5, 10, 8, 11, 9, 2**與**3, 7, 5, 8, 11, 2, 9, 10**也可以解，任何箭頭都是由左往右指的序列都可作為解的型態。
 
-## The code
+## 實作
 
-Here is how you could implement topological sort in Swift (see also [TopologicalSort1.swift](TopologicalSort1.swift)):
+以下是拓樸排序法（Topological Sort）以Swift語言的實作：
 
 */
 extension Graph {
@@ -133,32 +129,106 @@ extension Graph {
 
 /*:
 
-Some remarks:
+說明：
 
-1. Find the in-degree of each vertex and put all the vertices with in-degree 0 in the `startNodes` array. In this graph implementation, vertices are called "nodes". Both terms are used interchangeably by people who write graph code.
+1. 找到入度0的頂點並將其放入`startNodes`陣列中。在圖（Graph）類別的實作中，頂點被稱為節點，通常這兩個詞都有人使用也是可以互用的。
 
-2. The `visited` array keeps track of whether we've already seen a vertex during the depth-first search. Initially, we set all elements to `false`.
+2. `visited`字典持續追蹤於深度優先搜尋已被訪問的節點，開始前將字典內所有節點設為`false`。
 
-3. For each of the vertices in the `startNodes` array, perform a depth-first search. This returns an array of sorted `Node` objects. We prepend that array to our own `result` array.
+3. 對`startNodes`陣列中的所有節點進行深度優先搜尋，回傳`Node`物件的已排序陣列，我們將其加到`result`陣列之前。
 
-4. The `result` array contains all the vertices in topologically sorted order.
+4. `result`陣列包含全部經拓樸排序的頂點。
 
-> **Note:** For a slightly different implementation of topological sort using depth-first search, see [TopologicalSort3.swift](TopologicalSort3.swift). This uses a stack and does not require you to find all vertices with in-degree 0 first.
+> **注意：** 還有一種些微不同一樣使用深度優先搜尋法的實作版本，如後實作，使用堆疊來實作，此方式不需先找到入度0的所有節點。
 
-## Kahn's algorithm
+*/
+extension Graph {
+	public func topologicalSortAlternative() -> [Node] {
+		var stack = [Node]()
+		
+		var visited = [Node: Bool]()
+		for (node, _) in adjacencyLists {
+			visited[node] = false
+		}
+		
+		func depthFirstSearch(source: Node) {
+			if let adjacencyList = adjacencyList(forNode: source) {
+				for neighbor in adjacencyList {
+					if let seen = visited[neighbor] where !seen {
+						depthFirstSearch(neighbor)
+					}
+				}
+			}
+			stack.append(source)
+			visited[source] = true
+		}
+		
+		for (node, _) in visited {
+			if let seen = visited[node] where !seen {
+				depthFirstSearch(node)
+			}
+		}
+		
+		return stack.reverse()
+	}
+}
 
-Even though depth-first search is the typical way to perform a topological sort, there is another algorithm that also does the job.
+/*:
+## 可汗（Kahn）演算法
 
-1. Find out what the in-degree is of every vertex.
-2. Put all the vertices that have no predecessors in a new array called `leaders`. These vertices have in-degree 0 and therefore do not depend on any other vertices.
-3. Go through this list of leaders and remove them one-by-one from the graph. We don't actually modify the graph, we just decrement the in-degree of the vertices they point to. That has the same effect.
-4. Look at the (former) immediate neighbor vertices of each leader. If any of them now have an in-degree of 0, then they no longer have any predecessors themselves. We'll add those vertices to the `leaders` array too.
-5. This repeats until there are no more vertices left to look at. At this point, the `leaders` array contains all the vertices in sorted order.
+採用深度優先演算法是典型實作拓樸演算法的方式，也有其他演算法
 
-This is an **O(n + m)** algorithm where **n** is the number of vertices and **m** is the number of edges. You can see the implementation in [TopologicalSort2.swift](TopologicalSort2.swift).
+1. 找到每個頂點的入度。
+2. 將每個入度0的頂點放入稱為`leaders`的陣列中。
+3. 將`leaders`陣列中的頂點指向移除，即使其不指向其他頂點。
+4. 再次尋找圖中仍有鄰居而內度為0的頂點，再將它們放入`leaders`陣列中。
+5. 持續到所有頂點都被放入`leaders`陣列，此時陣列即呈排序的狀態。
 
-Source: I first read about this alternative algorithm in the Algorithm Alley column in Dr. Dobb's Magazine from May 1993.
+此演算法時間複雜度**O(n + m)**，其中**n**為頂點數，**m**為連結頂點的邊數。
+*/
+extension Graph {
+	/* Topological sort using Kahn's algorithm. */
+	public func topologicalSortKahn() -> [Node] {
+		var nodes = calculateInDegreeOfNodes()
+		
+		// Find vertices with no predecessors and puts them into a new list.
+		// These are the "leaders". The leaders array eventually becomes the
+		// topologically sorted list.
+		var leaders = nodes.filter({ _, indegree in
+			return indegree == 0
+		}).map({ node, indegree in
+			return node
+		})
+		
+		// "Remove" each of the leaders. We do this by decrementing the in-degree
+		// of the nodes they point to. As soon as such a node has itself no more
+		// predecessors, it is added to the leaders array. This repeats until there
+		// are no more vertices left.
+		var l = 0
+		while l < leaders.count {
+			if let edges = adjacencyList(forNode: leaders[l]) {
+				for neighbor in edges {
+					if let count = nodes[neighbor] {
+						nodes[neighbor] = count - 1
+						if count == 1 {             // this leader was the last predecessor
+							leaders.append(neighbor)  // so neighbor is now a leader itself
+						}
+					}
+				}
+			}
+			l += 1
+		}
+		
+		// Was there a cycle in the graph?
+		if leaders.count != nodes.count {
+			print("Error: graphs with cycles are not allowed")
+		}
+		
+		return leaders
+	}
+}
 
+/*:
 ***
 [Previous](@previous) | [Next](@next)
 */
