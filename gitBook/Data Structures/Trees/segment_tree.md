@@ -263,4 +263,3 @@ See the playground for more examples of how to use the segment tree.
 
 [Segment tree at PEGWiki](http://wcipeg.com/wiki/Segment_tree)
 
-*Written for Swift Algorithm Club by [Artur Antonov](https://github.com/goingreen)*
