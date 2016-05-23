@@ -1,61 +1,50 @@
-# Deque
+# 双端佇列（Deque）
 
-A double-ended queue. For some reason this is pronounced as "deck".
+兩頭皆能插入與刪除，稱作Deque，同時有著Stack和Queue的功效。Deque的發音類似"deck"。
 
-A regular [queue](../Queue/) adds elements to the back and removes from the front. The deque also allows enqueuing at the front and dequeuing from the back, and peeking at both ends.
+一般的[queue](Queue)由後加入元素由前取出元素而双端佇列（Deque）也允許自前加入元素與自後取出元素，及自兩端peek元素。
 
-Here is a very basic implementation of a deque in Swift:
-
+以下是以Swift實作程式碼：
 ```swift
 public struct Deque<T> {
-  private var array = [T]()
-  
-  public var isEmpty: Bool {
-    return array.isEmpty
-  }
-  
-  public var count: Int {
-    return array.count
-  }
-  
-  public mutating func enqueue(element: T) {
-    array.append(element)
-  }
-  
-  public mutating func enqueueFront(element: T) {
-    array.insert(element, atIndex: 0)
-  }
-  
-  public mutating func dequeue() -> T? {
-    if isEmpty {
-      return nil
-    } else {
-      return array.removeFirst()
-    }
-  }
-  
-  public mutating func dequeueBack() -> T? {
-    if isEmpty {
-      return nil
-    } else {
-      return array.removeLast()
-    }
-  }
-  
-  public func peekFront() -> T? {
-    return array.first
-  }
-  
-  public func peekBack() -> T? {
-    return array.last
-  }
+	private var array = [T]()
+	
+	public var isEmpty: Bool {
+		return array.isEmpty
+	}
+	
+	public var count: Int {
+		return array.count
+	}
+	
+	public mutating func enqueue(element: T) {
+		array.append(element)
+	}
+	
+	public mutating func enqueueFront(element: T) {
+		array.insert(element, atIndex: 0)
+	}
+	
+	public mutating func dequeue() -> T? {
+		guard !isEmpty else {return nil }
+		return array.removeFirst()
+	}
+	
+	public mutating func dequeueBack() -> T? {
+		guard !isEmpty else {return nil }
+		return array.removeLast()
+	}
+	
+	public func peekFront() -> T? {
+		return array.first
+	}
+	
+	public func peekBack() -> T? {
+		return array.last
+	}
 }
 ```
-
-This uses an array internally. Enqueuing and dequeuing are simply a matter of adding and removing items from the front or back of the array.
-
-An example of how to use it in a playground:
-
+此實作以內部陣列來實現，Enqueuing與dequeuing都是很簡單的自陣列首或尾來增加或移除元素。以下為在playground的測試：
 ```swift
 var deque = Deque<Int>()
 deque.enqueue(1)
@@ -70,236 +59,101 @@ deque.enqueueFront(5)
 deque.dequeue()       // 5
 ```
 
-This particular implementation of `Deque` is simple but not very efficient. Several operations are **O(n)**, notably `enqueueFront()` and `dequeue()`. I've included it only to show the principle of what a deque does.
+此版實作非常簡單去非很有效率。`enqueueFront()`與`dequeue()`操作的時間複雜度為**O(n)**。
 
-## A more efficient version
-  
-The reason that `dequeue()` and `enqueueFront()` are **O(n)** is that they work on the front of the array. If you remove an element at the front of an array, what happens is that all the remaining elements need to be shifted in memory.
+## 一個更有效率的版本
 
-Let's say the deque's array contains the following items:
+`enqueueFront()`與`dequeue()`操作的時間複雜度為**O(n)**的原因是自陣列的前方操作，需要將其他的元素在記憶體中位移。例如
 
-	[ 1, 2, 3, 4 ]
+ 自陣列`[ 1, 2, 3, 4 ]``dequeue()`會從陣列中移除`1`而其他的`2`、`3`與`4`向前位移一個位置成`[ 2, 3, 4 ]`。而當`enqueueFront(5)`時也是相同的情況`[ 5, 2, 3, 4 ]`。然而`enqueue()`和`dequeueBack()`操作的對象是陣列的尾端，沒有位移的過程。
 
-Then `dequeue()` will remove `1` from the array and the elements `2`, `3`, and `4`, are shifted one position to the front:
-
-	[ 2, 3, 4 ]
-
-This is an **O(n)** operation because all array elements need to be moved by one position in the computer's memory.
-
-Likewise, inserting an element at the front of the array is expensive because it requires that all other elements must be shifted one position to the back. So `enqueueFront(5)` will change the array to be:
-
-	[ 5, 2, 3, 4 ]
-
-First, the elements `2`, `3`, and `4` are moved up by one position in the computer's memory, and then the new element `5` is inserted at the position where `2` used to be.
-
-Why is this not an issue at for `enqueue()` and `dequeueBack()`? Well, these operations are performed at the end of the array. The way resizable arrays are implemented in Swift is by reserving a certain amount of free space at the back. 
-
-Our initial array `[ 1, 2, 3, 4]` actually looks like this in memory:
+一開始的陣列`[ 1, 2, 3, 4]`在記憶體中看起來像：
 
 	[ 1, 2, 3, 4, x, x, x ]
 
-where the `x`s denote additional positions in the array that are not being used yet. Calling `enqueue(6)` simply copies the new item into the next unused spot:
+其中`x`代表陣列中沒有使用的部分。呼叫`enqueue(6)`就簡單地將新的元素放到未使用的位置：
 
 	[ 1, 2, 3, 4, 6, x, x ]
 
-The `dequeueBack()` function uses `array.removeLast()` to delete that item. This does not shrink the array's memory but only decrements `array.count` by one. There are no expensive memory copies involved here. So operations at the back of the array are fast, **O(1)**.
+`dequeueBack()`方法使用到`array.removeLast()`方法來移除元素，並沒有壓縮陣列的記憶體而僅將`array.count`減1。因此對陣列尾端的操作其時間複雜度為 **O(1)**。
 
-It is possible the array runs out of free spots at the back. In that case, Swift will allocate a new, larger array and copy over all the data. This is an **O(n)** operation but because it only happens once in a while, adding new elements at the end of an array is still **O(1)** on average.
+陣列後面未被使用的預留空間也可能被用完，此時Swift會重新一個新的較大的陣列來儲存，此操作時間複雜度**O(n)**，而此動作短期間內只做一次，平均來說之後的自陣列尾端的操作效率為**O(1)**。
 
-Of course, we can use this same trick at the *beginning* of the array. That will make our deque efficient too for operations at the front of the queue. Our array will look like this:
+因此我們可以利用相同的機制來改善對於陣列前方操作的效率：
 
 	[ x, x, x, 1, 2, 3, 4, x, x, x ]
 
-There is now also a chunk of free space at the start of the array, which allows adding or removing elements at the front of the queue to be **O(1)** as well.
-
-Here is the new version of `Deque`:
+安排一些未使用的空間在陣列的前方，當在前方新增或移除元素時也可以有**O(1)**的效率。以下為改良版的實作
 
 ```swift
 public struct Deque<T> {
-  private var array: [T?]
-  private var head: Int
-  private var capacity: Int
-  
-  public init(capacity: Int = 10) {
-    self.capacity = max(capacity, 1)
-    array = .init(count: capacity, repeatedValue: nil)
-    head = capacity
-  }
-  
-  public var isEmpty: Bool {
-    return count == 0
-  }
-  
-  public var count: Int {
-    return array.count - head
-  }
-  
-  public mutating func enqueue(element: T) {
-    array.append(element)
-  }
-  
-  public mutating func enqueueFront(element: T) {
-    // this is explained below
-  }
-
-  public mutating func dequeue() -> T? {
-    // this is explained below
-  }
-
-  public mutating func dequeueBack() -> T? {
-    if isEmpty {
-      return nil
-    } else {
-      return array.removeLast()
-    }
-  }
-  
-  public func peekFront() -> T? {
-    if isEmpty {
-      return nil
-    } else {
-      return array[head]
-    }
-  }
-  
-  public func peekBack() -> T? {
-    if isEmpty {
-      return nil
-    } else {
-      return array.last!
-    }
-  }  
+	private var array: [T?]
+	private var head: Int
+	private var capacity: Int
+	
+	public init(capacity: Int = 10) {
+		self.capacity = max(capacity, 1)
+		array = .init(count: capacity, repeatedValue: nil)
+		head = capacity
+	}
+	
+	public var isEmpty: Bool {
+		return count == 0
+	}
+	
+	public var count: Int {
+		return array.count - head
+	}
+	
+	public mutating func enqueue(element: T) {
+		array.append(element)
+	}
+	
+	public mutating func enqueueFront(element: T) {
+		if head == 0 {
+			capacity *= 2
+			let emptySpace = [T?](count: capacity, repeatedValue: nil)
+			array.insertContentsOf(emptySpace, at: 0)
+			head = capacity
+		}
+		
+		head -= 1
+		array[head] = element
+	}
+	
+	public mutating func dequeue() -> T? {
+		guard head < array.count, let element = array[head] else { return nil }
+		
+		array[head] = nil
+		head += 1
+		
+		if capacity > 10 && head >= capacity*2 {
+			let amountToRemove = capacity + capacity/2
+			array.removeFirst(amountToRemove)
+			head -= amountToRemove
+			capacity /= 2
+		}
+		return element
+	}
+	
+	public mutating func dequeueBack() -> T? {
+		guard !isEmpty else {return nil }
+		return array.removeLast()
+	}
+	
+	public func peekFront() -> T? {
+		guard !isEmpty else {return nil }
+		return array[head]
+	}
+	
+	public func peekBack() -> T? {
+		guard !isEmpty else {return nil }
+		return array.last!
+	}
 }
 ```
 
-It still largely looks the same -- `enqueue()` and `dequeueBack()` haven't changed -- but there are also a few important differences. The array now stores objects of type `T?` instead of just `T` because we need some way to mark array elements as being empty.
-
-The `init` method allocates a new array that contains a certain number of `nil` values. This is the free room we have to work with at the beginning of the array. By default this creates 10 empty spots. 
-
-The `head` variable is the index in the array of the front-most object. Since the queue is currently empty, `head` points at an index beyond the end of the array.
-
-	[ x, x, x, x, x, x, x, x, x, x ]
-	                                 |
-	                                 head
-
-To enqueue an object at the front, we move `head` one position to the left and then copy the new object into the array at index `head`. For example, `enqueueFront(5)` gives:
-
-	[ x, x, x, x, x, x, x, x, x, 5 ]
-	                             |
-	                             head
-
-Followed by `enqueueFront(7)`:
-
-	[ x, x, x, x, x, x, x, x, 7, 5 ]
-	                          |
-	                          head
-
-And so on... the `head` keeps moving to the left and always points at the first item in the queue. `enqueueFront()` is now **O(1)** because it only involves copying a value into the array, a constant-time operation.
-
-Here is the code:
-
-```swift
-  public mutating func enqueueFront(element: T) {
-    head -= 1
-    array[head] = element
-  }
-```
-
-Appending to the back of the queue has not changed (it's the exact same code as before). For example, `enqueue(1)` gives:
-
-	[ x, x, x, x, x, x, x, x, 7, 5, 1, x, x, x, x, x, x, x, x, x ]
-	                          |
-	                          head
-
-Notice how the array has resized itself. There was no room to add the `1`, so Swift decided to make the array larger and add a number of empty spots to the end. If you enqueue another object, it gets added to the next empty spot in the back. For example, `enqueue(2)`:
-
-	[ x, x, x, x, x, x, x, x, 7, 5, 1, 2, x, x, x, x, x, x, x, x ]
-	                          |
-	                          head
-
-> **Note:** You won't see those empty spots at the back of the array when you `print(deque.array)`. This is because Swift hides them from you. Only the ones at the front of the array show up. 
-
-The `dequeue()` method does the opposite of `enqueueFront()`, it reads the value at `head`, sets the array element back to `nil`, and then moves `head` one position to the right:
-
-```swift
-  public mutating func dequeue() -> T? {
-    guard head < array.count, let element = array[head] else { return nil }
-
-    array[head] = nil
-    head += 1
-
-    return element
-  }
-```
-
-There is one tiny problem... If you enqueue a lot of objects at the front, you're going to run out of empty spots at the front at some point. When this happens at the back of the array, Swift automatically resizes it. But at the front of the array we have to handle this situation ourselves, with some extra logic in `enqueueFront()`:
-
-```swift
-  public mutating func enqueueFront(element: T) {
-    if head == 0 {
-      capacity *= 2
-      let emptySpace = [T?](count: capacity, repeatedValue: nil)
-      array.insertContentsOf(emptySpace, at: 0)
-      head = capacity
-    }
-
-    head -= 1
-    array[head] = element
-  }
-```
-
-If `head` equals 0, there is no room left at the front. When that happens, we add a whole bunch of new `nil` elements to the array. This is an **O(n)** operation but since this cost gets divided over all the `enqueueFront()`s, each individual call to `enqueueFront()` is still **O(1)** on average. 
-
-> **Note:** We also multiply the capacity by 2 each time this happens, so if your queue grows bigger and bigger, the resizing happens less often. This is also what Swift arrays automatically do at the back.
-
-We have to do something similar for `dequeue()`. If you mostly enqueue a lot of elements at the back and mostly dequeue from the front, then you may end up with an array that looks as follows:
-
-	[ x, x, x, x, x, x, x, x, x, x, x, x, x, x, x, x, x, x, x, x, 1, 2, 3 ]
-	                                                              |
-	                                                              head
-
-Those empty spots at the front only get used when you call `enqueueFront()`. But if enqueuing objects at the front happens only rarely, this leaves a lot of wasted space. So let's add some code to `dequeue()` to clean this up:
-
-```swift
-  public mutating func dequeue() -> T? {
-    guard head < array.count, let element = array[head] else { return nil }
-
-    array[head] = nil
-    head += 1
-
-    if capacity > 10 && head >= capacity*2 {
-      let amountToRemove = capacity + capacity/2
-      array.removeFirst(amountToRemove)
-      head -= amountToRemove
-      capacity /= 2
-    }
-    return element
-  }
-```
-
-Recall that `capacity` is the original number of empty places at the front of the queue. If the `head` has advanced more to the right than twice the capacity, then it's time to trim off a bunch of these empty spots. We reduce it to about 25%.
-
-For example, this:
-
-	[ x, x, x, x, x, x, x, x, x, x, x, x, x, x, x, x, x, x, x, x, 1, 2, 3 ]
-	                                |                             |
-	                                capacity                      head
-
-becomes after trimming:
-
-	[ x, x, x, x, x, 1, 2, 3 ]
-	              |
-	              head
-	              capacity
-
-This way we can strike a balance between fast enqueuing and dequeuing at the front and keeping the memory requirements reasonable.
-
-> **Note:** We don't perform trimming on very small arrays. It's not worth it for saving just a few bytes of memory.
-
-## See also
-
-Other ways to implement deque are by using a [doubly linked list](../Linked List/), a [circular buffer](../Ring Buffer/), or two [stacks](../Stack/) facing opposite directions.
+## 參考資料
 
 [A fully-featured deque implementation in Swift](https://github.com/lorentey/Deque)
 
-*Written for Swift Algorithm Club by Matthijs Hollemans*
