@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXFileReference section */
+		AD024A1B1CF2A7E80055862F /* Algorithms_Compression.playground */ = {isa = PBXFileReference; lastKnownFileType = file.playground; path = Algorithms_Compression.playground; sourceTree = "<group>"; };
 		AD0F21371CE15D1F001B5B46 /* Data_Structures_Trees.playground */ = {isa = PBXFileReference; lastKnownFileType = file.playground; path = Data_Structures_Trees.playground; sourceTree = "<group>"; };
 		AD1240C91CDE2FFF00DA171B /* Algorithms_Sorting_Algorithms.playground */ = {isa = PBXFileReference; lastKnownFileType = file.playground; path = Algorithms_Sorting_Algorithms.playground; sourceTree = "<group>"; };
 		AD362F9A1CDE5FB800E643F3 /* Algorithms_Searching_Algorithms.playground */ = {isa = PBXFileReference; lastKnownFileType = file.playground; path = Algorithms_Searching_Algorithms.playground; sourceTree = "<group>"; };
@@ -21,8 +22,9 @@
 			children = (
 				AD9397101CDC71B0002F1330 /* gitBook */,
 				AD362F9A1CDE5FB800E643F3 /* Algorithms_Searching_Algorithms.playground */,
-				AD1240C91CDE2FFF00DA171B /* Algorithms_Sorting_Algorithms.playground */,
 				ADD89F0F1CE04491007307AF /* Algorithms_String_Searching_Algorithms.playground */,
+				AD1240C91CDE2FFF00DA171B /* Algorithms_Sorting_Algorithms.playground */,
+				AD024A1B1CF2A7E80055862F /* Algorithms_Compression.playground */,
 				ADFB4CA01CDCFCE300D6FE9A /* Data_Structures_Queues.playground */,
 				AD0F21371CE15D1F001B5B46 /* Data_Structures_Trees.playground */,
 			);
