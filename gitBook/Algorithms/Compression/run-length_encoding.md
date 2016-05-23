@@ -1,139 +1,147 @@
-# Run-Length Encoding (RLE)
+# 遊程編碼（Run-Length Encoding - RLE）
 
-RLE is probably the simplest way to do compression. Let's say you have data that looks like this:
+遊程編碼（Run-Length Encoding - RLE）應該是一種最簡單的資料壓縮方式。假設我們有一份資料如下：
 
 	aaaaabbbcdeeeeeeef...
-	
-then RLE encodes it as follows:
+
+遊程編碼（Run-Length Encoding - RLE）壓縮後像是這樣：
 
 	5a3b1c1d7e1f...
 
-Instead of repeating bytes, you first write how often that byte occurs and then the byte's actual value. So `5a` means `aaaaa`. If the data has a lot of "byte runs", that is lots of repeating bytes, then RLE can save quite a bit of space. It works quite well on images.
+以位元組在資料中連續出現的次數來取代重複的位元組(byte)。意即`5a`取代`aaaaa`，假若資料有許多連續重複的位元組，遊程編碼（Run-Length Encoding - RLE）壓縮可以節省資料儲存的空間，對影像壓縮而言，此法是有效的。
 
-There are many different ways you can implement RLE. Here's an extension of `NSData` that does a version of RLE inspired by the old [PCX image file format](https://en.wikipedia.org/wiki/PCX).
+有非常多的方式來實作遊程編碼（Run-Length Encoding - RLE），在此我們以攥寫`NSData`的延伸功能的方式來實作。
 
-The rules are these:
+## 實作
 
-- Each byte run, i.e. when a certain byte value occurs more than once in a row, is compressed using two bytes: the first byte records the number of repetitions, the second records the actual value. The first byte is stored as: `191 + count`. This means encoded byte runs can never be more than 64 bytes long.
+- 在資料中，某位元組(byte)連續重複，便將資料壓縮為2個位元組，第一個位元組紀錄連續的次數，第二個位元組紀錄位元組的實際值。第一個位元組紀錄資料形式為`191 + count`，此代表連續重複的位元組數不超過64個位元組的長度。
 
-- A single byte in the range 0 - 191 is not compressed and is copied without change.
+- 單一個位元組的資料在0 - 191的範圍是直接複製沒有壓縮的資料位元
 
-- A single byte in the range 192 - 255 is represented by two bytes: first the byte 192 (meaning a run of 1 byte), followed by the actual value.
+- 單一個位元組的資料在192 - 255的範圍，代表需看連續兩位元，第一個位元192是連續位元組的個數為192 - 191 = 1，其後位元組為實際的資料
 
-Here is the compression code. It returns a new `NSData` object containing the run-length encoded bytes:
+以下為Swift實作程式碼，回傳為包含遊程編碼的`NSData`物件：
 
 ```swift
 extension NSData {
-  public func compressRLE() -> NSData {
-    let data = NSMutableData()
-    if length > 0 {
-      var ptr = UnsafePointer<UInt8>(bytes)
-      let end = ptr + length
-      
-      while ptr < end {                        // 1
-        var count = 0
-        var byte = ptr.memory
-        var next = byte
-        
-        while next == byte && ptr < end && count < 64 {   // 2
-          ptr = ptr.advancedBy(1)
-          next = ptr.memory
-          count += 1
-        }
-      
-        if count > 1 || byte >= 192 {          // 3
-          var size = 191 + UInt8(count)
-          data.appendBytes(&size, length: 1)
-          data.appendBytes(&byte, length: 1)
-        } else {                               // 4
-          data.appendBytes(&byte, length: 1)
-        }
-      }
-    }
-    return data
-  }
+	public func compressRLE() -> NSData {
+		let data = NSMutableData()
+		if length > 0 {
+			var ptr = UnsafePointer<UInt8>(bytes)
+			let end = ptr + length
+			
+			while ptr < end {                        // 1
+				var count = 0
+				var byte = ptr.memory
+				var next = byte
+				
+				while next == byte && ptr < end && count < 64 {   // 2
+					ptr = ptr.advancedBy(1)
+					next = ptr.memory
+					count += 1
+				}
+				
+				if count > 1 || byte >= 192 {          // 3
+					var size = 191 + UInt8(count)
+					data.appendBytes(&size, length: 1)
+					data.appendBytes(&byte, length: 1)
+				} else {                               // 4
+					data.appendBytes(&byte, length: 1)
+				}
+			}
+		}
+		return data
+	}
 }
 ```
 
-How it works:
+運作原理：
 
-1. We use an `UnsafePointer` to step through the bytes of the original `NSData` object.
+1. 使用`UnsafePointer`指標來對原始的`NSData`物件進行位元組的步進
 
-2. At this point we've read the current byte value into the `byte` variable. If the next byte is the same, then we keep reading until we find a byte value that is different, or we reach the end of the data. We also stop if the run is 64 bytes because that's the maximum we can encode.
+2. 將現在位置的位元資料讀進`byte`變數中，若下個位元組是相同的便繼續讀取直到發現不同的位元組或是讀完全部位元組，若連續的長度超過64的位元組我們也停止while迴圈，因為64為此方法編碼的最大連續重複長度。
 
-3. Here, we have to decide how to encode the bytes we just read. The first possibility is that we've read a run of 2 or more bytes (up to 64). In that case we write out two bytes: the length of the run followed by the byte value. But it's also possible we've read a single byte with a value >= 192. That will also be encoded with two bytes.
+3. 接下來我們決定如何編碼。有兩種可能性需要以2位元組編碼。即計數遊程為2位元組或更多時，與讀取的位元組資料的值大於192，這兩情況我們寫入2個位元組長度與資料位元來編碼。
 
-4. The third possibility is that we've read a single byte < 192. That simply gets copied to the output verbatim.
+4. 若讀到的資料遊程為1位元組且值小於192，便直接複製此位元組資料。
 
-You can test it like this in a playground:
+可在playground中進行以下測試：
 
 ```swift
 let originalString = "aaaaabbbcdeeeeeeef"
-let utf8 = originalString.dataUsingEncoding(NSUTF8StringEncoding)!
-let compressed = utf8.compressRLE()
+let utf8 = originalString.dataUsingEncoding(NSUTF8StringEncoding)! // <61616161 61626262 63646565 65656565 6566>
+let compressed = utf8.compressRLE() // <c461c262 6364c665 66>
 ```
 
-The compressed `NSData` object should be `<c461c262 6364c665 66>`. Let's decode that by hand to see what has happened:
+壓縮後的`NSData`物件為`<c461c262 6364c665 66>`，手動解碼如下：
+```
+c4    為10進位的196，代表下個位元組在原始資料中連續重複5次
+61    "a"字元的資料位元組
+c2    下個位元組連續重複3位元組
+62    "b"字元的資料位元組
+63    "c"字元的資料位元組，因為值<191，代表為資料位元只出現連續一次
+64    "d"字元的資料位元組，只出現連續一次
+c6    下個位元組連續重複7位元組
+65    "e"字元的資料位元組
+66    "f"字元的資料位元組，只出現連續一次
+```
+最後我們得到以9位元組的編碼方式來記錄原始長度為18位元組的資料。節省了50%的記憶空間。此方法與來源資料相關性很高，若原始資料中連續重複的位元組很少，此方法並不好。
 
-	c4    This is 196 in decimal. It means the next byte appears 5 times.
-	61    The data byte "a".
-	c2    The next byte appears 3 times.
-	62    The data byte "b".
-	63    The data byte "c". Because this is < 192, it's a single data byte.
-	64    The data byte "d". Also appears just once.
-	c6    The next byte will appear 7 times.
-	65    The data byte "e".
-	66    The data byte "f". Appears just once.
-
-So that's 9 bytes encoded versus 18 original. That's a savings of 50%. Of course, this was only a simple test case... If you get unlucky and there are no byte runs at all in your original data, then this method will actually make the encoded data twice as large! So it really depends on the input data.
-
-Here is the decompression code:
+以下為解碼部分的實作：
 
 ```swift
-  public func decompressRLE() -> NSData {
-    let data = NSMutableData()
-    if length > 0 {
-      var ptr = UnsafePointer<UInt8>(bytes)
-      let end = ptr + length
-
-      while ptr < end {
-        var byte = ptr.memory                 // 1
-        ptr = ptr.advancedBy(1)
-        
-        if byte < 192 {                       // 2
-          data.appendBytes(&byte, length: 1)
-
-        } else if ptr < end {                 // 3
-          var value = ptr.memory
-          ptr = ptr.advancedBy(1)
-
-          for _ in 0 ..< byte - 191 {
-            data.appendBytes(&value, length: 1)
-          }
-        }
-      }
-    }
-    return data
-  }
+extension NSData {
+	public func decompressRLE() -> NSData {
+		let data = NSMutableData()
+		if length > 0 {
+			var ptr = UnsafePointer<UInt8>(bytes)
+			let end = ptr + length
+			
+			while ptr < end {
+				var byte = ptr.memory                 // 1
+				ptr = ptr.advancedBy(1)
+				
+				if byte < 192 {                       // 2
+					data.appendBytes(&byte, length: 1)
+					
+				} else if ptr < end {                 // 3
+					var value = ptr.memory
+					ptr = ptr.advancedBy(1)
+					
+					for _ in 0 ..< byte - 191 {
+						data.appendBytes(&value, length: 1)
+					}
+				}
+			}
+		}
+		return data
+	}
+}
 ```
 
-1. Again this uses an `UnsafePointer` to read the `NSData`. Here we read the next byte; this is either a single value less than 192, or the start of a byte run.
+1. 再次以`UnsafePointer`指標讀取`NSData`，進行位元組步進讀取
 
-2. If it's a single value, then it's just a matter of copying it to the output.
+2. 如果讀取位元組值小於192，為資料位元組直接加入資料中
 
-3. But if the byte is the start of a run, we have to first read the actual data value and then write it out repeatedly.
+3. 如果資料位元組代表遊程，需在往下讀取位元組資料，重複遊程的長度，加入資料中。
 
-To turn the compressed data back into the original, you'd do:
-
+可在playground中進行以下測試：
 ```swift
-let decompressed = compressed.decompressRLE()
-let restoredString = String(data: decompressed, encoding: NSUTF8StringEncoding)
+let decompressed = compressed.decompressRLE() // <61616161 61626262 63646565 65656565 6566>
+let restoredString = String(data: decompressed, encoding: NSUTF8StringEncoding) // "aaaaabbbcdeeeeeeef"
+originalString == restoredString // true
 ```
 
-And now `originalString == restoredString` must be true!
+解碼後`originalString == restoredString`應該為真。
 
-Footnote: The original PCX implementation is slightly different. There, a byte value of 192 (0xC0) means that the following byte will be repeated 0 times. This also limits the maximum run size to 63 bytes. Because it makes no sense to store bytes that don't occur, in my implementation 192 means the next byte appears once, and the maximum run length is 64 bytes.
+註腳： 原始的PCX實作有些不同。在原始實作中，位元組值192 (0xC0)代表後面位元組的遊程長度0，而這也限制了遊程紀錄程度為63位元組，同時記錄一個遊程長度0的位元組並不合理，因此在我們的實作中192代表遊程長度為1，而最長可記錄長度為64位元組。
 
-This was probably a trade-off when they designed the PCX format way back when. If you look at it in binary, the upper two bits indicate whether a byte is compressed. (If both bits are set then the byte value is 192 or more.) To get the run length you can simply do `byte & 0x3F`, giving you a value in the range 0 to 63. 
+遙想當年設計PCX格式時，這可能是一個權衡之計。因為用二進制來看看，最前兩個位元可以表示一個字節是否被壓縮。為了得到遊程長度，可以簡單地做`byte & 0x3F`的位元操作，得到一個值範圍為0到63的數值。
 
-*Written for Swift Algorithm Club by Matthijs Hollemans*
+
+## 參考資料
+
+[維基百科：Run-Length Encoding](https://en.wikipedia.org/wiki/Run-length_encoding)
+
+[維基百科：PCX image file format](https://en.wikipedia.org/wiki/PCX)
+
