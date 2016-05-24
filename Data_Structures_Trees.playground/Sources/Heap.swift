@@ -147,3 +147,12 @@ extension Heap: CustomStringConvertible {
 		return elements.description
 	}
 }
+
+extension Heap {
+	public func reverse() -> Heap {
+		let reverseSort = {
+			!self.isOrderedBefore($0, $1)
+		}
+		return Heap(array: self.elements, sort: reverseSort)
+	}
+}
