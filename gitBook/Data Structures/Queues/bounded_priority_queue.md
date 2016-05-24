@@ -1,131 +1,83 @@
-# Bounded Priority queue
+# 有界優先佇列（Bounded Priority Queue）
 
-A bounded priority queue is similar to a regular [priority queue](../Priority Queue/), except that there is a fixed upper bound on the number of elements that can be stored. When a new element is added to the queue while the queue is at capacity, the element with the highest priority value is ejected from the queue.
+有界優先佇列（Bounded Priority Queue）是有元素數量限制的[優先佇列](priority_queue.md)。當一個新元素被添加到容量飽和的佇列，最不優先的元素從佇列中移出。
 
-## Example
+## 例子
 
-Suppose we have a bounded-priority-queue with maximum size 5 that has the following values and priorities:
+假設我們有個最大容量是5的有界優先佇列（Bounded Priority Queue），元素的值與優先序如下：
 
-```
-Value:    [ A,   B,    C,    D,   E   ]
-Priority: [ 0.1, 0.25, 1.33, 3.2, 4.6 ]
-```
+	Value:    [ A,   B,    C,    D,   E   ]
+	Priority: [ 0.1, 0.25, 1.33, 3.2, 4.6 ]
 
-Here, we consider the object with the lowest priority value to be the most important (so this is a *min-priority* queue). The larger the priority value, the less we care about the object. So `A` is more important than `B`, `B` is more important than `C`, and so on.
+定義最小優先序的是最重要的(*min-priority* queue)，`A`比`B`重要，`B`比`C`重要⋯⋯。新增一元素值`F`，優先序`0.4`因為佇列有容量限制為5，所以會將最不重要的`E`移出佇列並移入`F`：
 
-Now we want to insert the element `F` with priority `0.4` into this bounded priority queue. Because the queue has maximum size 5, this will insert the element `F` but then evict the lowest-priority element (`E`), yielding the updated queue:
+	Value:    [ A,   B,    F,   C,    D   ]
+	Priority: [ 0.1, 0.25, 0.4, 1.33, 3.2 ]
 
-```
-Value:    [ A,   B,    F,   C,    D   ]
-Priority: [ 0.1, 0.25, 0.4, 1.33, 3.2 ]
-```
+由`F`的優先序值決定其會被插入`B`與`C`之間。若要在加入新元素`G`其優先序4.0，則會因為其優先序值大於佇列中其他元素，沒有任何作用。
 
-`F` is inserted between `B` and `C` because of its priority value. It's less important than `B` but more important than `C`.
+## 實作
 
-Suppose that we wish to insert the element `G` with priority 4.0 into this BPQ. Because `G`'s priority value is greater than the maximum-priority element in the queue, upon inserting `G` it will immediately be evicted. In other words, inserting an element into a BPQ with priority greater than the maximum-priority element of the BPQ has no effect.
-
-## Implementation
-
-While a [heap](../Heap/) may be a really simple implementation for a priority queue, a sorted [linked list](../Linked List/) allows for **O(k)** insertion and **O(1)** deletion, where **k** is the bounding number of elements.
-
-Here's how you could implement it in Swift:
-
+以堆積(Heap)很容易實作優先佇列，實作如下：
 ```swift
-public class BoundedPriorityQueue<T: Comparable> {
-  private typealias Node = LinkedListNode<T>
+public struct BoundedPriorityQueue<T> {
+	private var heap: Heap<T>
+	private var maxElements: Int
+	private var isOrderedBefore: (T, T) -> Bool
+	
+	public init(maxElements: Int, sort: (T, T) -> Bool) {
+		self.maxElements = maxElements
+		self.isOrderedBefore = sort
+		self.heap = Heap(sort: sort)
+	}
+	
+	public var isEmpty: Bool {
+		return heap.isEmpty
+	}
+	
+	public var count: Int {
+		return heap.count
+	}
+	
+	public func peek() -> T? {
+		return heap.peek()
+	}
+	
+	public mutating func enqueue(element: T) {
+		if count < maxElements {
+			heap.insert(element)
+		} else {
+			let tail = heap.reverse().peek()
+			if isOrderedBefore(tail!, element) {
+				return
+			} else {
+				var reverseHeap = heap.reverse()
+				reverseHeap.remove()
+				heap = reverseHeap.reverse()
+				heap.insert(element)
+			}
 
-  private(set) public var count = 0
-  private var head: Node?
-  private var maxElements: Int
+		}
+	}
+	
+	public mutating func dequeue() -> T? {
+		return heap.remove()
+	}
+	
+	public mutating func changePriority(index i: Int, value: T) {
+		return heap.replace(index: i, value: value)
+	}
+}
 
-  public init(maxElements: Int) {
-    self.maxElements = maxElements
-  }
-  
-  public var isEmpty: Bool {
-    return count == 0
-  }
+extension BoundedPriorityQueue where T: Equatable {
+	public func indexOf(element: T) -> Int? {
+		return heap.indexOf(element)
+	}
+}
 
-  public func peek() -> T? {
-    return head?.value
-  } 
+extension BoundedPriorityQueue: CustomStringConvertible {
+	public var description: String {
+		return heap.description
+	}
+}
 ```
-
-The `BoundedPriorityQueue` class contains a doubly linked list of `LinkedListNode` objects. Nothing special here yet. The fun stuff happens in the `enqueue()` method:
-
-```swift
-  public func enqueue(value: T) {
-    let newNode = Node(value: value)
-
-    if head == nil  {
-      head = newNode
-      count = 1
-      return
-    }
-
-    var node = head
-    if count == maxElements && newNode.value > node!.value {
-      return
-    }
-    
-    while (node!.next != nil) && (newNode.value < node!.value) {
-      node = node!.next
-    }
-    
-    if newNode.value < node!.value {
-      newNode.next = node!.next
-      newNode.previous = node
-      
-      if newNode.next != nil {     /* TAIL */
-        newNode.next!.previous = newNode
-      }
-      node!.next = newNode
-    } else {
-      newNode.previous = node!.previous
-      newNode.next = node
-      if node!.previous == nil {   /* HEAD */
-        head = newNode
-      } else {
-        node!.previous!.next = newNode
-      }
-      node!.previous = newNode
-    }
-
-    if count == maxElements {
-      dequeue()
-    }
-    count += 1
-  }
-```
-
-We first check if the queue already has the maximum number of elements. If so, and the new priority value is greater than the `head` element's priority value, then there is no room for this new element and we return without inserting it.
-
-If the new value is acceptable, then we search through the list to find the proper insertion location and update the `next` and `previous` pointers.
-
-Lastly, if the queue has now reached the maximum number of elements, then we `dequeue()` the one with the largest priority value.
-
-By keeping the most important element at the front of the list, it makes dequeueing very easy:
-
-```swift
-  public func dequeue() -> T? {
-    if count == 0 {
-      return nil
-    }
-
-    let retVal = head!.value
-    
-    if count == 1 {
-      head = nil
-    } else {
-      head = head!.next
-      head!.previous = nil
-    }
-
-    count -= 1
-    return retVal
-  }
-```
-
-This simply removes the `head` element from the list and returns it.
-
-*Written for Swift Algorithm Club by John Gill and Matthijs Hollemans*
