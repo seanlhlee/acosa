@@ -4,7 +4,7 @@
 
 # 優先佇列（Priority Queue）
 
-優先佇列（Priority Queue）是一種最重要的元素總是排在最前面的[佇列（queue）](Queue)，又分為最大優先佇列（*max-priority* Queue）與最小優先佇列（*min-priority* Queue）兩種。
+優先佇列（Priority Queue）是一種最重要的元素總是排在最前面的[佇列（queue）](gitBook/Data Structures/Queues/queue.md)，又分為最大優先佇列（*max-priority* Queue）與最小優先佇列（*min-priority* Queue）兩種。
 
 ## 為什麼需要？
 
