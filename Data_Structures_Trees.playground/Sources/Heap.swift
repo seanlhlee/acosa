@@ -126,3 +126,24 @@ public struct Heap<T> {
 		}
 	}
 }
+
+extension Heap where T: Equatable {
+	public func indexOf(element: T) -> Int? {
+		return indexOf(element, 0)
+	}
+	
+	private func indexOf(element: T, _ i: Int) -> Int? {
+		if i >= count { return nil }
+		if isOrderedBefore(element, elements[i]) { return nil }
+		if element == elements[i] { return i }
+		if let j = indexOf(element, indexOfLeftChild(i)) { return j }
+		if let j = indexOf(element, indexOfRightChild(i)) { return j }
+		return nil
+	}
+}
+
+extension Heap: CustomStringConvertible {
+	public var description: String {
+		return elements.description
+	}
+}

@@ -9,7 +9,7 @@
 一般的[queue](Queue)由後加入元素由前取出元素而双端佇列（Deque）也允許自前加入元素與自後取出元素，及自兩端peek元素。
 
 以下是以Swift實作程式碼：
-```
+*/
 public struct Deque<T> {
 	private var array = [T]()
 	
@@ -47,9 +47,9 @@ public struct Deque<T> {
 		return array.last
 	}
 }
-```
+/*:
 此實作以內部陣列來實現，Enqueuing與dequeuing都是很簡單的自陣列首或尾來增加或移除元素。以下為在playground的測試：
-```
+*/
 var deque = Deque<Int>()
 deque.enqueue(1)
 deque.enqueue(2)
@@ -61,7 +61,7 @@ deque.dequeueBack()   // 4
 
 deque.enqueueFront(5)
 deque.dequeue()       // 5
-```
+/*:
 
 此版實作非常簡單去非很有效率。`enqueueFront()`與`dequeue()`操作的時間複雜度為**O(n)**。
 
@@ -166,7 +166,10 @@ public struct Deque<T> {
 */
 
 
+// 完整功能的deque原始碼
 
+
+/*
 //
 //  Deque.swift
 //  Deque
@@ -1042,3 +1045,4 @@ extension Deque {
 		return result
 	}
 }
+*/
