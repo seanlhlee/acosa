@@ -453,6 +453,26 @@ var minHeap = Heap<Int>(sort: <)
 
 I just wanted to point this out, because where most heap implementations use the `<` and `>` operators to compare values, this one uses the `isOrderedBefore()` closure.
 
+## Reverse & CustomStringConvertible
+
+- Add a new instance method: reverse(): Return a inversed order heap of `self`
+- Confirm to CustomStringConvertible
+
+```swift
+extension Heap: CustomStringConvertible {
+	
+	public func reverse() -> Heap {
+		let reverseSort = {
+			!self.isOrderedBefore($0, $1)
+		}
+		return Heap(array: self.elements, sort: reverseSort)
+	}
+	
+	public var description: String {
+		return elements.description
+	}
+}
+```
 ## See also
 
 [Heap on Wikipedia](https://en.wikipedia.org/wiki/Heap_%28data_structure%29)
