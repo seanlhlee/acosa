@@ -84,8 +84,8 @@
 - [Stack](gitBook/Data Structures/Queues/stack.md)  *堆疊*
 - [Queue](gitBook/Data Structures/Queues/queue.md)  *佇列*
 - [Deque](gitBook/Data Structures/Queues/deque.md) *双端佇列*
-- [Priority Queue](gitBook/Data Structures/Queues/priority_queue.md) *資料排序佇列*
-- [Bounded Priority Queue](gitBook/Data Structures/Queues/bounded_priority_queue.md) *優先佇列*
+- [Priority Queue](gitBook/Data Structures/Queues/priority_queue.md) *優先佇列*
+- [Bounded Priority Queue](gitBook/Data Structures/Queues/bounded_priority_queue.md) *有界優先佇列*
 - [Ring Buffer](gitBook/Data Structures/Queues/ring_buffer.md) *環形緩衝區*
 
 #### 串列(Lists)
