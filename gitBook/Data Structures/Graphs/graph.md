@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 /*:
 [Next](@next)
 ***
@@ -9,6 +10,15 @@
 ![A graph](/gitBook/pics/Graph.png)
 
 
+=======
+# 圖（Graph）
+
+在電腦科學的術語來說，圖是一組頂點（*vertices*）配對有一組邊（*edges*）的集合。頂點是圓的東西，而邊則為連接著頂點間的線。一個圖（Grapg）示意如下：
+
+![A graph](/gitBook/pics/Graph.png)
+
+
+>>>>>>> origin/master
 > **Note:** 頂點（*vertices*）也經常被稱為節點（*node*），邊也稱為鏈結（*links*）。
 
 舉例來說，圖可以描述一個社群網絡，每個人都是頂點，而互相認識的人們則以邊來彼此連接：
@@ -31,11 +41,19 @@
 ![DAG](/gitBook/pics/DAG.png)
 
 樹是無環的，無論從哪個頂點為起點都沒有不重複頂點的路徑可以回到原點。有向無環圖就像一棵樹，沒有路徑可以回到起點，其邊為有向，但形狀並不像樹有層級關係。
+<<<<<<< HEAD
 
 ## 為何使用圖？
 
 圖是一種非常有用的數據結構。假設你設計一個程式來解決問題，可以用頂點來代表一些數據，用邊來代表數據間的關係，就可以畫出一個描述問題的圖，再使用眾所周知的圖形算法，如廣度優先（**BFS**）搜尋或深度優先搜尋（**DFS**）等，來找到解決方案。
 
+=======
+
+## 為何使用圖？
+
+圖是一種非常有用的數據結構。假設你設計一個程式來解決問題，可以用頂點來代表一些數據，用邊來代表數據間的關係，就可以畫出一個描述問題的圖，再使用眾所周知的圖形算法，如廣度優先（**BFS**）搜尋或深度優先搜尋（**DFS**）等，來找到解決方案。
+
+>>>>>>> origin/master
 例如，假設有依工作清單，一些任務必須等待別人完成才開始，您可以使用有向無環圖將問題模型化如下：
 
 ![Tasks as a graph](/gitBook/pics/Tasks.png)
@@ -85,6 +103,7 @@
 
 表中"Checking adjacency"表示確認一個頂點是否為另一個頂點的鄰居，在以List實作時，此操作時間複雜度**O(V)**，因為最壞情況是他是每個點的鄰居。
 如果圖的每個頂點跟少數頂點相鄰，稱稀疏圖（*sparse graph*），採鄰接表（**Adjacency List**）實作較佳：反之，頂點與圖中大量其他頂點相鄰，稱稀疏圖（*dense graph*），採鄰接矩陣（**Adjacency Matrix**）實作較佳。以下為使用鄰接表與鄰接矩陣實作的程式碼：
+<<<<<<< HEAD
 
 ## 實作：鄰接表（**Adjacency List**）
 
@@ -153,10 +172,86 @@ linksTxt += edge.description
 
 return "V\(uniqueID){\(data)}" + linksTxt
 }
+=======
+
+## 實作：鄰接表（**Adjacency List**）
+
+頂點的鄰接表包含了`Edge`類別的物件：
+
+*/
+private var uniqueIDCounter = 0
+
+public struct Edge<T>: CustomStringConvertible {
+	public let from: Vertex<T>
+	public let to: Vertex<T>
+	public let weight: Double
+	public var description: String {
+		return "--\(weight)-->" + to.description
+	}
+}
+/*:
+
+這個結構描述了`from`和'to`頂點和權重值。注意，一個`Edge`物件是有向的單向連接。如果連接是雙向的，需要增加一個'Edge`物件到目標頂點的鄰接表。
+
+該`Vertex`如下：
+
+```swift
+public struct Vertex<T>: CustomStringConvertible {
+	public var data: T
+	public let uniqueID: Int
+	
+	private(set) public var edges: [Edge<T>] = []
+	
+	// for 鄰接表（**Adjacency List**）實作
+	public init(data: T) {
+		self.data = data
+		uniqueID = uniqueIDCounter
+		uniqueIDCounter += 1
+	}
+	
+	// for 鄰接矩陣（**Adjacency Matrix**）實作
+	public init(data: T, index: Int) {
+		self.data = data
+		uniqueID = index
+	}
+	
+	
+	public mutating func connectTo(destinationVertex: Vertex<T>, withWeight weight: Double = 0) {
+		edges.append(Edge<T>(from: self, to: destinationVertex, weight: weight))
+	}
+	
+	public mutating func connectBetween(inout otherVertex: Vertex<T>, withWeight weight: Double = 0) {
+		connectTo(otherVertex, withWeight: weight)
+		otherVertex.connectTo(self, withWeight: weight)
+	}
+	public func edgeTo(otherVertex: Vertex<T>) -> Edge<T>? {
+		for e in edges where e.to.uniqueID == otherVertex.uniqueID {
+			return e
+		}
+		return nil
+	}
+	public var description: String {
+		var linksTxt = ""
+		for edge in edges {
+			linksTxt += "\t"
+			linksTxt += edge.description
+		}
+		
+		return "V\(uniqueID){\(data)}" + linksTxt
+	}
+	
+}
+```
+
+頂點的關聯型別`T`代表使用泛型。頂點也有一個唯一的標識符，用來實作比較用。`edges`陣列為鄰接表。
+
+使用有向邊`connectTo`來連接兩個頂點，或使用`connectBetween`來連接兩點使其雙向連結。使用`edgeTo`來確認頂點與其他頂點是否相鄰。以下是一簡單範例：
+>>>>>>> origin/master
 
 }
 /*:
 
+<<<<<<< HEAD
 頂點的關聯型別`T`代表使用泛型。頂點也有一個唯一的標識符，用來實作比較用。`edges`陣列為鄰接表。
 
 使用有向邊`connectTo`來連接兩個頂點，或使用`connectBetween`來連接兩點使其雙向連結。使用`edgeTo`來確認頂點與其他頂點是否相鄰。以下是一簡單範例：
@@ -164,6 +259,9 @@ return "V\(uniqueID){\(data)}" + linksTxt
 ![Demo](/gitBook/pics/Demo1.png)
 
 */
+=======
+```swift
+>>>>>>> origin/master
 var v1 = Vertex(data: 1)
 var v2 = Vertex(data: 2)
 var v3 = Vertex(data: 3)
@@ -187,6 +285,7 @@ v3.edgeTo(v4)?.weight
 
 // Returns the weight of the edge from v4 to v1 (2.8)
 v4.edgeTo(v1)?.weight
+<<<<<<< HEAD
 
 /*:
 
@@ -289,6 +388,105 @@ v1   v2   v3   v4   v5
 
 
 
+=======
+```
+
+> **注意：** 有非常多的方式可以實作圖。這邊僅是揭露一種可能的實作方法。你可能要因應希望解決的問題來修改程式碼，例如，您的邊緣可能不需要權重`weight`屬性，或者可能沒有必要區分有向和無向邊。
+
+## 實作: 鄰接矩陣（**Adjacency Matrix**）
+
+接下來將以二維陣列`[[Double?]]`來代表鄰接矩陣，陣列中`nil`表示沒有相連的邊，而有值則代表了邊的權重。
+```swift
+public struct Graph<T>: CustomStringConvertible {
+	private var adjacencyMatrix: [[Double?]] = []
+	
+	public mutating func createVertex(data: T) -> Vertex<T> {
+		let vertex = Vertex(data: data, index: adjacencyMatrix.count)
+		
+		// Expand each existing row to the right one column.
+		for i in 0..<adjacencyMatrix.count {
+			adjacencyMatrix[i].append(nil)
+		}
+		
+		// Add one new row at the bottom.
+		let newRow = [Double?](count: adjacencyMatrix.count + 1, repeatedValue: nil)
+		adjacencyMatrix.append(newRow)
+		
+		return vertex
+	}
+	
+	public mutating func connect(sourceVertex: Vertex<T>, to destinationVertex: Vertex<T>, withWeight weight: Double = 0) {
+		adjacencyMatrix[sourceVertex.uniqueID][destinationVertex.uniqueID] = weight
+	}
+	
+	public func weightFrom(sourceVertex: Vertex<T>, toDestinationVertex: Vertex<T>) -> Double? {
+		return adjacencyMatrix[sourceVertex.uniqueID][toDestinationVertex.uniqueID]
+	}
+	
+	public var description: String {
+		return adjacencyMatrix.description
+	}
+	
+}
+```
+
+若`adjacencyMatrix[i][j]`非`nil`表示有頂點`i`到頂點`j`的邊。為了索引陣列中每個頂點，每個`Vertex`物件都有一個個別的索引值：
+
+在圖中要建立一新的頂點需要更新矩陣大小，矩陣資料建立好，可以很簡易的利用索引值來操作與查詢，測試如下：
+
+```swift
+var graph = Graph<Int>()
+let gv1 = graph.createVertex(1)
+let gv2 = graph.createVertex(2)
+let gv3 = graph.createVertex(3)
+let gv4 = graph.createVertex(4)
+let gv5 = graph.createVertex(5)
+
+graph.connect(gv1, to: gv2, withWeight: 1.0)
+graph.connect(gv2, to: gv3, withWeight: 1.0)
+graph.connect(gv3, to: gv4, withWeight: 4.5)
+graph.connect(gv4, to: gv1, withWeight: 2.8)
+graph.connect(gv2, to: gv5, withWeight: 3.2)
+
+graph.adjacencyMatrix
+
+// Returns the weight of the edge from v1 to v2 (1.0)
+graph.weightFrom(gv1, toDestinationVertex: gv2)
+
+// Returns the weight of the edge from v1 to v3 (nil, since there is not an edge)
+graph.weightFrom(gv1, toDestinationVertex: gv3)
+
+// Returns the weight of the edge from v3 to v4 (4.5)
+graph.weightFrom(gv3, toDestinationVertex: gv4)
+
+// Returns the weight of the edge from v4 to v1 (2.8)
+graph.weightFrom(gv4, toDestinationVertex: gv1)
+```
+
+此例，鄰接矩陣如下:
+```
+[[nil, 1.0, nil, nil, nil]    v1
+ [nil, nil, 1.0, nil, 3.2]    v2
+ [nil, nil, nil, 4.5, nil]    v3
+ [2.8, nil, nil, nil, nil]    v4
+ [nil, nil, nil, nil, nil]]   v5
+
+  v1   v2   v3   v4   v5
+```
+
+## 參考資料
+
+本文介紹了什麼是圖，可以如何實現基本的資料結構。圖還有許多實際應用，請繼續了解！
+
+
+
+
+
+
+
+
+
+>>>>>>> origin/master
 
 
 
