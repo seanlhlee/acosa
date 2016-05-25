@@ -1,94 +1,76 @@
-# Graph
+# 圖（Graph）
 
-A graph is something that looks like this:
+在電腦科學的術語來說，圖是一組頂點（*vertices*）配對有一組邊（*edges*）的集合。頂點是圓的東西，而邊則為連接著頂點間的線。一個圖（Grapg）示意如下：
 
-![A graph](/gitBook/pics/Graph2.png)
+![A graph](/gitBook/pics/Graph.png)
 
-In computer-science lingo, a graph is a set of *vertices* paired with a set of *edges*. The vertices are the round things and the edges are the lines between them. Edges connect a vertex to other vertices.
 
-> **Note:** Vertices are sometimes also called "nodes" and edges are also called "links".
+> **Note:** 頂點（*vertices*）也經常被稱為節點（*node*），邊也稱為鏈結（*links*）。
 
-For example, a graph can represent a social network. Each person is a vertex, and people who know each other are connected by edges. A somewhat historically inaccurate example:
-
+舉例來說，圖可以描述一個社群網絡，每個人都是頂點，而互相認識的人們則以邊來彼此連接：
 ![Social network](/gitBook/pics/SocialNetwork.png)
 
-Graphs come in all kinds of shapes and sizes. The edges can have a *weight*, where a positive or negative numeric value is assigned to each edge. Consider an example of a graph representing airplane flights. Cities can be vertices, and flights can be edges. Then an edge weight could describe flight time or the price of a ticket.
+圖有各種形狀和大小。邊可以具有權重（*weight*）－ 將一個數值分配給一個邊。飛機航線圖可做為例子。城市視為頂點，航班視為邊，然後邊的權重可以描述飛行時間或票價。
 
 ![Airplane flights](/gitBook/pics/Flights.png)
 
-With this hypothetical airline, flying from San Francisco to Moscow is cheapest by going through New York.
-
-Edges can also be *directed*. So far the edges you've seen have been undirected, so if Ada knows Charles, then Charles also knows Ada. A directed edge, on the other hand, implies a one-way relationship. A directed edge from vertex X to vertex Y connects X to Y, but *not* Y to X.
-
-Continuing from the flights example, a directed edge from San Francisco to Juneau in Alaska would indicate that there is a flight from San Francisco to Juneau, but not from Juneau to San Francisco (I suppose that means you're walking back).
+上面的例圖顯示，從舊金山飛往莫斯科的航班中，途經紐約是最便宜的。前面介紹的是無向圖，邊也可以有向（*directed*），有向邊（A directed edge）代表一個單向關係。一個由頂點X到頂點Y得有向邊代表X連向Y，但**不**代表Ｙ連向Ｘ。以航線圖說明，從舊金山飛往阿拉斯加的朱諾（Juneau）的有向邊，表示有從舊金山飛往朱諾的航班，但不能從朱諾飛往舊金山。
 
 ![One-way flights](/gitBook/pics/FlightsDirected.png)
 
-The following are also graphs:
+下例也是圖:
 
 ![Tree and linked list](/gitBook/pics/TreeAndList.png)
 
-On the left is a [tree](../Tree/) structure, on the right a [linked list](../Linked List/). Both can be considered graphs, but in a simpler form. After all, they have vertices (nodes) and edges (links).
-
-The very first graph I showed you contained *cycles*, where you can start off at a vertex, follow a path, and come back to the original vertex. A tree is a graph without such cycles.
-
-Another very common type of graph is the *directed acyclic graph* or DAG:
+左邊是樹（**tree**）結構，右邊是鏈結串列（**linked list**），他們都有頂點（節點）與邊（鏈結），屬於簡單形式的圖。若一圖中的由一頂點經一條不重複頂點的路徑可以回到此頂點稱為有環圖（*cycles*），還有一種很常見的類型稱有向無環圖（*directed acyclic graph*, **DAG**）如下圖：
 
 ![DAG](/gitBook/pics/DAG.png)
 
-Like a tree this does not have any cycles in it (no matter where you start, there is no path back to the starting vertex), but unlike a tree the edges are directional and the shape doesn't necessarily form a hierarchy.
+樹是無環的，無論從哪個頂點為起點都沒有不重複頂點的路徑可以回到原點。有向無環圖就像一棵樹，沒有路徑可以回到起點，其邊為有向，但形狀並不像樹有層級關係。
 
-## Why use graphs?
+## 為何使用圖？
 
-Maybe you're shrugging your shoulders and thinking, what's the big deal? Well, it turns out that graphs are an extremely useful data structure.
+圖是一種非常有用的數據結構。假設你設計一個程式來解決問題，可以用頂點來代表一些數據，用邊來代表數據間的關係，就可以畫出一個描述問題的圖，再使用眾所周知的圖形算法，如廣度優先（**BFS**）搜尋或深度優先搜尋（**DFS**）等，來找到解決方案。
 
-If you have some programming problem where you can represent some of your data as vertices and some of it as edges between those vertices, then you can draw your problem as a graph and use well-known graph algorithms such as [breadth-first search](../Breadth-First Search/) or [depth-first search](../Depth-First Search) to find a solution. 
-
-For example, let's say you have a list of tasks where some tasks have to wait on others before they can begin. You can model this using an acyclic directed graph:
+例如，假設有依工作清單，一些任務必須等待別人完成才開始，您可以使用有向無環圖將問題模型化如下：
 
 ![Tasks as a graph](/gitBook/pics/Tasks.png)
 
-Each vertex represents a task. Here, an edge between two vertices means that the source task must be completed before the destination task can start. So task C cannot start before B and D are finished, and B nor D can start before A is finished.
+圖中每個頂點代表一項工作，兩個頂點間的有向邊代表完成某項工作後才能進行下一項工作，如例圖任務B與D未完成前任務C無法進行， 任務B與D也必須在任務A完成後開始。已圖來簡化問題，可使用深度優先搜尋法來實行拓樸排序（topological sort），會排出序列來代表任務進行的次序如何可以最快完成，其中一種可能的最佳化次序為A, B, D, E, C, F, G, H, I, J, K。
 
-Now that the problem is expressed using a graph, you can use a depth-first search to perform a [topological sort](../Topological Sort/). This will put the tasks in an optimal order so that you minimize the time spent waiting for tasks to complete. (One possible order here is A, B, D, E, C, F, G, H, I, J, K.)
-
-Whenever you're faced with a tough programming problem, ask yourself, "how can I express this problem using a graph?" Graphs are all about representing relationships between your data. The trick is in how you define "relationship".
-
-If you're a musician you might appreciate this graph:
+即便遇到很困難的問題，也可以常自問如何用途來描述問題，圖可以請出描繪數據間的關係，而其技巧在於您如何去定義這個關係。音樂家可能會喜歡這個圖：
 
 ![Chord map](/gitBook/pics/ChordMap.png)
 
-The vertices are chords from the C major scale. The edges -- the relationships between the chords -- represent how [likely one chord is to follow another](http://mugglinworks.com/chordmaps/genmap.htm). This is a directed graph, so the direction of the arrows shows how you can go from one chord to the next. It's also a weighted graph, where the weight of the edges -- portrayed here by line thickness -- shows a strong relationship between two chords. As you can see, a G7-chord is very likely to be followed by a C chord, and much less likely by a Am chord.
+頂點是C大調的音階和弦。邊代表和弦之間的關係 - 代表一個和弦跟隨另一個和弦。這是一個有向圖，箭頭的方向表明從一弦到下一個，也是一個加權圖，邊的權重以線的粗細表示兩個和弦之間的關係強烈程度。正如你所看到的，一個G7和弦的後面很可能是C和弦而較少是Am和弦。
 
-You're probably already using graphs without even knowing it. Your data model is also a graph (from Apple's Core Data documentation):
+其實生活中你可能已經在使用圖來解決各種問題而不自知。數據模型也是一個圖（來源：蘋果公司的 Core Data文檔）：
 
-![Core Data model](https://developer.apple.com/library/ios/documentation/Cocoa/Conceptual/CoreDataVersioning/Art/recipe_version2.0.jpg)
+![Core Data model](/gitBook/pics/recipe_version2.0.jpg)
 
-Another common graph that's used by programmers is the state machine, where edges depict the conditions for transitioning between states. Here is a state machine that models my cat:
+另一種常見的圖是狀態機，其邊描繪了狀態間的轉換。下圖是一隻貓的狀態機範例：
 
 ![State machine](/gitBook/pics/StateMachine.png)
 
-Graphs are awesome. Facebook made a fortune from their social graph. If you're going to learn any data structure, it should be the graph and the vast collection of standard graph algorithms.
+圖是很好的工具。 Facebook利用人們的社交圖從而發了大財。要學習數據結構，不可錯過對圖和標準圖形演算法的學習。
 
-## Vertices and edges, oh my!
+## 頂點（Vertices）與邊（Edges）
 
-In theory, a graph is just a bunch of vertex objects and a bunch of edge objects. But how do you describe these in code?
+簡單來說，圖就只是一堆頂點和邊的物件。但是，我們如何用程式碼來描述呢？有兩種主要的策略：鄰接列表和鄰接矩陣。
 
-There are two main strategies: adjacency list and adjacency matrix.
-
-**Adjacency List.** In an adjacency list implementation, each vertex stores a list of edges that originate from that vertex. For example, if vertex A has an edge to vertices B, C, and D, then vertex A would have a list containing 3 edges.
+鄰接表（**Adjacency List**）: 在鄰接表實做中，每個頂點儲存一個從該頂點發出的邊的列表。例如，如果頂點A有到頂點B，C和D的邊，則頂點A儲存包含這3條邊的列表。
 
 ![Adjacency list](/gitBook/pics/AdjacencyList.png)
 
-The adjacency list describes outgoing edges. A has an edge to B but B does not have an edge back to A, so A does not appear in B's adjacency list.
+鄰接表描述出邊（outgoing edges）。 A有一個到B的邊，但B沒有回到A的邊，所以A不出現在B的鄰接表中。
 
-**Adjacency Matrix.** In an adjacency matrix implementation, a matrix with rows and columns representing vertices stores a weight to indicate if vertices are connected, and by what weight. For example, if there is a directed edge of weight 5.6 from vertex A to vertex B, then the entry with row for vertex A, column for vertex B would have value 5.6:
+鄰接矩陣（**Adjacency Matrix**）：在鄰接矩陣的實作中，以行和列表示邊及其權重。例如，一權重5.6的由頂點A到頂點B的有向邊，矩陣中行為頂點A，列為頂點B的元素值為5.6：
 
 ![Adjacency matrix](/gitBook/pics/AdjacencyMatrix.png)
 
-So which one should you use? Most of the time, the adjacency list is the right approach. What follows is a more detailed comparison between the two.
+應該使用哪一個？大多數情況下，鄰接表比較常用。以下是兩者之間的更詳細的比較。
 
-Let *V* be the number of vertices in the graph, and *E* the number of edges.  Then we have:
+假設* V *是圖中頂點的數目，* E *為邊的數目，我們有：
 
 | Operation       | Adjacency List | Adjacency Matrix |
 |-----------------|----------------|------------------|
@@ -97,79 +79,83 @@ Let *V* be the number of vertices in the graph, and *E* the number of edges.  Th
 | Add Edge        | O(1)           | O(1)             |
 | Check Adjacency | O(V)           | O(1)             |
 
-"Checking adjacency" means that we try to determine that a given vertex is an immediate neighbor of another vertex. The time to check adjacency for an adjacency list is **O(V)**, because in the worst case a vertex is connected to *every* other vertex.
+表中"Checking adjacency"表示確認一個頂點是否為另一個頂點的鄰居，在以List實作時，此操作時間複雜度**O(V)**，因為最壞情況是他是每個點的鄰居。
+如果圖的每個頂點跟少數頂點相鄰，稱稀疏圖（*sparse graph*），採鄰接表（**Adjacency List**）實作較佳：反之，頂點與圖中大量其他頂點相鄰，稱稀疏圖（*dense graph*），採鄰接矩陣（**Adjacency Matrix**）實作較佳。以下為使用鄰接表與鄰接矩陣實作的程式碼：
 
-In the case of a *sparse* graph, where each vertex is connected to only a handful of other vertices, an adjacency list is the best way to store the edges. If the graph is *dense*, where each vertex is connected to most of the other vertices, then a matrix is preferred.
+## 實作：鄰接表（**Adjacency List**）
 
-We'll show you sample implementations of both adjacency list and adjacency matrix.
+頂點的鄰接表包含了`Edge`類別的物件：
 
-## The code: adjacency list
+*/
+private var uniqueIDCounter = 0
 
-The adjacency list for each vertex consists of `Edge` objects:
+public struct Edge<T>: CustomStringConvertible {
+	public let from: Vertex<T>
+	public let to: Vertex<T>
+	public let weight: Double
+	public var description: String {
+		return "--\(weight)-->" + to.description
+	}
+}
+/*:
+
+這個結構描述了`from`和'to`頂點和權重值。注意，一個`Edge`物件是有向的單向連接。如果連接是雙向的，需要增加一個'Edge`物件到目標頂點的鄰接表。
+
+該`Vertex`如下：
 
 ```swift
-public struct Edge<T> {
-  public let from: Vertex<T>
-  public let to: Vertex<T>
-  public let weight: Double
+public struct Vertex<T>: CustomStringConvertible {
+	public var data: T
+	public let uniqueID: Int
+	
+	private(set) public var edges: [Edge<T>] = []
+	
+	// for 鄰接表（**Adjacency List**）實作
+	public init(data: T) {
+		self.data = data
+		uniqueID = uniqueIDCounter
+		uniqueIDCounter += 1
+	}
+	
+	// for 鄰接矩陣（**Adjacency Matrix**）實作
+	public init(data: T, index: Int) {
+		self.data = data
+		uniqueID = index
+	}
+	
+	
+	public mutating func connectTo(destinationVertex: Vertex<T>, withWeight weight: Double = 0) {
+		edges.append(Edge<T>(from: self, to: destinationVertex, weight: weight))
+	}
+	
+	public mutating func connectBetween(inout otherVertex: Vertex<T>, withWeight weight: Double = 0) {
+		connectTo(otherVertex, withWeight: weight)
+		otherVertex.connectTo(self, withWeight: weight)
+	}
+	public func edgeTo(otherVertex: Vertex<T>) -> Edge<T>? {
+		for e in edges where e.to.uniqueID == otherVertex.uniqueID {
+			return e
+		}
+		return nil
+	}
+	public var description: String {
+		var linksTxt = ""
+		for edge in edges {
+			linksTxt += "\t"
+			linksTxt += edge.description
+		}
+		
+		return "V\(uniqueID){\(data)}" + linksTxt
+	}
+	
 }
 ```
 
-This struct describes the "from" and "to" vertices and a weight value. Note that an `Edge` object is always directed, a one-way connection (shown as arrows in the illustrations above). If you want the connection to go both ways, you also need to add an `Edge` object to the adjacency list of the destination vertex.
+頂點的關聯型別`T`代表使用泛型。頂點也有一個唯一的標識符，用來實作比較用。`edges`陣列為鄰接表。
 
-The `Vertex` looks like this:
-
-```swift
-private var uniqueIDCounter = 0
-
-public struct Vertex<T> {
-  public var data: T
-  public let uniqueID: Int
-  
-  private(set) public var edges: [Edge<T>] = []
-  
-  public init(data: T) {
-    self.data = data
-    uniqueID = uniqueIDCounter
-    uniqueIDCounter += 1
-  }
-```
-
-It stores arbitrary data with a generic type `T`. The vertex also has a unique identifier, which we use to compare equality later. The `edges` array is the adjacency list.
-
-To connect two vertices using a directed edge:
-
-```swift
-  public mutating func connectTo(destinationVertex: Vertex<T>, withWeight weight: Double = 0) {
-    edges.append(Edge(from: self, to: destinationVertex, weight: weight))
-  }
-```
-
-As mentioned, to create an undirected edge you need to make two directed edges:
-
-```
-  public mutating func connectBetween(inout otherVertex: Vertex<T>, withWeight weight: Double = 0) {
-    connectTo(otherVertex, withWeight: weight)
-    otherVertex.connectTo(self, withWeight: weight)
-  }
-```
-
-There is also a method for checking adjacency, i.e. to determine if there is an edge between two vertices:
-
-```swift
-  public func edgeTo(otherVertex: Vertex<T>) -> Edge<T>? {
-    for e in edges where e.to.uniqueID == otherVertex.uniqueID {
-      return e
-    }
-    return nil
-  }
-```
-
-Here's an example of a very simple graph:
+使用有向邊`connectTo`來連接兩個頂點，或使用`connectBetween`來連接兩點使其雙向連結。使用`edgeTo`來確認頂點與其他頂點是否相鄰。以下是一簡單範例：
 
 ![Demo](/gitBook/pics/Demo1.png)
-
-This is how you'd create it using `Vertex` objects:
 
 ```swift
 var v1 = Vertex(data: 1)
@@ -183,92 +169,117 @@ v2.connectTo(v3, withWeight: 1.0)
 v3.connectTo(v4, withWeight: 4.5)
 v4.connectTo(v1, withWeight: 2.8)
 v2.connectTo(v5, withWeight: 3.2)
+
+// Returns the weight of the edge from v1 to v2 (1.0)
+v1.edgeTo(v2)?.weight
+
+// Returns the weight of the edge from v1 to v3 (nil, since there is not an edge)
+v1.edgeTo(v3)?.weight
+
+// Returns the weight of the edge from v3 to v4 (4.5)
+v3.edgeTo(v4)?.weight
+
+// Returns the weight of the edge from v4 to v1 (2.8)
+v4.edgeTo(v1)?.weight
 ```
 
-> **Note:** There are many, many ways to implement graphs. The code given here is just one possible implementation. You probably want to tailor the graph code to each individual problem you're trying to solve. For instance, your edges may not need a `weight` property, or you may not have the need to distinguish between directed and undirected edges.
+> **注意：** 有非常多的方式可以實作圖。這邊僅是揭露一種可能的實作方法。你可能要因應希望解決的問題來修改程式碼，例如，您的邊緣可能不需要權重`weight`屬性，或者可能沒有必要區分有向和無向邊。
 
-## The code: adjacency matrix
+## 實作: 鄰接矩陣（**Adjacency Matrix**）
 
-We'll keep track of the adjacency matrix in a two-dimensional `[[Double?]]` array. An entry of `nil` indicates no edge, while any other value indicates an edge of the given weight.
-
+接下來將以二維陣列`[[Double?]]`來代表鄰接矩陣，陣列中`nil`表示沒有相連的邊，而有值則代表了邊的權重。
 ```swift
-public struct Graph<T> {
-  private var adjacencyMatrix: [[Double?]] = []
+public struct Graph<T>: CustomStringConvertible {
+	private var adjacencyMatrix: [[Double?]] = []
+	
+	public mutating func createVertex(data: T) -> Vertex<T> {
+		let vertex = Vertex(data: data, index: adjacencyMatrix.count)
+		
+		// Expand each existing row to the right one column.
+		for i in 0..<adjacencyMatrix.count {
+			adjacencyMatrix[i].append(nil)
+		}
+		
+		// Add one new row at the bottom.
+		let newRow = [Double?](count: adjacencyMatrix.count + 1, repeatedValue: nil)
+		adjacencyMatrix.append(newRow)
+		
+		return vertex
+	}
+	
+	public mutating func connect(sourceVertex: Vertex<T>, to destinationVertex: Vertex<T>, withWeight weight: Double = 0) {
+		adjacencyMatrix[sourceVertex.uniqueID][destinationVertex.uniqueID] = weight
+	}
+	
+	public func weightFrom(sourceVertex: Vertex<T>, toDestinationVertex: Vertex<T>) -> Double? {
+		return adjacencyMatrix[sourceVertex.uniqueID][toDestinationVertex.uniqueID]
+	}
+	
+	public var description: String {
+		return adjacencyMatrix.description
+	}
+	
 }
 ```
 
-If `adjacencyMatrix[i][j]` is not nil, then there is an edge from vertex `i` to vertex `j`.
+若`adjacencyMatrix[i][j]`非`nil`表示有頂點`i`到頂點`j`的邊。為了索引陣列中每個頂點，每個`Vertex`物件都有一個個別的索引值：
 
-To index into the matrix using vertices, we give each `Vertex` a unique integer index:
-
-```swift
-public struct Vertex<T> {
-  public var data: T
-  private let index: Int
-}
-```
-
-To create a new vertex, the graph must resize the matrix:
-
-```swift
-  public mutating func createVertex(data: T) -> Vertex<T> {
-    let vertex = Vertex(data: data, index: adjacencyMatrix.count)
-    
-    // Expand each existing row to the right one column.
-    for i in 0..<adjacencyMatrix.count {
-      adjacencyMatrix[i].append(nil)
-    }
-    
-    // Add one new row at the bottom.
-    let newRow = [Double?](count: adjacencyMatrix.count + 1, repeatedValue: nil)
-    adjacencyMatrix.append(newRow)
-
-    return vertex
-  }
-```
-
-Once we have the matrix properly configured, adding edges and querying for edges are simple indexing operations into the matrix:
-
-```swift
-public mutating func connect(sourceVertex: Vertex<T>, to destinationVertex: Vertex<T>, withWeight weight: Double = 0) {
-  adjacencyMatrix[sourceVertex.index][destinationVertex.index] = weight
-}
-
-public func weightFrom(sourceVertex: Vertex<T>, toDestinationVertex: Vertex<T>) -> Double? {
-  return adjacencyMatrix[sourceVertex.index][toDestinationVertex.index]
-}
-```
-
-You use these objects as follows:
+在圖中要建立一新的頂點需要更新矩陣大小，矩陣資料建立好，可以很簡易的利用索引值來操作與查詢，測試如下：
 
 ```swift
 var graph = Graph<Int>()
-let v1 = graph.createVertex(1)
-let v2 = graph.createVertex(2)
-let v3 = graph.createVertex(3)
-let v4 = graph.createVertex(4)
-let v5 = graph.createVertex(5)
+let gv1 = graph.createVertex(1)
+let gv2 = graph.createVertex(2)
+let gv3 = graph.createVertex(3)
+let gv4 = graph.createVertex(4)
+let gv5 = graph.createVertex(5)
 
-graph.connect(v1, to: v2, withWeight: 1.0)
-graph.connect(v2, to: v3, withWeight: 1.0)
-graph.connect(v3, to: v4, withWeight: 4.5)
-graph.connect(v4, to: v1, withWeight: 2.8)
-graph.connect(v2, to: v5, withWeight: 3.2)
+graph.connect(gv1, to: gv2, withWeight: 1.0)
+graph.connect(gv2, to: gv3, withWeight: 1.0)
+graph.connect(gv3, to: gv4, withWeight: 4.5)
+graph.connect(gv4, to: gv1, withWeight: 2.8)
+graph.connect(gv2, to: gv5, withWeight: 3.2)
+
+graph.adjacencyMatrix
+
+// Returns the weight of the edge from v1 to v2 (1.0)
+graph.weightFrom(gv1, toDestinationVertex: gv2)
+
+// Returns the weight of the edge from v1 to v3 (nil, since there is not an edge)
+graph.weightFrom(gv1, toDestinationVertex: gv3)
+
+// Returns the weight of the edge from v3 to v4 (4.5)
+graph.weightFrom(gv3, toDestinationVertex: gv4)
+
+// Returns the weight of the edge from v4 to v1 (2.8)
+graph.weightFrom(gv4, toDestinationVertex: gv1)
 ```
 
-Then the adjacency matrix looks like this:
+此例，鄰接矩陣如下:
+```
+[[nil, 1.0, nil, nil, nil]    v1
+ [nil, nil, 1.0, nil, 3.2]    v2
+ [nil, nil, nil, 4.5, nil]    v3
+ [2.8, nil, nil, nil, nil]    v4
+ [nil, nil, nil, nil, nil]]   v5
 
-	[[nil, 1.0, nil, nil, nil]    v1
-	 [nil, nil, 1.0, nil, 3.2]    v2
-	 [nil, nil, nil, 4.5, nil]    v3
-	 [2.8, nil, nil, nil, nil]    v4
-	 [nil, nil, nil, nil, nil]]   v5
-	 
-	  v1   v2   v3   v4   v5
+  v1   v2   v3   v4   v5
+```
+
+## 參考資料
+
+本文介紹了什麼是圖，可以如何實現基本的資料結構。圖還有許多實際應用，請繼續了解！
 
 
-## See also
 
-This article described what a graph is and how you can implement the basic data structure. But we have many more articles on practical uses for graphs, so check those out too!
 
-*Written by Donald Pinckney and Matthijs Hollemans*
+
+
+
+
+
+
+
+
+
+
