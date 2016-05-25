@@ -1,122 +1,95 @@
-# Breadth-First Search
+# 廣度優先搜尋法（Breadth-First Search）
 
-Breadth-first search (BFS) is an algorithm for traversing or searching [tree](../Tree/) or [graph](../Graph/) data structures. It starts at a source node and explores the immediate neighbor nodes first, before moving to the next level neighbors.
+廣度優先搜尋法（Breadth-First Search, BFS）是一種樹（Tree）或圖（Graph）資料結構的搜索演算法，從圖的某一節點(vertex, node) 開始走訪，接著走訪此一節點所有相鄰且未拜訪過的節點，才進一步走訪下一層級的節點。可應用於有向圖與無向圖的搜尋。
 
-Breadth-first search can be used on both directed and undirected graphs.
+## 動畫實例
 
-## Animated example
-
-Here's how breadth-first search works on a graph:
+這邊是一個說明廣度優先搜尋法（Breadth-First Search）的動畫：
 
 ![Animated example of a breadth-first search](/gitBook/pics/AnimatedExample.gif)
 
-When we visit a node, we color it black. We also put its neighbor nodes into a [queue](../Queue/). In the animation the nodes that are enqueued but not visited yet are shown in gray.
+當走訪一個節點後，顏色變黑並將其鄰居節點放進佇列（queue）中，已放入佇列尚未走訪的呈現灰色。由`A`節點開始，一開始`A`變灰。
 
-Let's follow the animated example. We start with the source node `A` and add it to a queue. In the animation this is shown as node `A` becoming gray.
+`queue.enqueue(A)`
 
-```swift
-queue.enqueue(A)
-```
+佇列現為`[ A ]`，當有節點在佇列中，我們就依先進先出的方式走訪，並在過程中將為走訪過的鄰居的鄰居也加入佇列，開始時，我們將第一個節點`A`加入佇列走仿後標記為黑，然後加入他們的鄰居`B`和`C`著灰色。
 
-The queue is now `[ A ]`. The idea is that, as long as there are nodes in the queue, we visit the node that's at the front of the queue, and enqueue its immediate neighbor nodes if they have not been visited yet.
+`queue.dequeue()   // A`
 
-To start traversing the graph, we pull the first node off the queue, `A`, and color it black. Then we enqueue its two neighbor nodes `B` and `C`. This colors them gray.
+`queue.enqueue(B)`
 
-```swift
-queue.dequeue()   // A
-queue.enqueue(B)
-queue.enqueue(C)
-```
+`queue.enqueue(C)`
 
-The queue is now `[ B, C ]`. We dequeue `B`, and enqueue `B`'s neighbor nodes `D` and `E`.
+佇列現為`[ B, C ]`，接著佇列移出`B`並新增`B`的鄰居`D`與`E`
 
-```swift
-queue.dequeue()   // B
-queue.enqueue(D)
-queue.enqueue(E)
-```
+`queue.dequeue()   // B`
 
-The queue is now `[ C, D, E ]`. Dequeue `C`, and enqueue `C`'s neighbor nodes `F` and `G`.
+`queue.enqueue(D)`
 
-```swift
-queue.dequeue()   // C
-queue.enqueue(F)
-queue.enqueue(G)
-```
+`queue.enqueue(E)`
 
-The queue is now `[ D, E, F, G ]`. Dequeue `D`, which has no neighbor nodes.
+佇列現為`[ C, D, E ]`，接著佇列移出`C`並新增`C`的鄰居`F`與`G`
 
-```swift
-queue.dequeue()   // D
-```
+`queue.dequeue()   // C`
 
-The queue is now `[ E, F, G ]`. Dequeue `E` and enqueue its single neighbor node `H`. Note that `B` is also a neighbor for `E` but we've already visited `B`, so we're not adding it to the queue again.
+`queue.enqueue(F)`
 
-```swift
-queue.dequeue()   // E
-queue.enqueue(H)
-```
+`queue.enqueue(G)`
 
-The queue is now `[ F, G, H ]`. Dequeue `F`, which has no unvisited neighbor nodes.
+佇列現為`[ D, E, F, G ]`，接著佇列移出`D`，沒有鄰居
 
-```swift
-queue.dequeue()   // F
-```
+`queue.dequeue()   // D`
 
-The queue is now `[ G, H ]`. Dequeue `G`, which has no unvisited neighbor nodes.
+佇列現為`[ E, F, G ]`，接著佇列移出`E`並新增鄰居`H`。注意到`B`也是`E`的鄰居，因為已訪問我們並不將其加入佇列
 
-```swift
-queue.dequeue()   // G
-```
+`queue.dequeue()  // E`
 
-The queue is now `[ H ]`. Dequeue `H`, which has no unvisited neighbor nodes.
+`queue.enqueue(H)`
 
-```swift
-queue.dequeue()   // H
-```
+佇列現為`[ F, G, H ]`，移出`F`，沒有鄰居
 
-The queue is now empty, meaning that all nodes have been explored. The order in which the nodes were explored is `A`, `B`, `C`, `D`, `E`, `F`, `G`, `H`.
+`queue.dequeue()   // F`
 
-We can show this as a tree:
+佇列現為`[ G, H ]`，移出`G`，沒有鄰居
+
+`queue.dequeue()   // G`
+
+佇列現為`[ H ]`，移出`H`，沒有鄰居
+
+`queue.dequeue()   // H`
+
+現在佇列已經空了，也就是所有節點都走訪完畢，整個走訪的次序是`A`, `B`, `C`, `D`, `E`, `F`, `G`, `H`，可以數來呈現：
 
 ![The BFS tree](/gitBook/pics/TraversalTree.png)
 
-The parent of a node is the one that "discovered" that node. The root of the tree is the node you started the breadth-first search from.
+樹的跟節點就是開始廣度優先搜尋法（Breadth-First Search）的節點，每個節點的父節點（parent）為發現他們的節點。對沒有權重的圖，樹定義了一個從根節點到樹上每個節點的最短路徑。所以廣度優先搜尋法（Breadth-First Search）也是一種找到圖中兩節點最短路徑的方法之一。
 
-For an unweighted graph, this tree defines a shortest path from the starting node to every other node in the tree. So breadth-first search is one way to find the shortest path between two nodes in a graph.
+## 實作：
 
-## The code
-
-Simple implementation of breadth-first search using a queue:
+用佇列來實作廣度優先搜尋法（Breadth-First Search）：
 
 ```swift
 func breadthFirstSearch(graph: Graph, source: Node) -> [String] {
-  var queue = Queue<Node>()
-  queue.enqueue(source)
-
-  var nodesExplored = [source.label]
-  source.visited = true
-
-  while let node = queue.dequeue() {
-    for edge in node.neighbors {
-      let neighborNode = edge.neighbor
-      if !neighborNode.visited {
-        queue.enqueue(neighborNode)
-        neighborNode.visited = true
-        nodesExplored.append(neighborNode.label)
-      }
-    }
-  }
-
-  return nodesExplored
+	var queue = Queue<Node>()
+	queue.enqueue(source)
+	
+	var nodesExplored = [source.label]
+	source.visited = true
+	
+	while let node = queue.dequeue() {
+		for edge in node.neighbors {
+			let neighborNode = edge.neighbor
+			if !neighborNode.visited {
+				queue.enqueue(neighborNode)
+				neighborNode.visited = true
+				nodesExplored.append(neighborNode.label)
+			}
+		}
+	}
+	
+	return nodesExplored
 }
-```
 
-While there are nodes in the queue, we visit the first one and then enqueue its immediate neighbors if they haven't been visited yet.
-
-Put this code in a playground and test it like so:
-
-```swift
 let graph = Graph()
 
 let nodeA = graph.addNode("a")
@@ -142,13 +115,12 @@ let nodesExplored = breadthFirstSearch(graph, source: nodeA)
 print(nodesExplored)
 ```
 
-This will output: `["a", "b", "c", "d", "e", "f", "g", "h"]`
-   
-## What is BFS good for?
+最後輸出是：`["a", "b", "c", "d", "e", "f", "g", "h"]`
 
-Breadth-first search can be used to solve many problems. A small selection:
+## 使用廣度優先搜尋法的好處？
 
-* Computing the [shortest path](../Shortest Path/) between a source node and each of the other nodes (only for unweighted graphs).
-* Calculating the [minimum spanning tree](../Minimum Spanning Tree/) on an unweighted graph.
+廣度優先搜索可以用來解決很多問題。例如：
 
-*Written by [Chris Pilcher](https://github.com/chris-pilcher) and Matthijs Hollemans*
+* 計算無權重圖的起點節點與每個其它節點之間的[最短路徑](Shortest Path)。
+* 計算無權重的[最小生成樹](Minimum Spanning Tree)。
+
