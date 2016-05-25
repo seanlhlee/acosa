@@ -129,7 +129,7 @@
 
 #### Graphs 圖論
 
-- [Graph](gitBook/Data Structures/Graphs/graph.md) *圖論*
+- [Graph](gitBook/Data Structures/Graphs/graph.md) *圖*
 - [Breadth-First Search (BFS)](gitBook/Data Structures/Graphs/breadth-first_search.md) *廣度優先搜尋法*
 - [Depth-First Search (DFS)](gitBook/Data Structures/Graphs/depth-first_search.md) *深度優先搜尋法*
 - [Shortest Path](gitBook/Data Structures/Graphs/shortest_path_28unweighted29.md) *最短路徑搜尋法*
