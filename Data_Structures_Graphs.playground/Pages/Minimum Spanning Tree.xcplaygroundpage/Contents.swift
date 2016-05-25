@@ -3,110 +3,113 @@
 ***
 # 最小生成樹（Minimum Spanning Tree - Unweighted Graph）
 
-A minimum spanning tree describes a path that contains the smallest number of edges that are needed to visit every node in the graph.
-
-Take a look at the following graph:
+最小生成樹（Minimum Spanning Tree - Unweighted Graph）對無權重圖來說，是描述在一張圖中遍歷所有節點最短路徑的樹。對有權重圖，最小生成樹其實是最小權重生成樹的簡稱。請參考下圖：
 
 ![Graph](Graph.png)
 
-If we start from node `a` and want to visit every other node, then what is the most efficient path to do that? We can calculate this with the minimum spanning tree algorithm.
+從節點`a`要訪問其他所有節點，怎麼樣的路徑是最有效率的呢？可以利用最小生成樹（Minimum Spanning Tree - Unweighted Graph）演算法的計算來求得。
 
-Here is the minimum spanning tree for the graph. It is represented by the bold edges:
+下圖為以圖來表現的最小生成樹，分支以粗體線代表：
 
 ![Minimum spanning tree](MinimumSpanningTree.png)
 
-Drawn as a more conventional tree it looks like this:
+畫為一般的樹看起來像下圖：
 
 ![An actual tree](Tree.png)
 
-To calculate the minimum spanning tree on an unweighted graph, we can use the [breadth-first search](../Breadth-First Search/) algorithm. Breadth-first search starts at a source node and traverses the graph by exploring the immediate neighbor nodes first, before moving to the next level neighbors. If we tweak this algorithm by selectively removing edges, then it can convert the graph into the minimum spanning tree.
+要計算一個無權重圖的最小生成樹，可以使用廣度優先演算法（[BFS](Breadth-First Search)）由一個起始節點展開走訪。如果調整該算法選擇性地去除邊，那麼它可以將圖形轉換成最小生成樹。一步步來看一下這個例子：從`a`節點開始，將它加入佇列並標示為已訪問
 
-Let's step through the example. We start with the source node `a`, add it to a queue and mark it as visited.
+`queue.enqueue(a)`
 
-*/
-queue.enqueue(a)
-a.visited = true
-/*:
+`a.visited = true`
 
-The queue is now `[ a ]`. As is usual with breadth-first search, we dequeue the node at the front of the queue, `a`, and enqueue its immediate neighbor nodes `b` and `h`. We mark them as visited too.
 
-*/
-queue.dequeue()   // a
-queue.enqueue(b)
-b.visited = true
-queue.enqueue(h)
-h.visited = true
-/*:
+佇列現為`[ a ]`，從佇列取出`a`然後加入他的鄰居`b`和`h`，並標記為已訪問。
 
-The queue is now `[ b, h ]`. Dequeue `b` and enqueue the neighbor node `c`. Mark it as visited. Remove the edge from `b` to `h` because `h` has already been visited.
+`queue.dequeue()   // a`
 
-*/
-queue.dequeue()   // b
-queue.enqueue(c)
-c.visited = true
-b.removeEdgeTo(h)
-/*:
+`queue.enqueue(b)`
 
-The queue is now `[ h, c ]`. Dequeue `h` and enqueue the neighbor nodes `g` and `i`, and mark them as visited.
+`b.visited = true`
 
-*/
-queue.dequeue()   // h
-queue.enqueue(g)
-g.visited = true
-queue.enqueue(i)
-i.visited = true
-/*:
+`queue.enqueue(h)`
 
-The queue is now `[ c, g, i ]`. Dequeue `c` and enqueue the neighbor nodes `d` and `f`, and mark them as visited. Remove the edge between `c` and `i` because `i` has already been visited.
+`h.visited = true`
 
-*/
-queue.dequeue()   // c
-queue.enqueue(d)
-d.visited = true
-queue.enqueue(f)
-f.visited = true
-c.removeEdgeTo(i)
-/*:
+佇列現為`[ b, h ]`，佇列移出`b`並新增鄰居`c`，標示已訪問。移除`b`到`h`的邊，因為`h`已訪問。
 
-The queue is now `[ g, i, d, f ]`. Dequeue `g`. All of its neighbors have been discovered already, so there is nothing to enqueue. Remove the edges from `g` to `f`, as well as `g` to `i`, because `f` and `i` have already been discovered.
+`queue.dequeue()   // b`
 
-*/
-queue.dequeue()   // g
-g.removeEdgeTo(f)
-g.removeEdgeTo(i)
-/*:
+`queue.enqueue(c)`
 
-The queue is now `[ i, d, f ]`. Dequeue `i`. Nothing else to do for this node.
+`c.visited = true`
 
-*/
-queue.dequeue()   // i
-/*:
+`b.removeEdgeTo(h)`
 
-The queue is now `[ d, f ]`. Dequeue `d` and enqueue the neighbor node `e`. Mark it as visited. Remove the edge from `d` to `f` because `f` has already been visited.
+佇列現為[ h, c ]`. 佇列移出`h`並新增鄰居`g`與`i`標示為已訪問。
 
-*/
-queue.dequeue()   // d
-queue.enqueue(e)
-e.visited = true
-d.removeEdgeTo(f)
-/*:
+`queue.dequeue()   // h`
 
-The queue is now `[ f, e ]`. Dequeue `f`. Remove the edge between `f` and `e` because `e` has already been visited.
+`queue.enqueue(g)`
 
-*/
-queue.dequeue()   // f
-f.removeEdgeTo(e)
-/*:
+`g.visited = true`
 
-The queue is now `[ e ]`. Dequeue `e`.
+`queue.enqueue(i)`
 
-*/
-queue.dequeue()   // e
-/*:
+`i.visited = true`
 
-The queue is empty, which means the minimum spanning tree has been computed.
+佇列現為`[ c, g, i ]`，佇列移出`c`並新增鄰居`d`與`f`，標注為已訪問，並移除`c`到`i`的邊，因為`i`已訪問。
 
-Here's the code:
+
+`queue.dequeue()   // c`
+
+`queue.enqueue(d)`
+
+`d.visited = true`
+
+`queue.enqueue(f)`
+
+`f.visited = true`
+
+`c.removeEdgeTo(i)`
+
+
+佇列現為`[ g, i, d, f ]`，佇列移出`g`，他所有的鄰居都已訪問所以不需要新增進佇列移除`g`到`f`和`g`到`i`的邊，因為`f`與`i`都訪問過了。
+
+`queue.dequeue()   // g`
+
+`g.removeEdgeTo(f)`
+
+`g.removeEdgeTo(i)`
+
+佇列現為`[ i, d, f ]`，佇列移出`i`，對此節點沒有動作進行。
+
+
+`queue.dequeue()   // i`
+
+佇列現為`[ d, f ]`，佇列移出`d`並新增鄰居`e`，標示已訪問並移除`d`到`f`的邊，因為`f`已訪問。
+
+`queue.dequeue()   // d`
+
+`queue.enqueue(e)`
+
+`e.visited = true`
+
+`d.removeEdgeTo(f)`
+
+佇列現為`[ f, e ]`，佇列移出`f`，移除`f`到`e`的邊，因為`e`已訪問。
+
+`queue.dequeue()   // f`
+
+`f.removeEdgeTo(e)`
+
+佇列現為`[ e ]`，佇列移出`e`。
+
+`queue.dequeue()   // e`
+
+至此，佇列已經空了，最小生成樹已被計算。
+
+## 實作：
 
 */
 func breadthFirstSearchMinimumSpanningTree(graph: Graph, source: Node) -> Graph {
@@ -133,9 +136,9 @@ func breadthFirstSearchMinimumSpanningTree(graph: Graph, source: Node) -> Graph 
 }
 /*:
 
-This function returns a new `Graph` object that describes just the minimum spanning tree. In the figure, that would be the graph containing just the bold edges.
+`breadthFirstSearchMinimumSpanningTree`函式回傳一個新的圖`Graph`物件即為最小生成樹。事實上，其為前述例圖僅包含粗線的圖。
 
-Put this code in a playground and test it like so:
+可在playground中測試：
 
 */
 let graph = Graph()
@@ -181,16 +184,16 @@ graph.addEdge(nodeI, neighbor: nodeH)
 
 let minimumSpanningTree = breadthFirstSearchMinimumSpanningTree(graph, source: nodeA)
 
-print(minimumSpanningTree) // [node: a edges: ["b", "h"]]
+print(minimumSpanningTree)
+
+// [node: a edges: ["b", "h"]]
 // [node: b edges: ["c"]]
 // [node: c edges: ["d", "f"]]
 // [node: d edges: ["e"]]
 // [node: h edges: ["g", "i"]]
 /*:
 
-> **Note:** On an unweighed graph, any spanning tree is always a minimal spanning tree. This means you can also use a [depth-first search](../Depth-First Search) to find the minimum spanning tree.
-
-*Written by [Chris Pilcher](https://github.com/chris-pilcher) and Matthijs Hollemans*
+> **注意：** 對無權重圖而言，任一生成樹都是最小生成樹，意即也可以利用深度優先搜尋法（[DFS](Depth-First Search)來計算最小生成樹。
 
 ***
 [Previous](@previous) | [Next](@next)
