@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<playground version='6.0' target-platform='ios' display-mode='rendered'>
+    <pages>
+        <page name='Graph'/>
+        <page name='Breadth-First Search - BFS'/>
+        <page name='Depth-First Search - DFS'/>
+        <page name='Shortest Path'/>
+        <page name='Minimum Spanning Tree'/>
+        <page name='All Paths'/>
+    </pages>
+</playground>
