@@ -3,103 +3,81 @@
 ***
 # 定容陣列（Fixed Size Array）
 
-# Fixed-Size Arrays
+早期的程式語言並沒有很花哨的陣列。建立一個特定的大小的陣列，從那一刻起它永遠不會增長或收縮陣列。在C和Objective-C標準陣列都仍是這種類型。而定義一個陣列的語法像：
 
-Early programming languages didn't have very fancy arrays. You'd create the array with a specific size and from that moment on it would never grow or shrink. Even the standard arrays in C and Objective-C are still of this type.
+`int myArray[10];`
 
-When you define an array like so,
-
-int myArray[10];
-
-the compiler allocates one contiguous block of memory that can hold 40 bytes (assuming an `int` is 4 bytes):
+假設`int`型別占4位元組記憶空間，編譯器會配置一段連續的40 bytes的記憶區塊：
 
 ![An array with room for 10 elements](array.png)
 
-That's your array. It will always be this size. If you need to fit more than 10 elements, you're out of luck... there is no room for it.
+這個陣列會一直維持這個大小。如果要讓陣列大小可以變動，需要用到動態陣列（[dynamic array](https://en.wikipedia.org/wiki/Dynamic_array) ）物件，例如Objective-C裡的`NSMutableArray`或是C++的`std::vector` in C++，當然Swift的陣列是隨需要變動記憶體大小的。傳統陣列不便之處在於一開始要地易足夠大的空間，沒有利用到的就成為空間上的浪費，同時需要小心安全缺陷與緩衝溢位造成當機。綜上所述，固定大小的數組不夠彈性，幾乎沒有留容錯的空間。
 
-To get an array that grows when it gets full you need to use a [dynamic array](https://en.wikipedia.org/wiki/Dynamic_array) object such as `NSMutableArray` in Objective-C or `std::vector` in C++, or a language like Swift whose arrays increase their capacity as needed.
+但是有人會說，我喜歡**定容陣列（Fixed Size Array）**，因為他們簡單、快速又可預測。
 
-A major downside of the old-style arrays is that they need to be big enough or you run out of space. But if they are too big you're wasting memory. And you need to be careful about security flaws and crashes due to buffer overflows. In summary, fixed-size arrays are not flexible and they leave no room for error.
+典型陣列有以下可用操作：
 
-That said, **I like fixed-size arrays** because they are simple, fast, and predictable.
+- 新增新的元素到尾端
+- 插入新的元素到陣列中或最前面
+- 刪除元素
+- 以索引值找到元素
+- 計算陣列的大小
 
-The following operations are typical for an array:
-
-- append a new element to the end
-- insert a new element at the beginning or somewhere in the middle
-- delete an element
-- look up an element by index
-- count the size of the array
-
-For a fixed-size array, appending is easy as long as the array isn't full yet:
+定容陣列（Fixed Size Array）若還沒有滿，新增元素是容易的：
 
 ![Appending a new element](append.png)
 
-Looking up by index is also quick and easy:
+以索引查找元素也超容易：
 
 ![Indexing the array](indexing.png)
 
-These two operations have complexity **O(1)**, meaning the time it takes to perform them is independent of the size of the array.
+這兩項操作時間複雜度都為**O(1)**，代表其完成動作所需的時間與陣列大小無關。
 
-For an array that can grow, appending is more involved: if the array is full, new memory must be allocated and the old contents copied over to the new memory buffer. On average, appending is still an **O(1)** operation, but what goes on under the hood is less predictable.
-
-The expensive operations are inserting and deleting. When you insert an element somewhere that's not at the end, it requires moving up the remainder of the array by one position. That involves a relatively costly memory copy operation. For example, inserting the value `7` in the middle of the array:
+可變動大小陣列，當滿容時必須要配置更多的記憶體，並將就資料拷貝到新的記憶暫存中。平均而言其新增元素的時間複雜度也是**O(1)**，但底層如何運作是難以預期的（除非你很瞭解其運作）。插入跟刪除元素的代價相對就高了，因為涉及其他元素在記憶體中的位移。例如，將`7`插入到陣列的中間：
 
 ![Insert requires a memory copy](insert.png)
 
-If your code was using any indexes into the array beyond the insertion point, these indexes are now referring to the wrong objects.
-
-Deleting requires a copy the other way around:
+刪除元素也需要其他元素的位移：
 
 ![Delete also requires a memory copy](delete.png)
 
-This, by the way, is also true for `NSMutableArray` or Swift arrays. Inserting and deleting are **O(n)** operations -- the larger the array the more time it takes.
+對`NSMutableArray`或Swift的陣列，插入跟刪除時間複雜度為**O(n)**，陣列越大效率越慢。
 
-Fixed-size arrays are a good solution when:
+因為定容陣列（Fixed Size Array）的以下優點，有時候還是需要它：
 
-1. You know beforehand the maximum number of elements you'll need. In a game this could be the number of sprites that can be active at a time. It's not unreasonable to put a limit on this. (For games it's a good idea to allocate all the objects you need in advance anyway.)
-2. It is not necessary to have a sorted version of the array, i.e. the order of the elements does not matter.
+1. 已知最大元素量時。在遊戲中可以被同時激活的物件數量有限制。
+2. 不需要排序的陣列
 
-If the array does not need to be sorted, then an `insertAtIndex()` operation is not needed. You can simply append any new elements to the end, until the array is full.
+陣列無需排序代表`insertAtIndex()`的操作是不需要的，要加入元素就直接加在陣列末端未使用位置。實作上的程式碼就像：
 
-The code for adding an element becomes:
-
-*/
-func append(newElement) {
-	if count < maxSize {
-		array[count] = newElement
-		count += 1
+	func append(newElement) {
+		if count < maxSize {
+			array[count] = newElement
+			count += 1
+		}
 	}
-}
-/*:
 
-The `count` variable keeps track of the size of the array and can be considered the index just beyond the last element. That's the index where you'll insert the new element.
+`count`變數追蹤陣列已被利用的大小，因此可以索引值來直接存取第一個未被使用的記憶體位置。要知道陣列中現存多少元素，也只要讀取`count`的值，是**O(1)**的操作。
 
-Determining the number of elements in the array is just a matter of reading the `count` variable, a **O(1)** operation.
+刪除的實作也一樣簡單：
 
-The code for removing an element is equally simple:
+	func removeAtIndex(index) {
+		count -= 1
+		array[index] = array[count]
+	}
 
-*/
-func removeAtIndex(index) {
-	count -= 1
-	array[index] = array[count]
-}
-/*:
-
-This copies the last element on top of the element you want to remove, and then decrements the size of the array.
+只是把最後一個元素拷貝到要刪除元素的位置，並且`count`解減1而已。
 
 ![Deleting just means copying one element](delete-no-copy.png)
 
-This is why the array is not sorted. To avoid an expensive copy of a potentially large portion of the array we copy just one element, but that does change the order of the elements.
+這也是不希望有排序情況的原因，這樣做就避免了插入與刪除時需要位移其他元素的過程。
 
-There are now two copies of element `6` in the array, but what was previously the last element is no longer part of the active array. It's just junk data -- the next time you append an new element, this old version of `6` will be overwritten.
+刪除後陣列的記憶體中有兩個`6`，最後的那個`6`已經是非激活的，是無用資料，再下一次新增元素時就會被覆寫。
 
-Under these two constraints -- a limit on the number of elements and an unsorted array -- fixed-size arrays are still perfectly suitable for use in modern software.
-
-Here is an implementation in Swift:
+以下為Swift的實作：
 
 */
-struct FixedSizeArray<T> {
+struct FixedSizeArray<T>: CustomStringConvertible {
 	private var maxSize: Int
 	private var defaultValue: T
 	private var array: [T]
@@ -132,22 +110,32 @@ struct FixedSizeArray<T> {
 		array[count] = defaultValue
 		return result
 	}
+	var description: String {
+		return array[0..<count].description
+	}
 }
 /*:
 
-When creating the array, you specify the maximum size and a default value:
+以下面方式建立一個新的陣列:
 
 */
 var a = FixedSizeArray(maxSize: 10, defaultValue: 0)
 /*:
 
-Note that `removeAtIndex()` overwrites the last element with this `defaultValue` to clean up the "junk" object that gets left behind. Normally it wouldn't matter to leave that duplicate object in the array, but if it's a class or a struct it may have strong references to other objects and it's good boyscout practice to zero those out.
+請注意`removeAtIndex()`函式以`defaultValue`覆寫來清除垃圾。通常來說，保留也是沒關係的，不過關聯型別是class物件時，可能與其他物件間有強參考，將其歸零是好的。
+*/
+a.append(3)
+a.append(5)
+a.append(9)
+a[0]
+a[2]
+a.removeAtIndex(2)
+a
 
 
 
 
-
-
+/*:
 ***
 [Previous](@previous) | [Next](@next)
 */
