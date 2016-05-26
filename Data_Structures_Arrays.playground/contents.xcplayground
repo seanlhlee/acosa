@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <playground version='6.0' target-platform='ios' display-mode='rendered'>
     <pages>
-        <page name='Run-Length Encoding - RLE'/>
-        <page name='Huffman Coding'/>
+        <page name='Array2D'/>
+        <page name='Bit Set'/>
+        <page name='Fixed Size Array'/>
+        <page name='Ordered Array'/>
     </pages>
 </playground>
