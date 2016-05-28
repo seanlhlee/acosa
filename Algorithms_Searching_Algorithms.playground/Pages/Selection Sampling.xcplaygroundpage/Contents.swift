@@ -1,13 +1,11 @@
 /*:
 [Previous](@previous) | [Next](@next)
 ***
-# Selection Sampling
+# 取樣
 
-Goal: Select *k* items at random from a collection of *n* items.
+目標: 從*n*物件中亂數取出*k*個樣品
 
-Let's say you have a deck of 52 playing cards and you need to draw 10 cards at random. This algorithm lets you do that.
-
-Here's a very fast version:
+假設有一疊牌樸克牌共52張，要從中隨機選出10張牌，其演算法如下：
 
 */
 import Foundation
@@ -32,7 +30,7 @@ select(from: a, count: 10)
 
 /*:
 
-As often happens with these [kinds of algorithms](../Shuffle/), it divides the array into two regions. The first region contains the selected items; the second region is all the remaining items.
+As often happens with these [kinds of algorithms](Shuffle), it divides the array into two regions. The first region contains the selected items; the second region is all the remaining items.
 
 Here's an example. Let's say the array is:
 
@@ -63,7 +61,7 @@ One more random number to pick, let's say it is 4 again. We swap `"c"` with `"a"
 
 And that's it. Easy peasy. The performance of this function is **O(k)** because as soon as we've selected *k* elements, we're done.
 
-Here is an alternative algorithm, called "reservoir sampling":
+此處為另一種實作方式：
 
 */
 func reservoirSample<T>(from a: [T], count k: Int) -> [T] {
