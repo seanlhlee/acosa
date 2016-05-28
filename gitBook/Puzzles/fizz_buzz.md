@@ -1,51 +1,49 @@
 # Fizz Buzz
 
-Fizz buzz is a group word game for children to teach them about division. Players take turns to count incrementally, replacing any number divisible by three with the word "fizz", and any number divisible by five with the word "buzz".
+Fizz buzz是一個教小朋友的數學的團隊遊戲，遊戲的進行是小朋友依序報數，當他報的數是3的倍數時喊出"fizz"，是5的倍數時喊出"buzz"，同時是3也是5的倍數時喊出"Fizz buzz"。
 
-Fizz buzz has been used as an interview screening device for computer programmers.
+Fizz buzz現在也用來作為企業徵才時的一項題目。
 
-## Example
+## 例子
 
-A typical round of fizz buzz:
+報數喊出的順序如下：
 
 `1`, `2`, `Fizz`, `4`, `Buzz`, `Fizz`, `7`, `8`, `Fizz`, `Buzz`, `11`, `Fizz`, `13`, `14`, `Fizz Buzz`, `16`, `17`, `Fizz`, `19`, `Buzz`, `Fizz`, `22`, `23`, `Fizz`, `Buzz`, `26`, `Fizz`, `28`, `29`, `Fizz Buzz`, `31`, `32`, `Fizz`, `34`, `Buzz`, `Fizz`, ...
 
-## 	Modulus Operator
+## 	模數運算子（Modulus Operator）
 
-The modulus operator `%` is the key to solving fizz buzz.
+模數運算子（Modulus Operator, `%`）是解題的關鍵，回傳整數除法的餘數：
 
-The modulus operator returns the remainder after an integer division. Here is an example of the modulus operator:
+| Division | Division Result | Modulus | Modulus Result |
+| -- | -- | -- | -- |
+| 1/3 | 0 with a remainder of 3 | 1 % 3 | 1 |
+| 5/3 | 1 with a remainder of 2 |  5 % 3 | 2 |
+| 16/3 | 5 with a remainder of 1 | 16 % 3 | 1 |
 
-| Division      | Division Result            | Modulus         | Modulus Result  |
-| ------------- | -------------------------- | --------------- | ---------------:|
-| 1 / 3       | 0 with a remainder of 3  | 1 % 3         | 3             |
-| 5 / 3       | 1 with a remainder of 2  | 5 % 3         | 2             |
-| 16 / 3      | 5 with a remainder of 1  | 16 % 3        | 1             |
+通常要判斷一整數為奇數還是偶數也是用模數運算子（Modulus Operator, `%`）：
 
-A common approach to determine if a number is even or odd is to use the modulus operator:
+| Modulus| Result | Swift Code  | Swift Code Result | Comment |
+| -- | -- | -- | -- | -- |
+| 6 % 2 | 0 | `let isEven = (number % 2 == 0)` | `true` | If a number is divisible by 2 it is *even* |
+| 5 % 2 | 1 |  `let isOdd = (number % 2 != 0)` | `true` | If a number is not divisible by 2 it is *odd* |
 
-| Modulus       | Result          | Swift Code                      | Swift Code Result | Comment                                       |
-| ------------- | ---------------:| ------------------------------- | -----------------:| --------------------------------------------- |
-| 6 % 2       | 0               | `let isEven = (number % 2 == 0)`  | `true`            | If a number is divisible by 2 it is *even*    |
-| 5 % 2       | 1               | `let isOdd = (number % 2 != 0)`   | `true`            | If a number is not divisible by 2 it is *odd* |
+## 解題
 
-## Solving fizz buzz
+以模數運算子（Modulus Operator, `%`）解題
 
-Now we can use the modulus operator `%` to solve fizz buzz.
-
-Finding numbers divisible by three:
+以整數除以3的餘數來判斷：
 
 | Modulus | Modulus Result | Swift Code    | Swift Code Result |
-| ------- | --------------:| ------------- |------------------:|
+| -- | -- | -- | -- |
 | 1 % 3 | 1            | `1 % 3 == 0`  | `false`           |
 | 2 % 3 | 2            | `2 % 3 == 0`  | `false`           |
 | 3 % 3 | 0            | `3 % 3 == 0`  | `true`            |
 | 4 % 3 | 1            | `4 % 3 == 0`  | `false`           |
 
-Finding numbers divisible by five:
+以整數除以5的餘數來判斷：
 
 | Modulus | Modulus Result | Swift Code    | Swift Code Result |
-| ------- | --------------:| ------------- |------------------:|
+| -- | -- | -- | -- |
 | 1 % 5 | 1            | `1 % 5 == 0`  | `false`           |
 | 2 % 5 | 2            | `2 % 5 == 0`  | `false`           |
 | 3 % 5 | 3            | `3 % 5 == 0`  | `false`           |
@@ -53,44 +51,36 @@ Finding numbers divisible by five:
 | 5 % 5 | 0            | `5 % 5 == 0`  | `true`            |
 | 6 % 5 | 1            | `6 % 5 == 0`  | `false`           |
 
-## The code
+## 實作
 
-Here is a simple implementation in Swift:
+Swift程式碼實作如下：
 
 ```swift
 func fizzBuzz(numberOfTurns: Int) {
-  for i in 1...numberOfTurns {
-    var result = ""
-
-    if i % 3 == 0 {
-      result += "Fizz"
-    }
-
-    if i % 5 == 0 {
-      result += (result.isEmpty ? "" : " ") + "Buzz"
-    }
-
-    if result.isEmpty {
-      result += "\(i)"
-    }
-
-    print(result)
-  }
+	var result = ""
+	for i in 1...numberOfTurns {
+		var fizzBuzz : String = ""
+		if i % 3 == 0 {
+			fizzBuzz += "Fizz\t\t"
+		}
+		if i % 5 == 0 {
+			fizzBuzz += (result.isEmpty ? "" : " ") + "Buzz\t"
+		}
+		if fizzBuzz.isEmpty {
+			fizzBuzz += "\(i)\t"
+		}
+		result += fizzBuzz
+	}
+	print(result)
 }
-```
 
-Put this code in a playground and test it like so:
-
-```swift
 fizzBuzz(15)
 ```
 
-This will output:
+輸出：
 
-	1, 2, Fizz, 4, Buzz, Fizz, 7, 8, Fizz, Buzz, 11, Fizz, 13, 14, Fizz Buzz
+1, 2, Fizz, 4, Buzz, Fizz, 7, 8, Fizz, Buzz, 11, Fizz, 13, 14, Fizz Buzz
 
-## See also
+## 參考資料
 
-[Fizz buzz on Wikipedia](https://en.wikipedia.org/wiki/Fizz_buzz)
-
-*Written by [Chris Pilcher](https://github.com/chris-pilcher)*
+[維基百科：Fizz buzz](https://en.wikipedia.org/wiki/Fizz_buzz)
