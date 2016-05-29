@@ -30,38 +30,33 @@ select(from: a, count: 10)
 
 /*:
 
-As often happens with these [kinds of algorithms](Shuffle), it divides the array into two regions. The first region contains the selected items; the second region is all the remaining items.
+通常隨機取樣也會進行洗牌的過程，洗牌演算法會將陣列分為兩部分， selected items; the second region is all the remaining items.
 
-Here's an example. Let's say the array is:
+有一個陣列如下：
 
-[ "a", "b", "c", "d", "e", "f", "g" ]
+`[ "a", "b", "c", "d", "e", "f", "g" ]`
 
-We want to select 3 items, so `k = 3`. In the loop, `i` is initially 0, so it points at `"a"`.
+要從中隨機取樣3元素，`k = 3`。在圈中，`i`起始值為0，指向`"a"所在的位置`.
 
-[ "a", "b", "c", "d", "e", "f", "g" ]
-i
+`[ "a", "b", "c", "d", "e", "f", "g" ]`
 
-We calculate a random number between `i` and `a.count`, the size of the array. Let's say this is 4. Now we swap `"a"` with `"e"`, the element at index 4, and move `i` forward:
+接著在`i`與`a.count`之間取一個亂數值，假設是4，將`"a"`與`"e"`換位，`i`遞增1：
 
-[ "e" | "b", "c", "d", "a", "f", "g" ]
-i
+`[ "e" | "b", "c", "d", "a", "f", "g" ]`
 
-The `|` bar shows the split between the two regions. `"e"` is the first element we've selected. Everything to the right of the bar we still need to look at.
+此處以`|`來代表分隔兩區域的分界，`"e"`是我們亂數選出的第一樣本，在其後的則是可以再由其中挑出的母體。
 
-Again, we ask for a random number between `i` and `a.count`, but because `i` has shifted, the random number can never be less than 1. So we'll never again swap `"e"` with anything.
+再由`i`與`a.count`之間取一個亂數值，因為i會在每次取樣後持續遞增，因此換位的過程不會發生已取樣位置被換位的情況。這次假設亂數值為6，對`"b"`與`"g"`換位：
 
-Let's say the random number is 6 and we swap `"b"` with `"g"`:
+`[ "e" , "g" | "c", "d", "a", "f", "b" ]`
 
-[ "e" , "g" | "c", "d", "a", "f", "b" ]
-i
+進行最後一次取亂數，假設是4，進行`"c"`與`"a"`的換位，陣列中`|`左側的三個元素即為亂數取樣的結果。
 
-One more random number to pick, let's say it is 4 again. We swap `"c"` with `"a"` to get the final selection on the left:
+`[ "e", "g", "a" | "d", "c", "f", "b" ]`
 
-[ "e", "g", "a" | "d", "c", "f", "b" ]
+非常容易，對吧。此演算法的時間複雜度為**O(k)**，因為迴圈執行的次數與我們取的樣本數*k*有關。
 
-And that's it. Easy peasy. The performance of this function is **O(k)** because as soon as we've selected *k* elements, we're done.
-
-此處為另一種實作方式：
+此處為另一種實作方式，又稱為水庫取樣法：
 
 */
 func reservoirSample<T>(from a: [T], count k: Int) -> [T] {
@@ -82,16 +77,12 @@ func reservoirSample<T>(from a: [T], count k: Int) -> [T] {
 }
 /*:
 
-This works in two steps:
+此實作共分成兩步驟：
 
-1. Fill the `result` array with the first `k` elements from the original array. This is called the "reservoir".
-2. Randomly replace elements in the reservoir with elements from the remaining pool.
+1. 將原始母體陣列的前`k`個元素存入到`result`陣列，而此稱為水庫。
+2. 隨機地置換水庫中與母體陣列的元素。
 
-The performance of this algorithm is **O(n)**, so it's a little bit slower than the first algorithm. However, its big advantage is that it can be used for arrays that are too large to fit in memory, even if you don't know what the size of the array is (in Swift this might be something like a lazy generator that reads the elements from a file).
-
-There is one downside to the previous two algorithms: they do not keep the elements in the original order. In the input array `"a"` came before `"e"` but now it's the other way around. If that is an issue for your app, you can't use this particular method.
-
-Here is an alternative approach that does keep the original order intact, but is a little more involved:
+此演算法時間複雜度為**O(n)**，比前一演算法慢，其優勢在於應用於非常大的陣列。在取樣後仍要維持母體元素次序的話，使用上述兩個實作方法要特別注意到次序會被破壞的缺點。以下是維持原本元素次序實作方式：
 
 */
 func select1<T>(from a: [T], count requested: Int) -> [T] {
@@ -116,77 +107,65 @@ func select1<T>(from a: [T], count requested: Int) -> [T] {
 }
 /*:
 
-This algorithm uses probability to decide whether to include a number in the selection or not.
+此演算法採用機率來決定是否取樣母體中的元素。
 
-1. The loop steps through the array from beginning to end. It keeps going until we've selected *k* items from our set of *n*. Here, *k* is called `requested` and *n* is `a.count`.
+1. 迴圈從陣列頭步進到陣列尾，持續到*n*個元素的母體選出*k*個樣本，此處*k*稱為`requested`、*n*則是`a.count`。
 
-2. Calculate a random number between 0 and 1. We want `0.0 <= r < 1.0`. The higher bound is exclusive; we never want it to be exactly 1. That's why we divide the result from `arc4random()` by `0x100000000` instead of the more usual `0xffffffff`.
+2. 計算一個介於0到1的亂數值`0.0 <= r < 1.0`，因為上界值不希望是1，因此除法算式中的分母是`0x100000000`（為`Int32.max + 1`）
 
-3. `leftToExamine` is how many items we still haven't looked at. `leftToAdd` is how many items we still need to select before we're done.
+3. `leftToExamine`是母體中還沒有檢視過的元素數量，`leftToAdd`則是還需要選出多少元素才完成抽樣。
 
-4. This is where the magic happens. Basically, we're flipping a coin. If it was heads, we add the current array element to the selection; if it was tails, we skip it.
+4. 這段程式碼功能類似硬幣翻面，用以決定是否將目前檢視的元素加入到抽樣的目標陣列中。
 
-Interestingly enough, even though we use probability, this approach always guarantees that we end up with exactly *k* items in the output array.
+此演算法是採用機率算法來決定每個元素是否被選取，有趣之處在於一定確保最後選出的樣本數為*k*個。
 
-Let's walk through the same example again. The input array is:
+讓我們有前面的例子解說一下此演算法：
 
-[ "a", "b", "c", "d", "e", "f", "g" ]
+`[ "a", "b", "c", "d", "e", "f", "g" ]`
 
-The loop looks at each element in turn, so we start at `"a"`. We get a random number between 0 and 1, let's say it is 0.841. The formula at `// 4` multiplies the number of items left to examine with this random number. There are still 7 elements left to examine, so the result is:
+迴圈依序檢定每個元素，開始是`"a"`，得到一個0到1間的亂數值，假設是0.841，根據步驟4`// 4`的算式，將其乘以位被檢定元素數：
 
-7 * 0.841 = 5.887
+`7 * 0.841 = 5.887`
 
-We compare this to 3 because we wanted to select 3 items. Since 5.887 is greater than 3, we skip `"a"` and move on to `"b"`.
+將其與3比較，結果是否定，因此`"a"`的樣本選擇檢定是不選取此元素，接著進行`"b"`。取得一亂數假設是0.212，未檢定元素數為6：
 
-Again, we get a random number, let's say 0.212. Now there are only 6 elements left to examine, so the formula gives:
+`6 * 0.212 = 1.272`
 
-6 * 0.212 = 1.272
+這是比3小，因此`"b"`通過檢定成為樣本。接著是`"c"`，這次亂數假設是0.264：
 
-This *is* less than 3 and we add `"b"` to the selection. This is the first item we've selected, so two left to go.
+`5 * 0.264 = 1.32`
 
-On to the next element, `"c"`. The random number is 0.264, giving the result:
+待抽樣出的需求數現為2，因此與2做比較，通過檢定，`"c"`也成為樣本。現在已抽出樣本有`[ "b", "c" ]`。現在還有4個待檢定元素與一個待抽出樣本數，假設下一亂數值為0.718：
 
-5 * 0.264 = 1.32
+`4 * 0.718 = 2.872`
 
-There are only 2 elements left to select, so this number must be less than 2. It is, and we also add `"c"` to the selection. The total selection is `[ "b", "c" ]`.
+要成為被抽樣的樣本條件是算術值小於1，檢定`"d"`的結果為否，因此換下一個，假設亂數值0.346，算術：
 
-Only one item left to select but there are still 4 candidates to look at. Suppose the next random number is 0.718. The formula now gives:
+`3 * 0.346 = 1.038`
 
-4 * 0.718 = 2.872
+檢定失敗`"e"`也未能被抽樣。只剩下兩個元素未檢定。從算式其實可以觀察到，接下來亂數值是否大於0.5是決定`"f"`是否被選擇的關鍵，若小於，則成為樣本若大於則繼續下一個元素，假設此次亂數是0.583：
 
-For this element to be selected the number has to be less than 1, as there is only 1 element left to be picked. It isn't, so we skip `"d"`. Only three possibilities left -- will we make it before we run out of elements?
+`2 * 0.583 = 1.166`
 
-The random number is 0.346. The formula gives:
+`"f"`檢定失敗，必須檢定最後一個元素，到此很明顯地不論亂數為何，我們都應該要將最後一個元素加入樣本中，否則此演算法便未能達到要求的功能。假設最後這輪亂數是0.999：
 
-3 * 0.346 = 1.038
+`1 * 0.999 = 0.999`
 
-Just a tiny bit too high. We skip `"e"`. Only two candidates left...
+可以看出無論亂數值為何，這次的檢定一定是成功的，最後抽樣的結果為`[ "b", "c", "g" ]`。注意到母體陣列的排序方式並未受到破壞。
 
-Note that now literally we're dealing with a toin coss: if the random number is less than 0.5 we select `"f"` and we're done. If it's greater than 0.5, we go on to the final element. Let's say we get 0.583:
+可能你會好奇如果運氣非常好（或是說非常背），每次的亂數值都是0.999，這個演算法仍能運作嗎？試試看吧：
 
-2 * 0.583 = 1.166
+	7 * 0.999 = 6.993     < 3? 否
+	6 * 0.999 = 5.994     < 3? 否
+	5 * 0.999 = 4.995     < 3? 否
+	4 * 0.999 = 3.996     < 3? 否
+	3 * 0.999 = 2.997     < 3? 是
+	2 * 0.999 = 1.998     < 2? 是
+	1 * 0.999 = 0.999     < 1? 是
 
-We skip `"f"` and look at the very last element. Whatever random number we get here, it should always select `"g"` or we won't have selected enough elements and the algorithm doesn't work!
+一樣是對的！那是不是代表越在陣列後方的元素被抽樣出的機會越高呢？也不是的，所有的元素都是相同的機率被選取作為樣本。（當然前提是取得亂數的函式本身是真正的亂數）
 
-Let's say our final random number is 0.999 (remember, it can never be 1.0 or higher). Actually, no matter what we choose here, the formula will always give a value less than 1:
-
-1 * 0.999 = 0.999
-
-And so the last element will always be chosen if we didn't have a big enough selection yet. The final selection is `[ "b", "c", "g" ]`. Notice that the elements are still in their original order, because we examined the array from left to right.
-
-Maybe you're not convinced yet... What if we always got 0.999 as the random value (the maximum possible), would that still select 3 items? Well, let's do the math:
-
-7 * 0.999 = 6.993     is this less than 3? no
-6 * 0.999 = 5.994     is this less than 3? no
-5 * 0.999 = 4.995     is this less than 3? no
-4 * 0.999 = 3.996     is this less than 3? no
-3 * 0.999 = 2.997     is this less than 3? YES
-2 * 0.999 = 1.998     is this less than 2? YES
-1 * 0.999 = 0.999     is this less than 1? YES
-
-It always works! But does this mean that elements closer to the end of the array have a higher probability of being chosen than those in the beginning? Nope, all elements are equally likely to be selected. (Don't take my word for it: see the playground for a quick test that shows this in practice.)
-
-Here's an example of how to test this algorithm:
+以下為測試：
 
 */
 let input = [
@@ -200,13 +179,10 @@ let input = [
 let output = select(from: input, count: 10)
 print(output)
 print(output.count)
+
 /*:
 
-The performance of this second algorithm is **O(n)** as it may require a pass through the entire input array.
-
-> **Note:** If `k > n/2`, then it's more efficient to do it the other way around and choose `k` items to remove.
-
-Based on code from Algorithm Alley, Dr. Dobb's Magazine, October 1993.
+此實作時間複雜度**O(n)**。
 
 
 ***

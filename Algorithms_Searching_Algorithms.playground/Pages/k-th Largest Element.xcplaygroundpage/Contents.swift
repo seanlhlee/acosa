@@ -27,21 +27,16 @@ The `kthLargest()` function takes two parameters: the array `a` consisting of in
 
 Let's take a look at an example and run through the algorithm to see how it works. Given `k = 4` and the array:
 
-```swift
-[ 7, 92, 23, 9, -1, 0, 11, 6 ]
-```
+`[ 7, 92, 23, 9, -1, 0, 11, 6 ]`
 
 Initially there's no direct way to find the k-th largest element, but after sorting the array it's rather straightforward. Here's the sorted array:
 
-```swift
-[92, 23, 11, 9, 7, 6, 0, -1]
-```
+`[92, 23, 11, 9, 7, 6, 0, -1]`
 
 Now, all we must do is take the value at index `k - 1`:
 
-```swift
-sorted[k - 1] = sorted[4] = 9
-```
+
+`sorted[k - 1] = sorted[4] = 9`
 
 Of course, if you were looking for the k-th *smallest* element, you'd use `a.sort(<)` to sort the array.
 
