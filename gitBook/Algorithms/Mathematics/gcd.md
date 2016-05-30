@@ -1,117 +1,99 @@
-# Greatest Common Divisor
+# 最大公因數（Greatest Common Divisor - GCD）
 
-The *greatest common divisor* (or Greatest Common Factor) of two numbers `a` and `b` is the largest positive integer that divides both `a` and `b` without a remainder.
+最大公因數（Greatest Common Divisor，GCD；或Highest Common Factor，簡寫為HCF），指某幾個整數共有因數中最大的一個。
 
-For example, `gcd(39, 52) = 13` because 13 divides 39 (`39/13 = 3`) as well as 52 (`52/13 = 4`). But there is no larger number than 13 that divides them both.
+求兩個整數最大公因數主要的方法：
 
-You've probably had to learn about this in school at some point. :-)
+- 列舉法：各自列出因數，再找出最大的公因數。
+- 質因數分解法：兩數各作質因數分解，然後取出共有的項乘起來。
+- 短除法
+- 輾轉相除法（Euclid's algorithm）：常使用於直觀上不容易判別公因數的場合。
 
-The laborious way to find the GCD of two numbers is to first figure out the factors of both numbers, then take the greatest number they have in common. The problem is that factoring numbers is quite difficult, especially when they get larger. (On the plus side, that difficulty is also what keeps your online payments secure.)
+輾轉相除法（Euclid's algorithm）的思維為：
 
-There is a smarter way to calculate the GCD: Euclid's algorithm. The big idea here is that,
-
-	gcd(a, b) = gcd(b, a % b)
-
-where `a % b` calculates the remainder of `a` divided by `b`.
-
-Here is an implementation of this idea in Swift:
+`gcd(a, b) = gcd(b, a % b)`
+以下為其實作：
 
 ```swift
 func gcd(a: Int, _ b: Int) -> Int {
-  let r = a % b
-  if r != 0 {
-    return gcd(b, r)
-  } else {
-    return b
-  }
+	let r = a % b
+	if r != 0 {
+		return gcd(b, r)
+	} else {
+		return b
+	}
 }
-```
 
-Put it in a playground and try it out with these examples:
 
-```swift
 gcd(52, 39)        // 13
 gcd(228, 36)       // 12
 gcd(51357, 3819)   // 57
 ```
 
-Let's step through the third example:
+以下為第三例的分解動作：
 
-	gcd(51357, 3819)
+`gcd(51357, 3819)`
 
-According to Euclid's rule, this is equivalent to,
+依輾轉相除法的規則，下式左右是等價的：
 
-	gcd(3819, 51357 % 3819) = gcd(3819, 1710)
+`gcd(3819, 51357 % 3819) = gcd(3819, 1710)`
 
-because the remainder of `51357 % 3819` is `1710`. If you work out this division you get `51357 = (13 * 3819) + 1710` but we only care about the remainder part.
+之後的步驟為：
 
-So `gcd(51357, 3819)` is the same as `gcd(3819, 1710)`. That's useful because we can keep simplifying:
+`gcd(3819, 1710) = gcd(1710, 3819 % 1710) =`
 
-	gcd(3819, 1710) = gcd(1710, 3819 % 1710) = 
-	gcd(1710, 399)  = gcd(399, 1710 % 399)   = 
-	gcd(399, 114)   = gcd(114, 399 % 114)    = 
-	gcd(114, 57)    = gcd(57, 114 % 57)      = 
-	gcd(57, 0)
+`gcd(1710, 399)  = gcd(399, 1710 % 399)   =`
 
-And now can't divide any further. The remainder of `114 / 57` is zero because `114 = 57 * 2` exactly. That means we've found the answer:
+`gcd(399, 114)   = gcd(114, 399 % 114)    =`
 
-	gcd(3819, 51357) = gcd(57, 0) = 57
+`gcd(114, 57)    = gcd(57, 114 % 57)      =`
 
-So in each step of Euclid's algorithm the numbers become smaller and at some point it ends when one of them becomes zero.
+`gcd(57, 0)`
 
-By the way, it's also possible that two numbers have a GCD of 1. They are said to be *relatively prime*. This happens when there is no number that divides them both, for example:
+當出現餘數為0時，就是兩樹的最大公因數，以此例即為57：
 
-```swift
-gcd(841, 299)     // 1
-```
+gcd(3819, 51357) = gcd(57, 0) = 57
 
-Here is a slightly different implementation of Euclid's algorithm. Unlike the first version this doesn't use recursion but only a basic `while` loop.
+每個步驟數字會越來越小，並且出現其中一個數字變為0。也會有兩數知最大公因數為1的情況，如下例：
+
+
+`gcd(841, 299)     // 1`
+
+以下為以迴圈的方式實作輾轉相除法的程式碼：
 
 ```swift
 func gcd(m: Int, _ n: Int) -> Int {
-  var a = 0
-  var b = max(m, n)
-  var r = min(m, n)
-
-  while r != 0 {
-    a = b
-    b = r
-    r = a % b
-  }
-  return b
+	var a = 0
+	var b = max(m, n)
+	var r = min(m, n)
+	
+	while r != 0 {
+		a = b
+		b = r
+		r = a % b
+	}
+	return b
 }
 ```
 
-The `max()` and `min()` at the top of the function make sure we always divide the larger number by the smaller one.
+實作中`max()`與`min()`用以使迴圈中的除法確保是較大數除以較小數的情況。這在遞迴法中不需要，原因為較小數除以較大數的餘數為原數，會在遞迴過程中成為下一輪的除數。
 
-## Least Common Multiple
+## 最小公倍數（Least Common Multiple）
 
-An idea related to the GCD is the *least common multiple* or LCM.
+最小公倍數是數論中的一個概念。若有一個數X，可以被另外兩個數A、B整除，且X大於（或等於）A和B，則X為A和B的公倍數。A和B的公倍數可以有很多個，而所有的公倍數中，最小的公倍數就叫做最小公倍數。兩個整數公有的倍數稱為它們的公倍數，其中最小的一個正整數稱為它們兩個的最小公倍數。
 
-The least common multiple of two numbers `a` and `b` is the smallest positive integer that is a multiple of both. In other words, the LCM is evenly divisible by `a` and `b`. 
+例子： `lcm(2, 3) = 6`
 
-For example: `lcm(2, 3) = 6` because 6 can be divided by 2 and also by 3.
+要計算最小公倍數，以可以用輾轉相除法，其關係為：
 
-We can calculate the LCM using Euclid's algorithm too:
+`lcm(a, b) = a * b  /  gcd(a, b)`
 
-	              a * b
-	lcm(a, b) = ---------
-	            gcd(a, b)
-
-In code:
+實作如下：
 
 ```swift
 func lcm(m: Int, _ n: Int) -> Int {
-  return m*n / gcd(m, n)
+	return m*n / gcd(m, n)
 }
-```
 
-And to try it out in a playground:
-
-```swift
 lcm(10, 8)    // 40
 ```
-
-You probably won't need to use the GCD or LCM in any real-world problems, but it's cool to play around with this ancient algorithm. It was first described by Euclid in his [Elements](http://publicdomainreview.org/collections/the-first-six-books-of-the-elements-of-euclid-1847/) around 300 BC. Rumor has it that he discovered this algorithm while he was hacking on his Commodore 64.
-
-*Written for Swift Algorithm Club by Matthijs Hollemans*
