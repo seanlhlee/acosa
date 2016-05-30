@@ -6,7 +6,7 @@
 
 假設`int`型別占4位元組記憶空間，編譯器會配置一段連續的40 bytes的記憶區塊：
 
-![An array with room for 10 elements](/gitBook/pics/array.png)
+![An array with room for 10 elements](/gitBook/pics/Array.png)
 
 這個陣列會一直維持這個大小。如果要讓陣列大小可以變動，需要用到動態陣列（[dynamic array](https://en.wikipedia.org/wiki/Dynamic_array) ）物件，例如Objective-C裡的`NSMutableArray`或是C++的`std::vector` in C++，當然Swift的陣列是隨需要變動記憶體大小的。傳統陣列不便之處在於一開始要地易足夠大的空間，沒有利用到的就成為空間上的浪費，同時需要小心安全缺陷與緩衝溢位造成當機。綜上所述，固定大小的數組不夠彈性，幾乎沒有留容錯的空間。
 
